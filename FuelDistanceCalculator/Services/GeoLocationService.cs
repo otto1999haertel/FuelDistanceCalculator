@@ -59,7 +59,7 @@ public class GeoLocationService
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
         var url = $"https://nominatim.openstreetmap.org/search?q={place}&format=json";
-        Console.WriteLine($"🌍 API Request: {url}");
+        Console.WriteLine($"API Request: {url}");
 
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "YourAppName/1.0 (your@email.com)");

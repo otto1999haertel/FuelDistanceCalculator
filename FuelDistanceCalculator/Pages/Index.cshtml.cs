@@ -103,7 +103,7 @@ public class IndexModel : PageModel
         FuelPrice2 = 0;
         Distance2 = 0;
         Radius = 10;
-        Place = "02994";
+        Place = "";
 
         CheapestResultStations = new List<GasStation>();
 

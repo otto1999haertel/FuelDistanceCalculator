@@ -23,6 +23,7 @@ public class GeoLocationService
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
     {
+        if(place==null || place.Trim().Equals(string.Empty)) return null;
         string cacheKey = $"geo:{place.ToLower()}";
 
         // 🔍 Prüfe, ob Daten als Hash im Redis-Cache vorhanden sind

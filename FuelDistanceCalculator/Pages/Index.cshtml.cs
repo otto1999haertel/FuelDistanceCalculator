@@ -239,11 +239,6 @@ public class IndexModel : PageModel
         Console.WriteLine("Get Price Per km handler");
         Console.WriteLine("Car type " + carType);   
         await GetCarsAndRespectivePricePerkm();
-        Console.Write("Keys: ");
-        foreach(string temp in CarsAndRespectivePricePerkm.Keys){
-            Console.WriteLine("" + temp);
-        }
-       
         if (CarsAndRespectivePricePerkm.ContainsKey(carType))
         {
             Console.WriteLine("Key found");

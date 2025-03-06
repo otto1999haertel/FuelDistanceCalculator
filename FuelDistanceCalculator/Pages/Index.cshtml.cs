@@ -103,7 +103,7 @@ public class IndexModel : PageModel
 
         Console.WriteLine("get was executed and overwirte of values");
         FuelAmount = 0;
-        PricePerKm = 0.60;
+        PricePerKm = 0.25;
         FuelPrice1 = 0;
         Distance1 = 0;
         FuelPrice2 = 0;
@@ -234,7 +234,7 @@ public class IndexModel : PageModel
         return RedirectToPage();
     } 
 
-    public async Task<JsonResult> OnGetGetPricePerKm(string carType)
+    public async Task<JsonResult> OnGetPricePerKm(string carType)
     {
         Console.WriteLine("Get Price Per km handler");
         Console.WriteLine("Car type " + carType);   
@@ -254,7 +254,7 @@ public class IndexModel : PageModel
             Console.WriteLine("Key not found");
         }
 
-        return new JsonResult(new { pricePerKm = 2.50 });
+        return new JsonResult(new { pricePerKm = PricePerKm });
     }
 
     

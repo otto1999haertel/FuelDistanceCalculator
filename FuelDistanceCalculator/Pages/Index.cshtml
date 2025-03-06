@@ -69,9 +69,14 @@
                                     <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
                                         ADAC Vorschlag</a>
                                 </span>
-                                <select class="form-control" id="CarType" name="SelectedCarType" asp-for="SelectedCarType" 
-                                        asp-items="@(new SelectList(Model.CarsAndRespectivePricePerkm.Keys))">
-                                </select>
+                                <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList">
+                                <datalist id="CarTypeList">
+                                    @foreach (var car in Model.CarsAndRespectivePricePerkm.Keys)
+                                    {
+                                        <option value="@car"></option>
+                                    }
+                                </datalist>
+
                             </div>
                         </div>
                     </div>
@@ -344,14 +349,14 @@ function toggleDetails(element) {
         }
     }
 
-document.getElementById('CarType').addEventListener('change', function () {
-    var selectedCarType = this.value;
-    if(selectedCarType===""){
+$('#CarType').on('change', function () {
+    var selectedCarType = $(this).val();
+    if (selectedCarType === "") {
         $('#PricePerKm').val('');
         return;
     }
     $.ajax({
-        url: '?handler=GetPricePerKm',
+        url: '?handler=PricePerKm',
         type: 'GET',
         data: { carType: selectedCarType },
         success: function (data) {
@@ -359,6 +364,7 @@ document.getElementById('CarType').addEventListener('change', function () {
         }
     });
 });
+
 
 
 

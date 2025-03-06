@@ -7,6 +7,7 @@
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -57,17 +58,18 @@
                         <div class="col-md-6">
                             <!-- Preis pro Kilometer -->
                             <div class="form-group">
-                                <label for="pricePerKm">Preis pro Kilometer</label>
-                                <input type="number" step="0.01" id="PricePerKm" name="pricePerKm" class="form-control" required asp-for="PricePerKm" value="@Model.PricePerKm"/>
+                                <label for="PricePerKm">Preis pro Kilometer:</label>
+                                <input class="form-control" id="PricePerKm" name="PricePerKm" required asp-for="PricePerKm" value="@Model.PricePerKm"/>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="SelectedCarType">Fahrzeugtyp:</label>
                                 <span>
-                                <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
-                                    ADAC Vorschlag</a>
-                                <select class="form-control"  id="CarType" name="SelectedCarType" asp-for="SelectedCarType" 
+                                    <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
+                                        ADAC Vorschlag</a>
+                                </span>
+                                <select class="form-control" id="CarType" name="SelectedCarType" asp-for="SelectedCarType" 
                                         asp-items="@(new SelectList(Model.CarsAndRespectivePricePerkm.Keys))">
                                 </select>
                             </div>
@@ -341,6 +343,25 @@ function toggleDetails(element) {
             details.style.display = "none";
         }
     }
+
+document.getElementById('CarType').addEventListener('change', function () {
+    var selectedCarType = this.value;
+    if(selectedCarType===""){
+        $('#PricePerKm').val('');
+        return;
+    }
+    $.ajax({
+        url: '?handler=GetPricePerKm',
+        type: 'GET',
+        data: { carType: selectedCarType },
+        success: function (data) {
+            $('#PricePerKm').val(data.pricePerKm);
+        }
+    });
+});
+
+
+
 </script>
         <div class="row justify-content-center mt-3">
         <div class="d-flex justify-content-center">

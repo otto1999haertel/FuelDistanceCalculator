@@ -234,6 +234,30 @@ public class IndexModel : PageModel
         return RedirectToPage();
     } 
 
+    public async Task<JsonResult> OnGetGetPricePerKm(string carType)
+    {
+        Console.WriteLine("Get Price Per km handler");
+        Console.WriteLine("Car type " + carType);   
+        await GetCarsAndRespectivePricePerkm();
+        Console.Write("Keys: ");
+        foreach(string temp in CarsAndRespectivePricePerkm.Keys){
+            Console.WriteLine("" + temp);
+        }
+       
+        if (CarsAndRespectivePricePerkm.ContainsKey(carType))
+        {
+            Console.WriteLine("Key found");
+             PricePerKm=CarsAndRespectivePricePerkm[carType];
+            return new JsonResult(new { pricePerKm = PricePerKm });
+        }
+        else{
+            Console.WriteLine("Key not found");
+        }
+
+        return new JsonResult(new { pricePerKm = 2.50 });
+    }
+
+    
     private async Task GetCarsAndRespectivePricePerkm()
     {
         Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");

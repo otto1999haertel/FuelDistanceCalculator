@@ -4,6 +4,7 @@ using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 
 namespace FuelDistanceCalculator.Pages;
 
@@ -77,6 +78,11 @@ public class IndexModel : PageModel
     [BindProperty]
     public List<GasStation> CheapestResultStations { get; set; }
 
+    public Dictionary<string, double> CarsAndRespectivePricePerkm { get; private set; } = new Dictionary<string, double>();
+
+    [BindProperty]
+    public string SelectedCarType{get; set;}
+
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, GeoLocationService geoLocationService) 
     {
         _logger = logger;
@@ -86,7 +92,7 @@ public class IndexModel : PageModel
         _geoLocationService = geoLocationService;
     }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
         ViewData["ContactName"] = ContactInfo.Name;
         NameGasStation1 = "Tankstelle 1";
@@ -113,11 +119,13 @@ public class IndexModel : PageModel
             TotalCost2 = Convert.ToDouble(TempData["TotalCost2"]);
             CalculationSucessful = true; // Falls es berechnete Werte gibt, setze auf erfolgreich
         }
-
+        await GetCarsAndRespectivePricePerkm();
+        SelectedCarType = CarsAndRespectivePricePerkm.FirstOrDefault().Key;
     }
 
-    public void OnPostCalculateTotalCost()
+    public async Task OnPostCalculateTotalCost()
     {
+        await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
         Console.WriteLine("calculate with seperate methode");
         TotalCost1 = _fuelPriceService.CalculateEntireCost(FuelPrice1, Distance1);
@@ -176,6 +184,7 @@ public class IndexModel : PageModel
     }
 
     public async Task OnPostSearch(){
+        await GetCarsAndRespectivePricePerkm();
         Console.WriteLine("Search for optimum was executed");
         Console.WriteLine("Input mode in search case: " + SelectInputMode.ToString());
             Console.WriteLine("Radius " + Radius);
@@ -224,4 +233,16 @@ public class IndexModel : PageModel
         // Weiterleitung zurück zur Index-Seite
         return RedirectToPage();
     } 
+
+    private async Task GetCarsAndRespectivePricePerkm()
+    {
+        Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
+        if(CarsAndRespectivePricePerkm.Count!=0){
+             return;
+        }
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
+            Console.WriteLine("Combined Path: " + filePath);
+            var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
+            CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonContent);
+    }
 }

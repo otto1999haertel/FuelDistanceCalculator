@@ -53,10 +53,26 @@
                 </div>
 
                 <!-- Preis pro Kilometer -->
-                <div class="form-group">
-                    <label for="pricePerKm">Preis pro Kilometer</label>
-                    <input type="number" step="0.01" id="PricePerKm" name="pricePerKm" class="form-control" required asp-for="PricePerKm" value="@Model.PricePerKm"/>
-                </div>
+                <div class="row">
+                        <div class="col-md-6">
+                            <!-- Preis pro Kilometer -->
+                            <div class="form-group">
+                                <label for="pricePerKm">Preis pro Kilometer</label>
+                                <input type="number" step="0.01" id="PricePerKm" name="pricePerKm" class="form-control" required asp-for="PricePerKm" value="@Model.PricePerKm"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="SelectedCarType">Fahrzeugtyp:</label>
+                                <span>
+                                <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
+                                    ADAC Vorschlag</a>
+                                <select class="form-control"  id="CarType" name="SelectedCarType" asp-for="SelectedCarType" 
+                                        asp-items="@(new SelectList(Model.CarsAndRespectivePricePerkm.Keys))">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
 

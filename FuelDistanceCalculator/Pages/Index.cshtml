@@ -70,12 +70,9 @@
                                         ADAC Vorschlag</a>
                                 </span>
                                 <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList">
-                                <datalist id="CarTypeList">
-                                    @foreach (var car in Model.CarsAndRespectivePricePerkm.Keys)
-                                    {
-                                        <option value="@car"></option>
-                                    }
-                                </datalist>
+                                    <datalist id="CarTypeList">
+                                        <!-- Optionen werden dynamisch eingefügt -->
+                                    </datalist>
 
                             </div>
                         </div>
@@ -348,6 +345,32 @@ function toggleDetails(element) {
             details.style.display = "none";
         }
     }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Alle Fahrzeugtypen als Array (serialisiert vom Server)
+    const allCars = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarsAndRespectivePricePerkm.Keys));
+    
+    const input = document.getElementById('CarType');
+    const dataList = document.getElementById('CarTypeList');
+
+    input.addEventListener('input', function() {
+      // Datalist leeren
+      dataList.innerHTML = '';
+      
+      if (input.value.trim().length > 0) {
+        // Filtere passende Vorschläge (unabhängig von Groß-/Kleinschreibung)
+        const filteredCars = allCars.filter(car => car.toLowerCase().includes(input.value.toLowerCase()));
+        
+        // Füge die gefilterten Werte als Option-Elemente hinzu
+        filteredCars.forEach(car => {
+          const option = document.createElement('option');
+          option.value = car;
+          dataList.appendChild(option);
+        });
+      }
+    });
+  });
+
 
 $('#CarType').on('change', function () {
     var selectedCarType = $(this).val();

@@ -58,16 +58,16 @@
                         <div class="col-md-6">
                             <!-- Preis pro Kilometer -->
                             <div class="form-group">
-                                <label for="PricePerKm">Preis pro Kilometer:</label>
-                                <input class="form-control" id="PricePerKm" name="PricePerKm" required asp-for="PricePerKm" value="@Model.PricePerKm"/>
+                                <label for="PricePerKm">Preis pro Kilometer (€)</label>
+                                <input class="form-control" id="PricePerKm" name="PricePerKm" required onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm"/>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="SelectedCarType">Fahrzeugtyp:</label>
+                                <label for="SelectedCarType">Fahrzeugtyp </label>
                                 <span>
                                     <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
-                                        ADAC Vorschlag</a><sup><a href="#fn1" id="ref1">1</a></sup>.
+                                        (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>.
                                 </span>
                                 <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
                                     <datalist id="CarTypeList">
@@ -293,6 +293,11 @@
         } else {
             details.style.display = "none";
         }
+    }
+
+    function formatPricePerKm(input){
+        let expression = input.value.replace(",", "."); 
+        document.getElementById("PricePerKm").value = expression; 
     }
 
     document.addEventListener('DOMContentLoaded', function() {

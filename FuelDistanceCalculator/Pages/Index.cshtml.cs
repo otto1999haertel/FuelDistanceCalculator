@@ -120,7 +120,6 @@ public class IndexModel : PageModel
             CalculationSucessful = true; // Falls es berechnete Werte gibt, setze auf erfolgreich
         }
         await GetCarsAndRespectivePricePerkm();
-        SelectedCarType = CarsAndRespectivePricePerkm.FirstOrDefault().Key;
     }
 
     public async Task OnPostCalculateTotalCost()
@@ -252,16 +251,17 @@ public class IndexModel : PageModel
         return new JsonResult(new { pricePerKm = PricePerKm });
     }
 
-    
+
     private async Task GetCarsAndRespectivePricePerkm()
     {
         Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-        if(CarsAndRespectivePricePerkm.Count!=0){
-             return;
+        if (CarsAndRespectivePricePerkm.Count != 0)
+        {
+            return;
         }
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
-            Console.WriteLine("Combined Path: " + filePath);
-            var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
-            CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonContent);
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
+        Console.WriteLine("Combined Path: " + filePath);
+        var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
+        CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonContent);
     }
 }

@@ -69,7 +69,7 @@
                                     <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
                                         ADAC Vorschlag</a><sup><a href="#fn1" id="ref1">1</a></sup>.
                                 </span>
-                                <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList">
+                                <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
                                     <datalist id="CarTypeList">
                                         <!-- Optionen werden dynamisch eingefügt -->
                                     </datalist>
@@ -196,10 +196,15 @@
             </div>
 
         </div>
-
+        <div class="row justify-content-center mt-3">
+        <div class="d-flex justify-content-center">
+         </div>
+         </div>
+    </form>
+</div>
         <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
 <script>
-     function updateModelValueTS1(input) {
+    function updateModelValueTS1(input) {
                 // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
                     if (!input.value.trim()) {
                  input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
@@ -222,12 +227,9 @@
                     var name = document.querySelector('input[name="NameGasStation1"]').value;
                     label.innerHTML = 'Entfernung der ' + (name || "Tankstelle 1") + ' (km)';
                 }
-                }    
+        }    
 
-
-
-
-                function updateModelValueTS2(input) {
+    function updateModelValueTS2(input) {
                 // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
                     if (!input.value.trim()) {
                  input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
@@ -250,91 +252,38 @@
                     var name = document.querySelector('input[name="NameGasStation2"]').value;
                     label.innerHTML = 'Entfernung der ' + (name || "Tankstelle 2") + ' (km)';
                 }
-                }
-                function calculateAndStore(input) {
-                         try {
-                         let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                        if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                            let result = eval(expression); // Berechne den Ausdruck
-                        if (!isNaN(result)) {
-                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                            document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                        }
-                        }
-                     } catch (e) {
-                    console.error("Ungültiger Ausdruck:", e);
-                            }
-                }
-                function calculateAndStore(input) {
-                            try {
-                                let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                                if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                                    let result = eval(expression); // Berechne den Ausdruck
-                                    if (!isNaN(result)) {
-                                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                                        document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                                    }
-                                }
-                            } catch (e) {
-                                console.error("Ungültiger Ausdruck:", e);
-                            }
-                }
-                navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-        loadNearbyStations(lat, lon);
-    });
+        }
 
-    // Beispielhafte Tankstellen API (z.B. Google Places API)
-    function loadNearbyStations(lat, lon) {
-        // Beispiel-Daten für Tankstellen
-        var stations = [
-            { name: "Tankstelle 1", price: 1.50, distance: 2.5 },
-            { name: "Tankstelle 2", price: 1.55, distance: 3.0 },
-            { name: "Tankstelle 3", price: 1.45, distance: 1.2 },
-            { name: "Tankstelle 4", price: 1.60, distance: 4.5 },
-            { name: "Tankstelle 5", price: 1.58, distance: 5.0 }
-        ];
-
-        // Stationen in die Listen einfügen
-        var list1 = document.getElementById("tankStationList1");
-        var list2 = document.getElementById("tankStationList2");
-        
-        stations.forEach(function(station) {
-            var option1 = document.createElement("div");
-            option1.classList.add("list-item");
-            option1.textContent = station.name + " - " + station.price + " €";
-            option1.onclick = function() {
-                document.getElementById("NameGasStation1").value = station.name;
-                document.getElementById("FuelPrice1").value = station.price;
-                document.getElementById("Distance1").value = station.distance;
-            };
-            list1.appendChild(option1);
-
-            var option2 = document.createElement("div");
-            option2.classList.add("list-item");
-            option2.textContent = station.name + " - " + station.price + " €";
-            option2.onclick = function() {
-                document.getElementById("NameGasStation2").value = station.name;
-                document.getElementById("FuelPrice2").value = station.price;
-                document.getElementById("Distance2").value = station.distance;
-            };
-            list2.appendChild(option2);
-        });
+    function calculateAndStore(input) {
+        try {
+            let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
+            if (/^[0-9+\-*/().\s]*$/.test(expression)) {
+                let result = eval(expression); // Berechne den Ausdruck
+                if (!isNaN(result)) {
+                    input.value = result; // Zeige das Ergebnis im Eingabefeld an
+                    document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
+                }
+            }
+        } catch (e) 
+        {
+            console.error("Ungültiger Ausdruck:", e);
+        }
     }
+
     function toggleInputMethod(radio) {
-    var manualFields = document.getElementById("manualInputFields");
-    var autoFields = document.getElementById("autoInputFields");
-
-    if (radio.value === "Manual") {
-        manualFields.style.display = "block";
-        autoFields.style.display = "none";
-    } else {
-        manualFields.style.display = "none";
-        autoFields.style.display = "block";
+        var manualFields = document.getElementById("manualInputFields");
+        var autoFields = document.getElementById("autoInputFields");
+        if (radio.value === "Manual") {
+            manualFields.style.display = "block";
+            autoFields.style.display = "none";
+        } 
+        else {
+            manualFields.style.display = "none";
+            autoFields.style.display = "block";
+        }
     }
-}
-function toggleDetails(element) {
+
+    function toggleDetails(element) {
         // Holen des Elements, das die Details enthält
         var details = element.nextElementSibling;
         
@@ -346,30 +295,30 @@ function toggleDetails(element) {
         }
     }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Alle Fahrzeugtypen als Array (serialisiert vom Server)
-    const allCars = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarsAndRespectivePricePerkm.Keys));
-    
-    const input = document.getElementById('CarType');
-    const dataList = document.getElementById('CarTypeList');
-
-    input.addEventListener('input', function() {
-      // Datalist leeren
-      dataList.innerHTML = '';
-      
-      if (input.value.trim().length > 0) {
-        // Filtere passende Vorschläge (unabhängig von Groß-/Kleinschreibung)
-        const filteredCars = allCars.filter(car => car.toLowerCase().includes(input.value.toLowerCase()));
+    document.addEventListener('DOMContentLoaded', function() {
+        // Alle Fahrzeugtypen als Array (serialisiert vom Server)
+        const allCars = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarsAndRespectivePricePerkm.Keys));
         
-        // Füge die gefilterten Werte als Option-Elemente hinzu
-        filteredCars.forEach(car => {
-          const option = document.createElement('option');
-          option.value = car;
-          dataList.appendChild(option);
+        const input = document.getElementById('CarType');
+        const dataList = document.getElementById('CarTypeList');
+
+        input.addEventListener('input', function() {
+        // Datalist leeren
+        dataList.innerHTML = '';
+        
+        if (input.value.trim().length > 0) {
+            // Filtere passende Vorschläge (unabhängig von Groß-/Kleinschreibung)
+            const filteredCars = allCars.filter(car => car.toLowerCase().includes(input.value.toLowerCase()));
+            
+            // Füge die gefilterten Werte als Option-Elemente hinzu
+            filteredCars.forEach(car => {
+            const option = document.createElement('option');
+            option.value = car;
+            dataList.appendChild(option);
+            });
+        }
         });
-      }
     });
-  });
 
 
 $('#CarType').on('change', function () {
@@ -387,17 +336,7 @@ $('#CarType').on('change', function () {
         }
     });
 });
-
-
-
-
 </script>
-        <div class="row justify-content-center mt-3">
-        <div class="d-flex justify-content-center">
-         </div>
-         </div>
-    </form>
-</div>
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
     @if (Model.CalculationSucessful)
     {

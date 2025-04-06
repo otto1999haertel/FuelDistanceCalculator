@@ -251,6 +251,10 @@ public class IndexModel : PageModel
         return new JsonResult(new { pricePerKm = PricePerKm });
     }
 
+    
+    public  string ToDisplay(object obj){
+        return obj.ToString().Replace(".",",");
+    }
 
     private async Task GetCarsAndRespectivePricePerkm()
     {

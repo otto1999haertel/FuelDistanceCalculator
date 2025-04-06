@@ -59,7 +59,7 @@
                             <!-- Preis pro Kilometer -->
                             <div class="form-group">
                                 <label for="PricePerKm">Preis pro Kilometer (€)</label>
-                                <input class="form-control" id="PricePerKm" name="PricePerKm" required onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm"/>
+                                                                <input class="form-control" id="PricePerKm" name="PricePerKm" required onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm"/>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -172,11 +172,11 @@
                         <li class="station-item">
                         <div class="station-summary" onclick="toggleDetails(this)">
                             <strong>@station.Name</strong> - Gesamtkosten: 
-                             @((station.CalculateTotalCost(@Model.FuelAmount, @Model.PricePerKm))) €
+                             @(Model.ToDisplay(station.CalculateTotalCost(@Model.FuelAmount, @Model.PricePerKm).ToString())) €
                             </div>
                             <div class="station-details" style="display:none;">
-                            <p>Einzelpreis pro Liter: @station.Price €</p>
-                            <p>Entfernung: @station.Distance km</p>
+                            <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
+                            <p>Entfernung: @Model.ToDisplay(station.Distance.ToString()) km</p>
                             <p>Ort: 
                             <a href="https://www.google.com/maps?q=@station.Place,@station.Street+@station.HouseNumber" target="_blank">
                                    @station.Place, @station.Street @station.HouseNumber
@@ -347,11 +347,11 @@ $('#CarType').on('change', function () {
     {
         <div class="mt-4 text-center">
             <h4>Ergebnisse:</h4>
-            <p>@Model.NameGasStation1 -  Gesamtkosten: @Model.TotalCost1.ToString("0.00") €</p>
-            <p>@Model.NameGasStation2 -  Gesamtkosten: @Model.TotalCost2.ToString("0.00") €</p>
+            <p>@Model.NameGasStation1 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost1.ToString("0.00")) €</p>
+            <p>@Model.NameGasStation2 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost2.ToString("0.00")) €</p>
             @if(Model.BreakEvenAnalysisDeterministic){
                 if((int)Model.FuelAmountBreakEven>0){
-                      <p>Break-Even Analyse: ab einer Tankmenge von <strong>@Model.FuelAmountBreakEven.ToString("0.00") </strong> l ist <strong>@Model.NameGasStationBreakEven</strong> günstiger</p>
+                      <p>Break-Even Analyse: ab einer Tankmenge von <strong>@Model.ToDisplay(Model.FuelAmountBreakEven.ToString("0.00")) </strong> l ist <strong>@Model.NameGasStationBreakEven</strong> günstiger</p>
                 }
                 else{
                     <p>Break-Even Analyse: <strong>@Model.NameGasStationBreakEven</strong> ist sofort günstoger</p>

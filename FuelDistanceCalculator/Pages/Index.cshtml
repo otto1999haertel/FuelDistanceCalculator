@@ -31,14 +31,14 @@
                 <h3>Globale Eingabewerte</h3>
 
                 <!-- Dropdown für Spritart -->
-                <div class="form-group">
-                    <label for="FuelType">Spritart</label>
-                    <select class="form-control" id="FuelType" name="SelectedFuelType" asp-for="SelectedFuelType" 
-                        asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem 
-                        { 
-                            Value = kvp.Key.ToString(), 
-                            Text = kvp.Value 
-                        }))">
+                <div class="mb-3">
+                    <label asp-for="SelectedFuelType" class="form-label">Spritart</label>
+                    <select asp-for="SelectedFuelType" class="form-select"
+                            asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
+                            {
+                                Value = kvp.Key.ToString(),
+                                Text = kvp.Value
+                            }))">
                     </select>
                 </div>
 
@@ -155,7 +155,7 @@
                     <input type="text" id="generalLocation" class="form-control" placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
                 </div>
                 <div class="col-md-5">
-                    <label for="generalRadius">Radius (in km)</label>
+                    <label for="generalRadius">Radius (km)</label>
                     <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1" asp-for="Radius" value="@Model.Radius">
                 </div>
             </div>
@@ -345,7 +345,7 @@ $('#CarType').on('change', function () {
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
     @if (Model.CalculationSucessful)
     {
-        <div class="mt-4 text-center">
+         <div class="mt-4 text-center">
             <h4>Ergebnisse:</h4>
             <p>@Model.NameGasStation1 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost1.ToString("0.00")) €</p>
             <p>@Model.NameGasStation2 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost2.ToString("0.00")) €</p>

@@ -298,74 +298,70 @@
         document.getElementById("PricePerKm").value = expression; 
     }
 
-    $(function () {
-    let debounceTimer = null;
-    const $input = $("#CarType");
-    const $suggestionsBox = $("#suggestions");
+   $(function () {
+        let debounceTimer = null;
+        const $input = $("#CarType");
+        const $suggestionsBox = $("#suggestions");
 
-    $input.on('input', function () {
-        clearTimeout(debounceTimer);
-        const searchTerm = $(this).val().trim();
-        $suggestionsBox.empty().hide();
+        // Input-Feld beobachten
+        $input.on('input', function () {
+            clearTimeout(debounceTimer);
+            const searchTerm = $(this).val().trim();
+            $suggestionsBox.empty().hide();
 
-        debounceTimer = setTimeout(function () {
-            if (searchTerm.length > 0) {
-                $.ajax({
-                    url: '?handler=FilterCarTypes',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { query: searchTerm },
-                    success: function (data) {
-                        data.filteredCars.forEach(car => {
-                            const item = $('<div id="suggestion-item" class="suggestion-item"></div>').text(car);
-                            item.on('click', function () {
-                                $input.val(car);
-                                $suggestionsBox.empty().hide();
+            debounceTimer = setTimeout(function () {
+                if (searchTerm.length > 0) {
+                    $.ajax({
+                        url: '?handler=FilterCarTypes',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: searchTerm },
+                        success: function (data) {
+                            data.filteredCars.forEach(car => {
+                                const item = $('<div class="suggestion-item"></div>').text(car);
+                                $suggestionsBox.append(item);
                             });
-                            $suggestionsBox.append(item);
-                        });
-                        if (data.filteredCars.length > 0) {
-                            $suggestionsBox.show();
+                            if (data.filteredCars.length > 0) {
+                                $suggestionsBox.show();
+                            }
+                        },
+                        error: function () {
+                            console.error("Fehler bei der Filterabfrage");
                         }
-                    },
-                    error: function () {
-                        console.error("Fehler bei der Filterabfrage");
-                    }
-                });
+                    });
+                }
+            }, 300); // <-- Debounce von 300 ms
+        });
+
+        // Nur EIN zentraler Click-Handler für dynamische Vorschläge
+        $suggestionsBox.on('click', '.suggestion-item', function () {
+            const selectedCarType = $(this).text();
+            $input.val(selectedCarType);
+            $suggestionsBox.empty().hide();
+            if (selectedCarType === "") {
+                $('#PricePerKm').val('');
+                return;
             }
-        }, 300);
-    });
-});
 
+            $.ajax({
+                url: '?handler=PricePerKm',
+                type: 'GET',
+                data: { carType: selectedCarType },
+                success: function (data) {
+                    $('#PricePerKm').val(data.pricePerKm);
+                },
+                error: function () {
+                    console.error("Fehler beim Abrufen von PricePerKm");
+                }
+            });
+        });
 
-$('#suggestions').on('click', '.suggestion-item', function () {
-        const selectedCarType = $(this).text();
-        $('#CarType').val(selectedCarType);
-        $suggestionsBox.empty().hide();
-        alert('test');
-        if (selectedCarType === "") {
-            $('#PricePerKm').val('');
-            return;
-        }
-
-        $.ajax({
-            url: '?handler=PricePerKm',
-            type: 'GET',
-            data: { carType: selectedCarType },
-            success: function (data) {
-                $('#PricePerKm').val(data.pricePerKm);
-            },
-            error: function () {
-                console.error("Fehler beim Abrufen von PricePerKm");
+        // Click außerhalb der Box: Suggestions schließen
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#suggestions, #CarType').length) {
+                $suggestionsBox.empty().hide();
             }
         });
-    });
-
-    // Optional: Click außerhalb schließt Box
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('#suggestions, #CarType').length) {
-            $('#suggestions').empty().hide();
-        }
     });
 
 

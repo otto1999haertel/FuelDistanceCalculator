@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Data;
 using FuelDistanceCalculator.Model;
@@ -252,14 +253,29 @@ public class IndexModel : PageModel
     }
 
     
-    public  string ToDisplay(object obj){
+    public  string ToDisplay(string obj){
         return obj.ToString().Replace(".",",");
+    }
+
+    public async Task<JsonResult> OnGetFilterCarTypes(string query)
+    {
+        // Stelle sicher, dass das Dictionary bereits geladen ist
+        Console.WriteLine("Server filter car types was called with input "  + query);
+        await GetCarsAndRespectivePricePerkm();
+        Console.WriteLine("Cars Dictionary Einträge: " + CarsAndRespectivePricePerkm.Count);
+        // Führe die Filterung basierend auf dem Query-String durch (Groß-/Kleinschreibung ignorieren)
+        var filteredCars = CarsAndRespectivePricePerkm.Keys
+            .Where(car => car.ToLower().Contains(query.ToLower()))  
+            .ToList();
+        Console.WriteLine("Filtered results: " + filteredCars.Count);    
+
+        return new JsonResult(new { filteredCars });
     }
 
     private async Task GetCarsAndRespectivePricePerkm()
     {
         Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-        if (CarsAndRespectivePricePerkm.Count != 0)
+        if (CarsAndRespectivePricePerkm.Count > 0)
         {
             return;
         }

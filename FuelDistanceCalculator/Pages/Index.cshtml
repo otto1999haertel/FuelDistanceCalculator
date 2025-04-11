@@ -300,31 +300,43 @@
         document.getElementById("PricePerKm").value = expression; 
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Alle Fahrzeugtypen als Array (serialisiert vom Server)
-        const allCars = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarsAndRespectivePricePerkm.Keys));
-        
-        const input = document.getElementById('CarType');
+    $(function() {
+    let debounceTimer = null;
+    $("#CarType").on('input', function() {
+        clearTimeout(debounceTimer);
+        const searchTerm = $(this).val().trim();
         const dataList = document.getElementById('CarTypeList');
-
-        input.addEventListener('input', function() {
-        // Datalist leeren
+         // Datalist leeren
         dataList.innerHTML = '';
-        
-        if (input.value.trim().length > 0) {
-            // Filtere passende Vorschläge (unabhängig von Groß-/Kleinschreibung)
-            const filteredCars = allCars.filter(car => car.toLowerCase().includes(input.value.toLowerCase()));
-            
-            // Füge die gefilterten Werte als Option-Elemente hinzu
-            filteredCars.forEach(car => {
-            const option = document.createElement('option');
-            option.value = car;
-            dataList.appendChild(option);
-            });
-        }
-        });
-    });
 
+        debounceTimer = setTimeout(function () {
+            if (searchTerm.length > 0) {
+                $.ajax({
+                    url: '?handler=FilterCarTypes', // Neuer Endpunkt für serverseitiges Filtern
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { query: searchTerm },
+                    success: function(data) {
+                        // Beispiel: Eine Liste von Vorschlägen im Client anzeigen,
+                        // z. B. in einem Dropdown-Container, den du anlegen könntest.
+                        // Hier setzen wir die Vorschläge in ein Element (kannst Du anpassen):
+                        console.log(data);
+                        data.filteredCars.forEach(car => {
+                        const option = document.createElement('option');
+                        option.value = car;
+                        dataList.appendChild(option);
+                        });
+                    },
+                    error: function() {
+                        console.error("Fehler bei der Filterabfrage");
+                    }
+                });
+            } else {
+                $('#suggestions').empty();
+            }
+        }, 300); // Debounce von 300ms
+    });
+});
 
 $('#CarType').on('change', function () {
     var selectedCarType = $(this).val();

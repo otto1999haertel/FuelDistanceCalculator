@@ -63,7 +63,7 @@ public class GeoLocationService
         Console.WriteLine($"API Request: {url}");
 
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("User-Agent", "YourAppName/1.0 (your@email.com)");
+        request.Headers.Add("User-Agent", "FuelGo/1.0");
 
         var response = await _httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)

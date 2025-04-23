@@ -1,5 +1,5 @@
 # Verwende das .NET SDK-Image zum Bauen der Anwendung
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 RUN apt-get update
 RUN apt-get install -y tzdata
@@ -19,7 +19,7 @@ RUN dotnet restore "FuelDistanceCalculator/FuelDistanceCalculator.csproj"
 RUN dotnet publish "FuelDistanceCalculator/FuelDistanceCalculator.csproj" -c Release -o /app/publish --no-restore
 
 # Verwende das .NET Runtime-Image für die finale App
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:8080

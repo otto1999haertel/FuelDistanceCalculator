@@ -12,7 +12,7 @@ services:
     networks:
       - fuel-network
 
-  webapp:
+  fuelgo-webapp:
     build:
       context: .
       dockerfile: Dockerfile
@@ -35,7 +35,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
-      - webapp
+      - fuelgo-webapp
     networks:
       - fuel-network
 

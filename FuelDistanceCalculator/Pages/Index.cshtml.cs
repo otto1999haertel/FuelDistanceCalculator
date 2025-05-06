@@ -35,19 +35,26 @@ public class IndexModel : PageModel
     public double FuelPrice2 { get; set; }
     
     [BindProperty]
-    public string NameGasStation1 {get;set;}
+    public string NamePlace1 {get;set;}
 
     [BindProperty]
-    public string NameGasStation2 {get;set;}
+    public int RadiusPlace1 {get;set;}
+
+
+    [BindProperty]
+    public string NamePlace2 {get;set;}
+
+    [BindProperty]
+    public int RadiusPlace2{get;set;}
        
     [BindProperty]
     public bool CalculationSucessful { get; set; }
 
     [BindProperty]
-    public double TotalCost1 { get; private set; }
+    public double AverageCostPlace1 { get; private set; }
 
     [BindProperty]
-    public double TotalCost2 { get; private set; }
+    public double AverageCostPlace2 { get; private set; }
 
     [BindProperty]
     public FuelType SelectedFuelType { get; set; }
@@ -96,8 +103,10 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         ViewData["ContactName"] = ContactInfo.Name;
-        NameGasStation1 = "Tankstelle 1";
-        NameGasStation2 = "Tankstelle 2";
+        NamePlace1 = "Ort 1";
+        RadiusPlace1 = 0;
+        NamePlace2 = "Ort 2";
+        RadiusPlace2 = 0;
         SelectedFuelType = FuelType.Diesel;
         SelectInputMode = InputMode.auto;
 
@@ -114,31 +123,35 @@ public class IndexModel : PageModel
 
         CheapestResultStations = new List<GasStation>();
 
-        if (TempData["TotalCost1"] != null && TempData["TotalCost2"] != null)
+        if (TempData["AverageCostPlace1"] != null && TempData["TotalCost2"] != null)
         {
-            TotalCost1 = Convert.ToDouble(TempData["TotalCost1"]);
-            TotalCost2 = Convert.ToDouble(TempData["TotalCost2"]);
+            AverageCostPlace1 = Convert.ToDouble(TempData["AverageCostPlace1"]);
+            AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
             CalculationSucessful = true; // Falls es berechnete Werte gibt, setze auf erfolgreich
         }
         await GetCarsAndRespectivePricePerkm();
     }
 
-    public async Task OnPostCalculateTotalCost()
+    public async Task OnPostCalculateAverageCost()
     {
         await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
-        Console.WriteLine("calculate with seperate methode");
-        TotalCost1 = _fuelPriceService.CalculateEntireCost(FuelPrice1, Distance1);
-                TotalCost2 = _fuelPriceService.CalculateEntireCost(FuelPrice2, Distance2);
-                if (TotalCost1 > 0 && TotalCost2 > 0)
+        Console.WriteLine("calculate average cost with seperate methode");
+        Console.WriteLine("Name Place 1 "  + NamePlace1);
+        Console.WriteLine("Radius Place 1 " + RadiusPlace1);
+        Console.WriteLine("Name Place 2 " + NamePlace2);
+        Console.WriteLine("Radius Place 2 " + RadiusPlace2);
+        AverageCostPlace1 = _fuelPriceService.CalculateEntireCost(FuelPrice1, Distance1);
+                AverageCostPlace2 = _fuelPriceService.CalculateEntireCost(FuelPrice2, Distance2);
+                if (AverageCostPlace1 > 0 && AverageCostPlace2 > 0)
                 {
-                    Console.WriteLine($"{NameGasStation1} : {TotalCost1}");
-                     Console.WriteLine($"{NameGasStation2} : {TotalCost2}");
+                    Console.WriteLine($"{NamePlace1} : {AverageCostPlace1}");
+                     Console.WriteLine($"{NamePlace2} : {AverageCostPlace2}");
                     CalculationSucessful = true;
-                    TempData["FuelPrice1"] = TotalCost1.ToString(); // Speichern in TempData
-                    TempData["FuelPrice2"] = TotalCost2.ToString(); // Speichern in TempData
+                    TempData["AverageCostPlace1"] = AverageCostPlace1.ToString(); // Speichern in TempData
+                    TempData["AverageCostPlace2"] = AverageCostPlace2.ToString(); // Speichern in TempData
                     string [] tempBreakEvenAnalysis =  new string [2];
-                    tempBreakEvenAnalysis = _fuelPriceService.AnalyseBreakEven(FuelPrice1, Distance1, NameGasStation1, FuelPrice2,Distance2, NameGasStation2);
+                    tempBreakEvenAnalysis = _fuelPriceService.AnalyseBreakEven(FuelPrice1, Distance1, NamePlace1, FuelPrice2,Distance2, NamePlace2);
                     if(tempBreakEvenAnalysis.Length ==2){
                         NameGasStationBreakEven = tempBreakEvenAnalysis[0];
                         double ergTemp=0;
@@ -159,8 +172,8 @@ public class IndexModel : PageModel
                 DateTime germanTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"));
                 DateTime dbTime = DateTime.SpecifyKind(germanTime, DateTimeKind.Local); // Wichtig für PostgreSQL!
 
-                Console.WriteLine($"{NameGasStation1} : {FuelPrice1}");
-                Console.WriteLine($"{NameGasStation2} : {FuelPrice2}");
+                Console.WriteLine($"{NamePlace1} : {FuelPrice1}");
+                Console.WriteLine($"{NamePlace2} : {FuelPrice2}");
                 Console.WriteLine($"Ausgewählte Spritart: {SelectedFuelType}");
                 Console.WriteLine($"Zu tankende Menge: {FuelAmount}");
                 Console.WriteLine(dbTime.ToString("HH:mm dd.MM.yyyy"));
@@ -170,9 +183,9 @@ public class IndexModel : PageModel
                     timesaved  = dbTime.ToString("dd.MM.yyyy HH:mm"),
                     fueltype = SelectedFuelType.ToString(),
                     fuelamount = FuelAmount,
-                    namegasstation1 = NameGasStation1,
+                    namegasstation1 = NamePlace1,
                     fuelprice1 = FuelPrice1,
-                    namegasstation2 = NameGasStation2,
+                    namegasstation2 = NamePlace2,
                     fuelprice2 = FuelPrice2
                 };
 

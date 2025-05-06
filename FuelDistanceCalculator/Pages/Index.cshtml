@@ -9,11 +9,11 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'G-JEP2Q2QZMH');
+    gtag('config', 'G-JEP2Q2QZMH');
 </script>
 
 
@@ -33,19 +33,19 @@
                 <!-- Dropdown für Spritart -->
                 <div class="mb-3">
                     <label asp-for="SelectedFuelType" class="form-label">Spritart</label>
-                    <select asp-for="SelectedFuelType" class="form-select"
-                            asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
-                            {
-                                Value = kvp.Key.ToString(),
-                                Text = kvp.Value
-                            }))">
+                    <select asp-for="SelectedFuelType" class="form-select" asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
+                                                                           {
+                                                                               Value = kvp.Key.ToString(),
+                                                                               Text = kvp.Value
+                                                                           }))">
                     </select>
                 </div>
 
                 <!-- Eingabe für Tankmenge -->
                 <div class="form-group">
                     <label for="fuelAmount">Tankmenge (@Model.VolumeUnit)</label>
-                    <input type="text" id="FuelAmountDisplay" class="form-control" required onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
+                    <input type="text" id="FuelAmountDisplay" class="form-control" required
+                        onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
                     <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
 
                     <script>
@@ -55,202 +55,156 @@
 
                 <!-- Preis pro Kilometer -->
                 <div class="row">
-                        <div class="col-md-6">
-                            <!-- Preis pro Kilometer -->
-                            <div class="form-group">
-                                <label for="PricePerKm">Preis pro Kilometer (€)</label>
-                                                                <input class="form-control" id="PricePerKm" name="PricePerKm" required onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm"/>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="SelectedCarType">Fahrzeugtyp </label>
-                                <span>
-                                    <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/" target="_blank">
-                                        (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
-                                </span>
-                                <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..." list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
-                                    <div id="suggestions" class="suggestions-box"></div>
-
-                            </div>
+                    <div class="col-md-6">
+                        <!-- Preis pro Kilometer -->
+                        <div class="form-group">
+                            <label for="PricePerKm">Preis pro Kilometer (€)</label>
+                            <input class="form-control" id="PricePerKm" name="PricePerKm" required
+                                onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="SelectedCarType">Fahrzeugtyp </label>
+                            <span>
+                                <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
+                                    target="_blank">
+                                    (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
+                            </span>
+                            <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..."
+                                list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
+                            <div id="suggestions" class="suggestions-box"></div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-       <div class="form-group d-flex justify-content-center radio-spacing">
-        <label>
-            <input type="radio" name="SelectInputMode" id="autoInput" value="Auto" @(Model.SelectInputMode == InputMode.auto ? "checked" : "") onchange="toggleInputMethod(this)"> Optimale Suche
-        </label>
-        <label>
-            <input type="radio" name="SelectInputMode" id="manualInput" value="Manual" @(Model.SelectInputMode == InputMode.man ? "checked" : "") onchange="toggleInputMethod(this)"> Manuelle Eingabe
-        </label>
+        <div class="form-group d-flex justify-content-center radio-spacing">
+            <label>
+                <input type="radio" name="SelectInputMode" id="autoInput" value="Auto" @(Model.SelectInputMode ==
+                                                                                                           InputMode.auto ? "checked" : "") onchange="toggleInputMethod(this)"> Optimale Suche
+            </label>
+            <label>
+                <input type="radio" name="SelectInputMode" id="manualInput" value="Manual" @(Model.SelectInputMode ==
+                                                                                                               InputMode.man ? "checked" : "") onchange="toggleInputMethod(this)"> Manuelle Eingabe
+            </label>
         </div>
 
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
-         <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
+        <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
             <div class="row">
                 <!-- Tankstelle 1 Eingabefelder - links ausgerichtet -->
                 <div class="col-md-5 offset-md-1">
-                    <h4>
-                        <input type="text" id="NameGasStation1" name="NameGasStation1" class="form-control" 
-                        placeholder="Tankstelle 1" value="@Model.NameGasStation1" 
-                        asp-for="NameGasStation1" onblur="updateModelValueTS1(this)" />
-                    </h4>
-                    <div class="form-group">
-                        <label for="fuelPrice1">Preis an der @Model.NameGasStation1 (€/@Model.VolumeUnit)</label>
-                        <input type="number" step="0.01" id="FuelPrice1" name="FuelPrice1" class="form-control" required asp-for="FuelPrice1" value="@Model.FuelPrice1"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="distance1">Entfernung der @Model.NameGasStation1 (km)</label>
-                        <input type="number" step="0.1" id="Distance1" name="Distance1" class="form-control" required asp-for="Distance1" value="@Model.Distance1" />
-                    </div>
+                    <label for="NamePlace1">Standort 1 (PLZ/ Straße, Ort)</label>
+                    <input type="text" id="NamePlace1" class="form-control" placeholder="Geben Sie einen Ort ein"
+                        asp-for="NamePlace1" value="@Model.NamePlace1">
+                </div>
+                <div class="col-md-5">
+                    <label for="RadiusPlace1">Radius (km)</label>
+                    <input type="number" id="RadiusPlace1" class="form-control" placeholder="Radius in km" min="1"
+                        asp-for="RadiusPlace1" value="@Model.RadiusPlace1" onblur="updateRadius(this)">
                 </div>
 
                 <!-- Tankstelle 2 Eingabefelder - rechts ausgerichtet -->
+                <div class="col-md-5 offset-md-1">
+                    <label for="NamePlace2">Standort 2 (PLZ/ Straße, Ort)</label>
+                    <input type="text" id="NamePlace2" class="form-control" placeholder="Geben Sie einen Ort ein"
+                        asp-for="NamePlace2" value="@Model.NamePlace2">
+                </div>
                 <div class="col-md-5">
-                    <h4>
-                        <input type="text" id="NameGasStation2" name="NameGasStation2" class="form-control" 
-                        placeholder="Tankstelle 2" value="@Model.NameGasStation2" 
-                        asp-for="NameGasStation2" onblur="updateModelValueTS2(this)" />
-                    </h4>
-                    <div class="form-group">
-                        <label for="fuelPrice2">Preis an der @Model.NameGasStation2 (€/@Model.VolumeUnit)</label>
-                        <input type="number" step="0.01" id="FuelPrice2" name="FuelPrice2" class="form-control" required asp-for="FuelPrice2" value="@Model.FuelPrice2" />
-                    </div>
-                    <div class="form-group">
-                        <label for="distance2">Entfernung der @Model.NameGasStation2 (km)</label>
-                        <input type="number" step="0.1" id="Distance2" name="Distance2" class="form-control" required asp-for="Distance2" value="@Model.Distance2" />
-                    </div>
+                    <label for="RadiusPlace2">Radius (km)</label>
+                    <input type="number" id="RadiusPlace2" class="form-control" placeholder="Radius in km" min="1"
+                        asp-for="RadiusPlace2" value="@Model.RadiusPlace2" onblur="updateRadius(this)">
                 </div>
             </div>
             <!-- Berechnen-Button -->
              <div class="row justify-content-center mt-3">
-           <button type="submit" class="btn btn-primary mx-2" 
-                style="width: 120px" asp-page-handler="CalculateTotalCost">
-                 Berechnen
-            </button>
+                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
+                    asp-page-handler="CalculateAverageCost">
+                    Berechnen
+                </button>
+             </div>
+        </div>
 
-
-            <!-- Speichern-Button -->
-            @if(GlobalState.IsNotPublic)
+    <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
+    <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+    <!-- Automatische Eingabe für Standort und Radius -->
+    <div class="row">
+        <div class="col-md-5 offset-md-1">
+            <label for="generalLocation">Standort (PLZ/ Straße, Ort)</label>
+            <input type="text" id="generalLocation" class="form-control" placeholder="Geben Sie einen Ort ein"
+                asp-for="Place" value="@Model.Place">
+        </div>
+        <div class="col-md-5">
+            <label for="generalRadius">Radius (km)</label>
+            <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
+                asp-for="Radius" value="@Model.Radius">
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
+            asp-page-handler="Search">Suchen</button>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6" style="padding: 20px;">
+            @if (Model.CheapestResultStations.Any())
             {
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px" 
-                    asp-page-handler="Save" 
-                    disabled="@(!Model.CalculationSucessful)">
-                Speichern
-            </button>
+                <ul class="station-list">
+                    @foreach (var station in Model.CheapestResultStations)
+                    {
+                        <li class="station-item">
+                            <div class="station-summary" onclick="toggleDetails(this)">
+                                <strong>@station.Name</strong> - Gesamtkosten:
+                                @(Model.ToDisplay(station.CalculateTotalCost(@Model.FuelAmount, @Model.PricePerKm).ToString()))
+                                €
+                            </div>
+                            <div class="station-details" style="display:none;">
+                                <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
+                                <p>Entfernung: @Model.ToDisplay(station.Distance.ToString()) km</p>
+                                <p>Ort:
+                                    <a href="https://www.google.com/maps?q=@station.Place,@station.Street+@station.HouseNumber"
+                                        target="_blank">
+                                        @station.Place, @station.Street @station.HouseNumber
+                                    </a>
+                                </p>
+
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Keine offenen Tankstellen im Radius gefunden.</p>
             }
         </div>
         </div>
-
-        <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
-        <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
-        <!-- Automatische Eingabe für Standort und Radius -->
-            <div class="row">
-                <div class="col-md-5 offset-md-1">
-                    <label for="generalLocation">Standort (PLZ/ Straße, Ort)</label>
-                    <input type="text" id="generalLocation" class="form-control" placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
-                </div>
-                <div class="col-md-5">
-                    <label for="generalRadius">Radius (km)</label>
-                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1" asp-for="Radius" value="@Model.Radius">
-                </div>
-            </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px" asp-page-handler="Search">Suchen</button>
-            </div>
-            <div class="row justify-content-center">
-            <div class="col-md-6" style="padding: 20px;">
-                 @if (Model.CheapestResultStations.Any())
-                 {
-                    <ul class="station-list">
-                     @foreach (var station in Model.CheapestResultStations)
-                    {
-                        <li class="station-item">
-                        <div class="station-summary" onclick="toggleDetails(this)">
-                            <strong>@station.Name</strong> - Gesamtkosten: 
-                             @(Model.ToDisplay(station.CalculateTotalCost(@Model.FuelAmount, @Model.PricePerKm).ToString())) €
-                            </div>
-                            <div class="station-details" style="display:none;">
-                            <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
-                            <p>Entfernung: @Model.ToDisplay(station.Distance.ToString()) km</p>
-                            <p>Ort: 
-                            <a href="https://www.google.com/maps?q=@station.Place,@station.Street+@station.HouseNumber" target="_blank">
-                                   @station.Place, @station.Street @station.HouseNumber
-                            </a>
-                            </p>
-
-                        </div>
-                         </li>
-                    }
-                    </ul>
-                }
-                else
-                {
-                 <p>Keine offenen Tankstellen im Radius gefunden.</p>
-                 }
-            </div>
-            </div>
-
-        </div>
+        
+    </div>
         <div class="row justify-content-center mt-3">
         <div class="d-flex justify-content-center">
-         </div>
-         </div>
+        </div>
+        </div>
     </form>
 </div>
-        <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
+<!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
 <script>
-    function updateModelValueTS1(input) {
-                // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
-                    if (!input.value.trim()) {
-                 input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
-                }
-
-                // Aktualisiere das Modell im Hintergrund
-                var nameGasStationField = document.querySelector('input[name="NameGasStation1"]');
-                if (nameGasStationField) {
-                 nameGasStationField.value = input.value;  // Das Modell im Hintergrund aktualisieren
-                }
-
-                // Aktualisiere das Label für den Preis an der Tankstelle
-                var label = document.querySelector("label[for='fuelPrice1']");
-                if (label) {
-                    var name = document.querySelector('input[name="NameGasStation1"]').value;
-                    label.innerHTML = 'Preis an der ' + (name || "Tankstelle 1") + ' (€/@Model.VolumeUnit)';
-                }
-                label = document.querySelector("label[for='distance1']");
-                if (label) {
-                    var name = document.querySelector('input[name="NameGasStation1"]').value;
-                    label.innerHTML = 'Entfernung der ' + (name || "Tankstelle 1") + ' (km)';
-                }
-        }    
-
-    function updateModelValueTS2(input) {
-                // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
-                    if (!input.value.trim()) {
-                 input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
-                }
-
-                // Aktualisiere das Modell im Hintergrund
-                var nameGasStationField = document.querySelector('input[name="NameGasStation2"]');
-                if (nameGasStationField) {
-                 nameGasStationField.value = input.value;  // Das Modell im Hintergrund aktualisieren
-                }
-
-                // Aktualisiere das Label für den Preis an der Tankstelle
-                var label = document.querySelector("label[for='fuelPrice2']");
-                if (label) {
-                    var name = document.querySelector('input[name="NameGasStation2"]').value;
-                    label.innerHTML = 'Preis an der ' + (name || "Tankstelle 2") + ' (€/@Model.VolumeUnit)';
-                }
-                label = document.querySelector("label[for='distance2']");
-                if (label) {
-                    var name = document.querySelector('input[name="NameGasStation2"]').value;
-                    label.innerHTML = 'Entfernung der ' + (name || "Tankstelle 2") + ' (km)';
-                }
+    function updateRadius(input) {
+        // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
+        if (!input.value.trim()) {
+            input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
         }
+
+        // Aktualisiere das Modell im Hintergrund
+        var radiusPlace1 = document.querySelector('input[name="RadiusPlace1"]');
+        var radiusPlace2 = document.querySelector('input[name="RadiusPlace2"]');
+        if (input.value>0) {
+            radiusPlace1.value = input.value; 
+            radiusPlace2.value = input.value;  // Das Modell im Hintergrund aktualisieren
+        }
+    }
 
     function calculateAndStore(input) {
         try {
@@ -262,8 +216,7 @@
                     document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
                 }
             }
-        } catch (e) 
-        {
+        } catch (e) {
             console.error("Ungültiger Ausdruck:", e);
         }
     }
@@ -274,7 +227,7 @@
         if (radio.value === "Manual") {
             manualFields.style.display = "block";
             autoFields.style.display = "none";
-        } 
+        }
         else {
             manualFields.style.display = "none";
             autoFields.style.display = "block";
@@ -284,7 +237,7 @@
     function toggleDetails(element) {
         // Holen des Elements, das die Details enthält
         var details = element.nextElementSibling;
-        
+
         // Wenn die Details sichtbar sind, verstecke sie, sonst zeige sie an
         if (details.style.display === "none" || details.style.display === "") {
             details.style.display = "block";
@@ -293,12 +246,12 @@
         }
     }
 
-    function formatPricePerKm(input){
-        let expression = input.value.replace(",", "."); 
-        document.getElementById("PricePerKm").value = expression; 
+    function formatPricePerKm(input) {
+        let expression = input.value.replace(",", ".");
+        document.getElementById("PricePerKm").value = expression;
     }
 
-   $(function () {
+    $(function () {
         let debounceTimer = null;
         const $input = $("#CarType");
         const $suggestionsBox = $("#suggestions");
@@ -367,26 +320,17 @@
 
 </script>
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
-    @if (Model.CalculationSucessful)
-    {
-         <div class="mt-4 text-center">
-            <h4>Ergebnisse:</h4>
-            <p>@Model.NameGasStation1 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost1.ToString("0.00")) €</p>
-            <p>@Model.NameGasStation2 -  Gesamtkosten: @Model.ToDisplay(Model.TotalCost2.ToString("0.00")) €</p>
-            @if(Model.BreakEvenAnalysisDeterministic){
-                if((int)Model.FuelAmountBreakEven>0){
-                      <p>Break-Even Analyse: ab einer Tankmenge von <strong>@Model.ToDisplay(Model.FuelAmountBreakEven.ToString("0.00")) </strong> l ist <strong>@Model.NameGasStationBreakEven</strong> günstiger</p>
-                }
-                else{
-                    <p>Break-Even Analyse: <strong>@Model.NameGasStationBreakEven</strong> ist sofort günstoger</p>
-                }
-          
-            }
-        </div>
-    }
+@if (Model.CalculationSucessful)
+{
+    <div class="mt-4 text-center">
+        <h4>Ergebnisse:</h4>
+        <p>@Model.NamePlace1 - Durchschnittspreis: @Model.ToDisplay(Model.AverageCostPlace1.ToString("0.00")) €</p>
+        <p>@Model.NamePlace1 - Durchschnittspreis: @Model.ToDisplay(Model.AverageCostPlace1.ToString("0.00")) €</p>
+    </div>
+}
 <hr>
 <ol>
-  <li id="fn1">
-    Herbst/ Winter 2024
-  </li>
+    <li id="fn1">
+        Herbst/ Winter 2024
+    </li>
 </ol>

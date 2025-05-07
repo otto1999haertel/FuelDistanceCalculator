@@ -154,12 +154,8 @@ public class IndexModel : PageModel
                 () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, RadiusPlace1, fuelTypeForAPI));
         var gasStationsPlace2 = await fuelThrottle.ExecuteWithThrottle("FuelPrice", 
                 () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, RadiusPlace2, fuelTypeForAPI));
-        foreach(GasStation gasStation in gasStationsPlace1){
-            Console.WriteLine( gasStation.Place  + " : " +  gasStation.Price);
-        }
-        foreach(GasStation gasStation in gasStationsPlace2){
-            Console.WriteLine( gasStation.Place  + " : " +  gasStation.Price);
-        }
+        Console.WriteLine( "Gasstaion place 1 count"  + " : " +  gasStationsPlace1.Count);
+        Console.WriteLine( "Gasstaion place 2 count"  + " : " +  gasStationsPlace2.Count);
         double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1);
         double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2);
         if(averageCostPlace1!=null && averageCostPlace2!=null){

@@ -313,6 +313,20 @@
         });
     });
 
+    $(function () {
+        var type = '@TempData["ToastType"]';
+        var message = '@TempData["ToastMessage"]';
+
+        if (message) {
+            toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-bottom-right" // ⬅️ hier wird die Position gesetzt
+            };
+            toastr[type](message);
+        }
+    });
+
 
 </script>
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->

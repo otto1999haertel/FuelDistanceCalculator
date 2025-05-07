@@ -170,7 +170,9 @@ public class IndexModel : PageModel
                     }
             }
             else{
-                //TODO Error Handling
+                Console.WriteLine("Error in search Tanker-API Request" + gasStationsPlace1.ErrorMessage);
+                TempData["ToastType"] = "error";
+                TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
         }
     }
@@ -242,6 +244,8 @@ public class IndexModel : PageModel
             else{
                 //TODO: Error Handling
                 Console.WriteLine("Error in search Tanker-API Request" + gasStations.ErrorMessage);
+                TempData["ToastType"] = "error";
+                TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
         }
     }

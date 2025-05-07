@@ -151,9 +151,9 @@ public class IndexModel : PageModel
         var coordinatesPlace1 = await _geoLocationService.GetCoordinatesAsync(NamePlace1);
         var coordinatesPlace2 = await _geoLocationService.GetCoordinatesAsync(NamePlace2);
         var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice", 
-                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, Radius, fuelTypeForAPI));
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, RadiusPlace1, fuelTypeForAPI));
         var gasStationsPlace2 = await fuelThrottle.ExecuteWithThrottle("FuelPrice", 
-                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, Radius, fuelTypeForAPI));
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, RadiusPlace2, fuelTypeForAPI));
         foreach(GasStation gasStation in gasStationsPlace1){
             Console.WriteLine( gasStation.Place  + " : " +  gasStation.Price);
         }

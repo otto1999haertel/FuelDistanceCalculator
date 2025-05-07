@@ -29,8 +29,6 @@ public class MarketFuelPriceService
 
     if (!response.IsSuccessStatusCode)
     {
-        //throw new Exception($"API request failed with status code {response.StatusCode}");
-        //TODO return Statuscode via Out Parameter
         return new GasStationResult
         {
             IsSuccess = false,

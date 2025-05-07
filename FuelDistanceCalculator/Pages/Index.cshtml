@@ -320,11 +320,13 @@
 
 </script>
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
-    <div class="mt-4 text-center">
+    @if(Model.SelectInputMode == InputMode.man && (Model.AverageCostPlace1 > 0 || Model.AverageCostPlace2 > 0)){
+    <div id="averageCost" class="mt-4 text-center">
         <h4>Ergebnisse:</h4>
         <p>@Model.NamePlace1 - @(Model.AverageCostPlace1 > 0 ? $"Durchschnittspreis: {Model.ToDisplay(Model.AverageCostPlace1.ToString("0.00"))} €" : "Keine Preise verfügbar")</p>
         <p>@Model.NamePlace2 - @(Model.AverageCostPlace2 > 0 ? $"Durchschnittspreis: {Model.ToDisplay(Model.AverageCostPlace2.ToString("0.00"))} €" : "Keine Preise verfügbar")</p>
     </div>
+    }
 <hr>
 <ol>
     <li id="fn1">

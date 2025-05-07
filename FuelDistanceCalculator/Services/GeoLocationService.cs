@@ -68,6 +68,7 @@ public class GeoLocationService
         var response = await _httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
+            //TODO return status code via out parameter
             throw new Exception("Error fetching coordinates");
         }
 

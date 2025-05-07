@@ -20,7 +20,7 @@ public static class TankCostService{
                 stationCosts.Add((station, totalCost));
             }
         }
-
+        Console.WriteLine("Anzahl TS in Total Cost Caluculation: " + stationCosts.Count);
         // Sortiere die Tankstellen nach den Gesamtkosten (aufsteigend)
         return stationCosts.OrderBy(sc => sc.TotalCost)
                             .Take(10)

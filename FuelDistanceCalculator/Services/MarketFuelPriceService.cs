@@ -14,7 +14,7 @@ public class MarketFuelPriceService
                   ?? throw new Exception("API Key missing");
     }
 
-    public async Task<List<GasStation>> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
+    public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
     {
        Console.WriteLine("Called from API method");
     Console.WriteLine("Lat " + latitude);
@@ -30,11 +30,36 @@ public class MarketFuelPriceService
     if (!response.IsSuccessStatusCode)
     {
         //throw new Exception($"API request failed with status code {response.StatusCode}");
-        return new List<GasStation>();
+        //TODO return Statuscode via Out Parameter
+        return new GasStationResult
+        {
+            IsSuccess = false,
+            ErrorMessage = $"API request failed with HTTP status code {response.StatusCode}",
+            Stations = new List<GasStation>()
+        };
     }
 
     var responseContent = await response.Content.ReadAsStringAsync();
-    Console.WriteLine("Response in Service" + responseContent);
+    Console.WriteLine("Response in Service: " + responseContent);
+    ResponseModelMarketFuelPriceService? error = null;
+    try
+        {
+            error = JsonSerializer.Deserialize<ResponseModelMarketFuelPriceService>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+    catch{
+        Console.WriteLine("Fail during desrialization");
+    }
+    if(!error.ok){
+        return new GasStationResult
+            {
+                IsSuccess = false,
+                ErrorMessage = $"{error.message}",
+                Stations = new List<GasStation>()
+            };
+    }
     
     var gasStationResponse = JsonSerializer.Deserialize<GasStationResponse>(responseContent, new JsonSerializerOptions
     {
@@ -42,12 +67,17 @@ public class MarketFuelPriceService
     });
 
     // Filter the gas stations where IsOpen is true
+    //Gets every gas station
     List<GasStation> openStations = gasStationResponse?.Stations?
     .Where(station => station.IsOpen && station.Price.HasValue && station.Distance.HasValue)
     .ToList() ?? new List<GasStation>();
     foreach(GasStation gS in openStations){
         Console.WriteLine("Open Gasstations in Service " + gS.ToString());
     }
-    return openStations;
+        return new GasStationResult
+        {
+            IsSuccess = true,
+            Stations = openStations
+        };
     }
 }

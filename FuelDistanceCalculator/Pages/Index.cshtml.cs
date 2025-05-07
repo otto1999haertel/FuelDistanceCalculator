@@ -157,15 +157,20 @@ public class IndexModel : PageModel
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, RadiusPlace1, fuelTypeForAPI));
             var gasStationsPlace2 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, RadiusPlace2, fuelTypeForAPI));
-            Console.WriteLine("Gasstaion place 1 count" + " : " + gasStationsPlace1.Count);
-            Console.WriteLine("Gasstaion place 2 count" + " : " + gasStationsPlace2.Count);
-            double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1);
-            double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2);
-            if (averageCostPlace1 != null && averageCostPlace2 != null)
-            {
-                CalculationSucessful = true;
-                AverageCostPlace1 = (double)averageCostPlace1;
-                AverageCostPlace2 = (double)averageCostPlace2;
+            if(gasStationsPlace1.IsSuccess && gasStationsPlace2.IsSuccess){
+                    Console.WriteLine("Gasstaion place 1 count" + " : " + gasStationsPlace1.Stations.Count);
+                    Console.WriteLine("Gasstaion place 2 count" + " : " + gasStationsPlace2.Stations.Count);
+                    double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations);
+                    double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2.Stations);
+                    if (averageCostPlace1 != null && averageCostPlace2 != null)
+                    {
+                        CalculationSucessful = true;
+                        AverageCostPlace1 = (double)averageCostPlace1;
+                        AverageCostPlace2 = (double)averageCostPlace2;
+                    }
+            }
+            else{
+                //TODO Error Handling
             }
         }
     }
@@ -225,12 +230,18 @@ public class IndexModel : PageModel
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
             () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
-            Console.WriteLine("Response in Index, Listlänge" + gasStations.Count);
-            CheapestResultStations = TankCostService.GetCheapestStations(gasStations, FuelAmount, PricePerKm);
-            foreach (var station in CheapestResultStations)
-            {
-                string finalAnswer = $"{station.Name}, {station.Place}, {station.Street}, {station.HouseNumber} Gesamtkosten: {(station.Price * FuelAmount + station.Distance * PricePerKm):F2} EUR, Entfernung {station.Distance}";
-                Console.WriteLine(finalAnswer);
+            if(gasStations.IsSuccess){
+                Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);
+                CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
+                foreach (var station in CheapestResultStations)
+                {
+                    string finalAnswer = $"{station.Name}, {station.Place}, {station.Street}, {station.HouseNumber} Gesamtkosten: {(station.Price * FuelAmount + station.Distance * PricePerKm):F2} EUR, Entfernung {station.Distance}";
+                    Console.WriteLine(finalAnswer);
+                }
+            }
+            else{
+                //TODO: Error Handling
+                Console.WriteLine("Error in search Tanker-API Request" + gasStations.ErrorMessage);
             }
         }
     }

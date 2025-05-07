@@ -119,6 +119,8 @@ public class IndexModel : PageModel
         FuelPrice2 = 0;
         Distance2 = 0;
         Radius = 10;
+        AverageCostPlace1=0;
+        AverageCostPlace2=0;
         Place = "";
 
         CheapestResultStations = new List<GasStation>();
@@ -160,7 +162,7 @@ public class IndexModel : PageModel
         }
         double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1);
         double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2);
-        if(averageCostPlace1!=null && averageCostPlace1>0 && averageCostPlace2!=null && averageCostPlace2>0){
+        if(averageCostPlace1!=null && averageCostPlace2!=null){
             CalculationSucessful = true;
             AverageCostPlace1 = (double)averageCostPlace1;
             AverageCostPlace2 = (double)averageCostPlace2;

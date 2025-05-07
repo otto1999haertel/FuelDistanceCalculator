@@ -10,6 +10,15 @@ public class FuelPriceService
         this.fuelAmount = FuelAmount;
     }
 
+    public double? CalculateAverageCost(List<GasStation> gasStations)
+    {
+        if (gasStations == null || gasStations.Count == 0){
+            return 0.0;
+        }
+
+        return gasStations.Average(gs => gs.Price);
+    }
+
     public double CalculateEntireCost(double pricePerLiter, double distance){
         return (fuelAmount * pricePerLiter) + (distance *pricePerkilometer);
     }

@@ -123,7 +123,7 @@ public class IndexModel : PageModel
 
         CheapestResultStations = new List<GasStation>();
 
-        if (TempData["AverageCostPlace1"] != null && TempData["TotalCost2"] != null)
+        if (TempData["AverageCostPlace1"] != null && TempData["AverageCostPlace2"] != null)
         {
             AverageCostPlace1 = Convert.ToDouble(TempData["AverageCostPlace1"]);
             AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
@@ -141,28 +141,30 @@ public class IndexModel : PageModel
         Console.WriteLine("Radius Place 1 " + RadiusPlace1);
         Console.WriteLine("Name Place 2 " + NamePlace2);
         Console.WriteLine("Radius Place 2 " + RadiusPlace2);
-        AverageCostPlace1 = _fuelPriceService.CalculateEntireCost(FuelPrice1, Distance1);
-                AverageCostPlace2 = _fuelPriceService.CalculateEntireCost(FuelPrice2, Distance2);
-                if (AverageCostPlace1 > 0 && AverageCostPlace2 > 0)
-                {
-                    Console.WriteLine($"{NamePlace1} : {AverageCostPlace1}");
-                     Console.WriteLine($"{NamePlace2} : {AverageCostPlace2}");
-                    CalculationSucessful = true;
-                    TempData["AverageCostPlace1"] = AverageCostPlace1.ToString(); // Speichern in TempData
-                    TempData["AverageCostPlace2"] = AverageCostPlace2.ToString(); // Speichern in TempData
-                    string [] tempBreakEvenAnalysis =  new string [2];
-                    tempBreakEvenAnalysis = _fuelPriceService.AnalyseBreakEven(FuelPrice1, Distance1, NamePlace1, FuelPrice2,Distance2, NamePlace2);
-                    if(tempBreakEvenAnalysis.Length ==2){
-                        NameGasStationBreakEven = tempBreakEvenAnalysis[0];
-                        double ergTemp=0;
-                        double.TryParse(tempBreakEvenAnalysis[1], out ergTemp);
-                        FuelAmountBreakEven = ergTemp;
-                        BreakEvenAnalysisDeterministic =true;
-                    }
-                    else{
-                        BreakEvenAnalysisDeterministic =false; 
-                    }
-                }
+
+        // API-Aufruf zur Koordinatensuche
+        ApiThrottle geoThrottle = new ApiThrottle();
+        ApiThrottle fuelThrottle = new ApiThrottle();
+        string fuelTypeForAPI = GetFuelTypeForAPI();
+        var coordinatesPlace1 = await _geoLocationService.GetCoordinatesAsync(NamePlace1);
+        var coordinatesPlace2 = await _geoLocationService.GetCoordinatesAsync(NamePlace2);
+        var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice", 
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, Radius, fuelTypeForAPI));
+        var gasStationsPlace2 = await fuelThrottle.ExecuteWithThrottle("FuelPrice", 
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, Radius, fuelTypeForAPI));
+        foreach(GasStation gasStation in gasStationsPlace1){
+            Console.WriteLine( gasStation.Place  + " : " +  gasStation.Price);
+        }
+        foreach(GasStation gasStation in gasStationsPlace2){
+            Console.WriteLine( gasStation.Place  + " : " +  gasStation.Price);
+        }
+        double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1);
+        double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2);
+        if(averageCostPlace1!=null && averageCostPlace1>0 && averageCostPlace2!=null && averageCostPlace2>0){
+            CalculationSucessful = true;
+            AverageCostPlace1 = (double)averageCostPlace1;
+            AverageCostPlace2 = (double)averageCostPlace2;
+        }
     }
     public void OnPostSave(){
         Console.WriteLine("save with seperate method");
@@ -205,18 +207,8 @@ public class IndexModel : PageModel
             Console.WriteLine("Fuel type  " + SelectedFuelType.ToString().ToLower());
             Console.WriteLine("Fuel Amount " + FuelAmount);
             Console.WriteLine("Price pro kilometer " + PricePerKm);
-            string fuelTypeForAPI = "";
-            switch (SelectedFuelType){
-                case FuelType.Diesel:
-                    fuelTypeForAPI = SelectedFuelType.ToString().ToLower();
-                break;
-                case FuelType.SuperE5:
-                    fuelTypeForAPI = "e5";
-                break;
-                case FuelType.SuperE10:
-                    fuelTypeForAPI="e10";
-                break;
-            }
+            string fuelTypeForAPI = GetFuelTypeForAPI();
+            
 
             // API-Aufruf zur Koordinatensuche
             ApiThrottle geoThrottle = new ApiThrottle();
@@ -296,5 +288,17 @@ public class IndexModel : PageModel
         Console.WriteLine("Combined Path: " + filePath);
         var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
         CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonContent);
+    }
+
+    private string GetFuelTypeForAPI(){
+            switch (SelectedFuelType){
+                case FuelType.Diesel:
+                    return SelectedFuelType.ToString().ToLower();
+                case FuelType.SuperE5:
+                    return "e5";
+                case FuelType.SuperE10:
+                    return "e10";
+            }
+        return string.Empty;
     }
 }

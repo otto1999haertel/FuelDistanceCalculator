@@ -29,7 +29,8 @@ public class MarketFuelPriceService
 
     if (!response.IsSuccessStatusCode)
     {
-        throw new Exception($"API request failed with status code {response.StatusCode}");
+        //throw new Exception($"API request failed with status code {response.StatusCode}");
+        return new List<GasStation>();
     }
 
     var responseContent = await response.Content.ReadAsStringAsync();

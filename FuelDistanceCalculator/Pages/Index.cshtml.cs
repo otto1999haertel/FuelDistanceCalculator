@@ -104,10 +104,10 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         ViewData["ContactName"] = ContactInfo.Name;
-        NamePlace1 = "Ort 1";
-        RadiusPlace1 = 0;
-        NamePlace2 = "Ort 2";
-        RadiusPlace2 = 0;
+        NamePlace1 = "";
+        RadiusPlace1 = 10;
+        NamePlace2 = "";
+        RadiusPlace2 = 10;
         SelectedFuelType = FuelType.Diesel;
         SelectInputMode = InputMode.auto;
 

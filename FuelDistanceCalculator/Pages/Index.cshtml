@@ -43,7 +43,7 @@
 
                 <!-- Eingabe für Tankmenge -->
                 <div class="form-group">
-                    <label for="fuelAmount">Tankmenge (@Model.VolumeUnit)</label>
+                    <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
                         <span class="input-group-text-icon" data-bs-toggle="tooltip"
                             title="Du kannst auch Berechnungen mit +, −, *, / durchführen">
                             ⓘ
@@ -62,7 +62,11 @@
                     <div class="col-md-6">
                         <!-- Preis pro Kilometer -->
                         <div class="form-group">
-                            <label for="PricePerKm">Preis pro Kilometer (€)</label>
+                            <label for="PricePerKm">Kosten pro Kilometer (€)</label>
+                            <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                            title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Suche">
+                            ⓘ
+                            </span>
                             <input class="form-control" id="PricePerKm" name="PricePerKm" required
                                 onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
                         </div>

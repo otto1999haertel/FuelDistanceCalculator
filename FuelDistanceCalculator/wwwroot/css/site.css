@@ -247,6 +247,29 @@ body.dark-mode .suggestion-item:hover {
   background-color: #444;
 }
 
+.tooltip-inner {
+  background-color: #efefef !important; /* Deine Wunschfarbe */
+  color: #000000 !important;
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  opacity: 1 !important; 
+}
+
+body.dark-mode .tooltip-inner {
+  background-color: #333 !important;  /* Dunkelgrauer Hintergrund */
+  color: white !important;  /* Weiße Schrift */
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  opacity: 1 !important; 
+}
+
+.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: #bbb !important;
+}
+
 
 
 @media screen and (max-width: 767px) {

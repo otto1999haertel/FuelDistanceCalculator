@@ -44,8 +44,12 @@
                 <!-- Eingabe für Tankmenge -->
                 <div class="form-group">
                     <label for="fuelAmount">Tankmenge (@Model.VolumeUnit)</label>
-                    <input type="text" id="FuelAmountDisplay" class="form-control" required
-                        onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
+                        <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                            title="Du kannst auch Berechnungen mit +, −, *, / durchführen">
+                            ⓘ
+                        </span>
+                        <input type="text" id="FuelAmountDisplay" class="form-control" required
+                                onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
                     <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
 
                     <script>
@@ -326,6 +330,13 @@
             };
             toastr[type](message);
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     });
 
 

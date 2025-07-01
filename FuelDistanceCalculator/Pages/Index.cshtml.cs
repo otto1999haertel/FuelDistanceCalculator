@@ -85,10 +85,10 @@ public class IndexModel : PageModel
     public string Place { get; set; }
 
     [BindProperty]
-    public long LongitudePlace { get; set; }
+    public double LongitudePlace { get; set; }
 
      [BindProperty]
-    public long LatitudePlace { get; set; }
+    public double LatitudePlace { get; set; }
 
     [BindProperty]
     public List<GasStation> CheapestResultStations { get; set; }
@@ -233,8 +233,8 @@ public class IndexModel : PageModel
         ApiThrottle fuelThrottle = new ApiThrottle();
 
         var coordinates = await _geoLocationService.GetCoordinatesAsync(Place);
-        LongitudePlace = (long)(coordinates?.Longitude ?? 0);
-        LatitudePlace = (long)(coordinates?.Latitude ?? 0);
+        LongitudePlace = (double)(coordinates?.Longitude ?? 0);
+        LatitudePlace = (double)(coordinates?.Latitude ?? 0);
         Console.WriteLine("Koordinates from API " + coordinates);
         if (coordinates != null)
         {

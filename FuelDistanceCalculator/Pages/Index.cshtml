@@ -426,7 +426,11 @@
                  L.marker([@lat, @lng], { icon: @(isCheapest ? "greenIcon" : "defaultIcon") })
                     .addTo(map)
                     .bindTooltip(`@price €`, { permanent: true, direction: "top" })
-                    .openTooltip();
+                    .openTooltip()
+                    .on('click',function(){
+                        window.open("https://www.google.com/maps?q=@lat,@lng", "_blank");
+                    });
+                        
             </text>
         }
     }

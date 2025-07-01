@@ -391,24 +391,42 @@
             attribution: '© OpenStreetMap',
         }).addTo(map);
 
+
+
+        const defaultIcon = new L.Icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            tooltipAnchor: [0, -32],
+            shadowSize: [41, 41]
+        });
         // Beispiel-Marker (dynamisch aus Razor erzeugt)
+        const greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],      // Spitze des Icons (für Popup/Tooltip Position)
+            tooltipAnchor: [0, -32],   // <<–– das ist entscheidend!
+            shadowSize: [41, 41]
+        });
+
         @foreach (var station in Model.CheapestResultStations)
         {
-            var lat = @station.Latitude.ToString().Replace(",", ".");
-            var lng = @station.Longitude.ToString().Replace(",", ".");
+            var lat = station.Latitude.ToString().Replace(",", ".");
+            var lng = station.Longitude.ToString().Replace(",", ".");
             var name = Html.Raw(Json.Serialize(station.Name));
-            var price = "0";
-            if(Model.FuelAmount > 0){
-                price = Model.ToDisplay(station.CalculateTotalCost(Model.FuelAmount, Model.PricePerKm).ToString());
-            }
-            else
-                price = Model.ToDisplay(station.Price.ToString());
+            var price = Model.FuelAmount > 0
+                ? Model.ToDisplay(station.CalculateTotalCost(Model.FuelAmount, Model.PricePerKm).ToString())
+                : Model.ToDisplay(station.Price.ToString());
+
+            var isCheapest = station == Model.CheapestResultStations.First();
 
             <text>
-                    L.marker([@lat, @lng])
-                        .addTo(map)
-                        .bindTooltip(`@price €`, { permanent: true, direction: "top" })
-                        .openTooltip();
+                 L.marker([@lat, @lng], { icon: @(isCheapest ? "greenIcon" : "defaultIcon") })
+                    .addTo(map)
+                    .bindTooltip(`@price €`, { permanent: true, direction: "top" })
+                    .openTooltip();
             </text>
         }
     }

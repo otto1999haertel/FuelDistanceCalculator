@@ -164,7 +164,6 @@
         <div class="col-md-6" style="padding: 20px;">
             @if (Model.CheapestResultStations.Any())
             {
-                @* TODO Switch betwwen list and map *@
                 <div class="view-switch">
                     <label for="viewMode">Ansicht:</label>
                     <select id="viewMode" onchange="switchView()">
@@ -207,6 +206,7 @@
                     </ul>
                 </div>
                 <div id="mapView" style="display: none;">
+                    @* TODO add Tool tip with click option*@
                    <div id="map" style="height: 500px;"></div>
                 </div>
             }

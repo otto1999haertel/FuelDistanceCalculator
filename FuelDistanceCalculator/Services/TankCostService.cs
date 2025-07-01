@@ -1,6 +1,10 @@
 public static class TankCostService{
     public static List<GasStation> GetCheapestStations(List<GasStation> stations, double fuelAmount, double costPerKm)
     {
+        if (fuelAmount <= 0)
+        {
+            return stations.OrderBy(sc => sc.Price).Take(10).ToList();
+        }
         var stationCosts = new List<(GasStation Station, double TotalCost)>();
 
         foreach (var station in stations)
@@ -11,7 +15,7 @@ public static class TankCostService{
                 double fuelCost = (station.Price ?? 0.0) * fuelAmount;
 
                 // Wegkosten (Entfernung in km * Kosten pro Kilometer)
-                double travelCost = (station.Distance?? 0.0) * costPerKm;
+                double travelCost = (station.Distance ?? 0.0) * costPerKm;
 
                 // Gesamtkosten (Spritkosten + Wegkosten)
                 double totalCost = fuelCost + travelCost;
@@ -22,6 +26,7 @@ public static class TankCostService{
         }
         Console.WriteLine("Anzahl TS in Total Cost Caluculation: " + stationCosts.Count);
         // Sortiere die Tankstellen nach den Gesamtkosten (aufsteigend)
+
         return stationCosts.OrderBy(sc => sc.TotalCost)
                             .Take(10)
                            .Select(sc => sc.Station)

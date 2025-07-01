@@ -237,7 +237,7 @@ public class IndexModel : PageModel
                 CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
                 foreach (var station in CheapestResultStations)
                 {
-                    string finalAnswer = $"{station.Name}, {station.Place}, {station.Street}, {station.HouseNumber} Gesamtkosten: {(station.Price * FuelAmount + station.Distance * PricePerKm):F2} EUR, Entfernung {station.Distance}";
+                    string finalAnswer = $"{station.Name}, {station.Place}, {station.Street}, {station.HouseNumber} Gesamtkosten: {(station.Price * FuelAmount + station.Distance * PricePerKm):F2} EUR, Entfernung {station.Distance}, Latitude {station.Latitude}, Longitude {station.Longitude}";
                     Console.WriteLine(finalAnswer);
                 }
             }

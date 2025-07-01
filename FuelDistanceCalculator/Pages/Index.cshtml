@@ -45,7 +45,7 @@
                 <div class="form-group">
                     <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
                         <span class="input-group-text-icon" data-bs-toggle="tooltip"
-                            title="Du kannst auch Berechnungen mit +, −, *, / durchführen">
+                            title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
                             ⓘ
                         </span>
                         <input type="text" id="FuelAmountDisplay" class="form-control" required
@@ -165,12 +165,21 @@
                     {
                         <li class="station-item">
                             <div class="station-summary" onclick="toggleDetails(this)">
-                                <strong>@station.Name</strong> - Gesamtkosten:
-                                @(Model.ToDisplay(station.CalculateTotalCost(@Model.FuelAmount, @Model.PricePerKm).ToString()))
-                                €
+                                <strong>@station.Name</strong> - 
+                                @if (Model.FuelAmount > 0)
+                                {
+                                    <span>Gesamtkosten: @Model.ToDisplay(station.CalculateTotalCost(Model.FuelAmount, Model.PricePerKm).ToString()) €</span>
+                                }
+                                else
+                                {
+                                    <span>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString()) €</span>
+                                }
                             </div>
                             <div class="station-details" style="display:none;">
-                                <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
+                                @if (Model.FuelAmount > 0)
+                                {
+                                    <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
+                                }
                                 <p>Entfernung: @Model.ToDisplay(station.Distance.ToString()) km</p>
                                 <p>Ort:
                                     <a href="https://www.google.com/maps?q=@station.Place,@station.Street+@station.HouseNumber"

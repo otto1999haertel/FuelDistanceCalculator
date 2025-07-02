@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("darkModeToggle");
     const body = document.body;
     const table = document.getElementById("fuelTable");
+    const mapContainer = document.getElementById("map_div");
     
 
     // Dark Mode Status aus dem Local Storage abrufen
@@ -32,10 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleButton.classList.remove("btn-outline-dark");
             toggleButton.classList.add("btn-outline-light");
             table?.classList.add("table-dark");
-            if (typeof map !== "undefined" && map.removeLayer && currentTiles) {
-                map.removeLayer(currentTiles);
-                darkTiles.addTo(map);
-                currentTiles = darkTiles;
+            if (mapContainer && mapContainer.classList) {
+                mapContainer.classList.add("dark-map");
             }
         } else {
             localStorage.setItem("darkMode", "disabled");
@@ -44,10 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleButton.classList.add("btn-outline-dark");
             table?.classList.remove("table-dark");
             // 💡 Kartenlayer umschalten
-            if (typeof map !== "undefined" && map.removeLayer && currentTiles) {
-                map.removeLayer(currentTiles);
-                lightTiles.addTo(map);
-                currentTiles = lightTiles;
+            if (mapContainer && mapContainer.classList) {
+                mapContainer.classList.remove("dark-map");
             }
         }
     });

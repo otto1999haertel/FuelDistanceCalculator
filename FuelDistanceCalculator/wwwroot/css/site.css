@@ -270,6 +270,14 @@ body.dark-mode .tooltip-inner {
   border-top-color: #bbb !important;
 }
 
+/* Dark Mode Map Filter */
+.dark-map .leaflet-layer,
+.dark-map .leaflet-control-zoom-in,
+.dark-map .leaflet-control-zoom-out,
+.dark-map .leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
 
 
 @media screen and (max-width: 767px) {

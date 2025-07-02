@@ -226,9 +226,7 @@
 <script>
     let mapInitialized = false;
     let map;
-    let darkTiles;
-    let lightTiles;
-    let currentTiles;
+    let Tiles;
     function updateRadius(input) {
         // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
         if (!input.value.trim()) {
@@ -391,24 +389,14 @@
         var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
         var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
         map = L.map('map_div').setView([latitude, longitude], 12); // Zentrum (z. B. Erlangen)
-        darkTiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; Stadia Maps, OpenMapTiles & OpenStreetMap contributors',
-                maxZoom: 20});
-        lightTiles = lightTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        Tiles  = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap',});
-        if (localStorage.getItem("darkMode") === "enabled"){
-           darkTiles.addTo(map);
+        Tiles.addTo(map);
+        if (localStorage.getItem("darkMode") === "enabled") {
+            document.getElementById("map_div").classList.add("dark-map");
         }
         else{
-            lightTiles.addTo(map);
-        }
-
-        if (document.body.classList.contains("dark-mode")) {
-            darkTiles.addTo(map);
-            currentTiles = darkTiles;
-        } else {
-            lightTiles.addTo(map);
-            currentTiles = lightTiles;
+             document.getElementById("map_div").classList.remove("dark-map");
         }
 
         const defaultIcon = new L.Icon({

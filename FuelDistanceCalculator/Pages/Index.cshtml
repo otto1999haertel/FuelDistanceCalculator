@@ -10,6 +10,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
@@ -207,7 +209,7 @@
                 </div>
                 <div id="mapView" style="display: none;">
                     @* TODO add Tool tip with click option*@
-                   <div id="map" style="height: 500px;"></div>
+                   <div id="map_div" style="height: 500px;"></div>
                 </div>
             }
             else
@@ -223,6 +225,10 @@
 <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
 <script>
     let mapInitialized = false;
+    let map;
+    let darkTiles;
+    let lightTiles;
+    let currentTiles;
     function updateRadius(input) {
         // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
         if (!input.value.trim()) {
@@ -371,6 +377,7 @@
     });
 
     function switchView() {
+        let mapInitialized = false;
         const selected = document.getElementById("viewMode").value;
         document.getElementById("listView").style.display = selected === "list" ? "block" : "none";
         document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
@@ -380,17 +387,29 @@
             mapInitialized = true;
         }
     }
-
     function initMap() {
         var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
         var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
-        const map = L.map('map').setView([latitude, longitude], 12); // Zentrum (z. B. Erlangen)
+        map = L.map('map_div').setView([latitude, longitude], 12); // Zentrum (z. B. Erlangen)
+        darkTiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; Stadia Maps, OpenMapTiles & OpenStreetMap contributors',
+                maxZoom: 20});
+        lightTiles = lightTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',});
+        if (localStorage.getItem("darkMode") === "enabled"){
+           darkTiles.addTo(map);
+        }
+        else{
+            lightTiles.addTo(map);
+        }
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-        }).addTo(map);
-
-
+        if (document.body.classList.contains("dark-mode")) {
+            darkTiles.addTo(map);
+            currentTiles = darkTiles;
+        } else {
+            lightTiles.addTo(map);
+            currentTiles = lightTiles;
+        }
 
         const defaultIcon = new L.Icon({
             iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',

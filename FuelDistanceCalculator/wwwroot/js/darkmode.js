@@ -31,13 +31,24 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleButton.textContent = "☀️ Mode";
             toggleButton.classList.remove("btn-outline-dark");
             toggleButton.classList.add("btn-outline-light");
-            table.classList.add("table-dark");
+            table?.classList.add("table-dark");
+            if (typeof map !== "undefined" && map.removeLayer && currentTiles) {
+                map.removeLayer(currentTiles);
+                darkTiles.addTo(map);
+                currentTiles = darkTiles;
+            }
         } else {
             localStorage.setItem("darkMode", "disabled");
             toggleButton.textContent = "🌙 Mode";
             toggleButton.classList.remove("btn-outline-light");
             toggleButton.classList.add("btn-outline-dark");
-            table.classList.remove("table-dark");
+            table?.classList.remove("table-dark");
+            // 💡 Kartenlayer umschalten
+            if (typeof map !== "undefined" && map.removeLayer && currentTiles) {
+                map.removeLayer(currentTiles);
+                lightTiles.addTo(map);
+                currentTiles = lightTiles;
+            }
         }
     });
     

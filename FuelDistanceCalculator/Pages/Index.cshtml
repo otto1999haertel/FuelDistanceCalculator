@@ -113,8 +113,11 @@
                 <!-- Tankstelle 1 Eingabefelder - links ausgerichtet -->
                 <div class="col-md-5 offset-md-1">
                     <label for="NamePlace1">Standort 1 (PLZ/ Straße, Ort)</label>
+                    <div class="input-group">
                     <input type="text" id="NamePlace1" class="form-control" placeholder="Geben Sie einen Ort ein"
                         asp-for="NamePlace1" value="@Model.NamePlace1">
+                    <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
+                    </div>
                 </div>
                 <div class="col-md-5">
                     <label for="RadiusPlace1">Radius (km)</label>
@@ -379,10 +382,15 @@
     });
     document.addEventListener('DOMContentLoaded', function () {
     const geoButton = document.getElementById("geoButton");
-        if (geoButton) {
-            geoButton.addEventListener("click", getLocation);
+    if (geoButton) {
+        geoButton.addEventListener("click", getLocation);
+    }
+
+        const geoButton2 = document.getElementById("geoButton2");
+        if (geoButton2) {
+            geoButton2.addEventListener("click", getLocation);
         }
-        });
+    });
 
     function switchView() {
         let mapInitialized = false;
@@ -473,6 +481,7 @@ async function sendPositionToServer(position) {
     const result = await response.json();
     if (result.success && result.address) {
       document.getElementById("generalLocation").value = result.address;
+      document.getElementById("NamePlace1").value = result.address;
     }
   } else {
     alert("Serverfehler bei Standortabfrage.");

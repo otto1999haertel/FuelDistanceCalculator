@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -58,46 +59,50 @@ public class GeoLocationService
     }
 
     public async Task<string> GetAddressFromCoordinatesAsync(double latitude, double longitude)
-    {
-        string cacheKey = $"geo:reverse:{latitude}:{longitude}";
-        
-        // Prüfe Redis-Cache
-        var cachedAddress = await _redisDb.StringGetAsync(cacheKey);
-        if (cachedAddress.HasValue)
         {
-            Console.WriteLine($"Reverse Cache-Hit für {latitude}, {longitude}");
-            return cachedAddress.ToString();
-        }
+            string latKey = latitude.ToString("F3", CultureInfo.InvariantCulture);
+            string lonKey = longitude.ToString("F3", CultureInfo.InvariantCulture);
+            string cacheKey = $"geo:reverse:{latKey}:{lonKey}";
 
-        Console.WriteLine($"Reverse Cache-Miss für {latitude}, {longitude}");
-        var url = $"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json";
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("User-Agent", "FuelGo/1.0");
+            // Prüfe Redis-Cache
+            var cachedAddress = await _redisDb.StringGetAsync(cacheKey);
+            if (cachedAddress.HasValue)
+            {
+                Console.WriteLine($"[Redis HIT] {cacheKey}");
+                return cachedAddress;
+            }
 
-        var response = await _httpClient.SendAsync(request);
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception("Fehler beim Reverse Geocoding");
-        }
+            Console.WriteLine($"[Redis MISS] {cacheKey}");
+            var url = $"https://nominatim.openstreetmap.org/reverse?lat={latKey}&lon={lonKey}&format=json";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "FuelGo/1.0");
 
-        var json = JObject.Parse(await response.Content.ReadAsStringAsync());
-        var address = json["address"];
-        if (address == null) return null;
+            var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Fehler beim Reverse Geocoding");
+            }
 
-        // Adresse zusammenbauen
-        string road = address["road"]?.ToString();
-        string house = address["house_number"]?.ToString();
-        string postcode = address["postcode"]?.ToString();
-        string city = address["city"]?.ToString() ?? address["town"]?.ToString() ?? address["village"]?.ToString();
+            var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var address = json["address"];
+            if (address == null) return null;
 
-        string fullAddress = $"{road} {house}, {postcode} {city}".Trim();
+            // Adresse zusammenbauen
+            string road = address["road"]?.ToString();
+            string house = address["house_number"]?.ToString();
+            string postcode = address["postcode"]?.ToString();
+            string city = address["city"]?.ToString() ?? address["town"]?.ToString() ?? address["village"]?.ToString();
 
-        // In Redis speichern
-        await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+            string fullAddress = $"{road} {house}, {postcode} {city}".Trim();
 
-        return fullAddress;
-    }
+            // Caching in Redis
+            if (!string.IsNullOrWhiteSpace(fullAddress))
+            {
+                await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+            }
 
+            return fullAddress;
+}
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
         var url = $"https://nominatim.openstreetmap.org/search?q={place}&format=json";

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace FuelDistanceCalculator.Pages;
 
+[IgnoreAntiforgeryToken] 
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
@@ -255,6 +256,24 @@ public class IndexModel : PageModel
                 TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
         }
+    }
+
+    // optional bei JS-only Requests ohne Token
+    public async Task<IActionResult> OnPostUpdateLocation([FromBody] Dictionary<string, double> coords)
+    {
+        Console.WriteLine("Update Locatiion was called");
+        if (!coords.TryGetValue("latitude", out var latitude) || !coords.TryGetValue("longitude", out var longitude))
+        {
+            return BadRequest(new { success = false, message = "Invalid coordinates" });
+        }
+
+        LatitudePlace = latitude;
+        LongitudePlace = longitude;
+
+        // Serverseitig Adresse ermitteln
+        Place = await _geoLocationService.GetAddressFromCoordinatesAsync(latitude, longitude);
+        Console.WriteLine("Place recevied from ccordinates" + Place);
+        return new JsonResult(new { success = true, address = Place });
     }
     // Speichern-Methode, wird durch den Speichern-Button ausgelöst
     public IActionResult OnPostSaveData()

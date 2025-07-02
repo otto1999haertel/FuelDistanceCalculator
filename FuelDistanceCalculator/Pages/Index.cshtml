@@ -146,18 +146,22 @@
     <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
     <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
     <!-- Automatische Eingabe für Standort und Radius -->
-    <div class="row">
-        <div class="col-md-5 offset-md-1">
-            <label for="generalLocation">Standort (PLZ/ Straße, Ort)</label>
+    <div class="row align-items-end">
+    <div class="col-md-5 offset-md-1">
+        <label for="generalLocation" class="form-label">Standort (PLZ/ Straße, Ort)</label>
+        <div class="input-group">
             <input type="text" id="generalLocation" class="form-control" placeholder="Geben Sie einen Ort ein"
                 asp-for="Place" value="@Model.Place">
-        </div>
-        <div class="col-md-5">
-            <label for="generalRadius">Radius (km)</label>
-            <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
-                asp-for="Radius" value="@Model.Radius">
+            <button id="geoButton" class="btn btn-primary btn-sm" type="button">📍</button>
         </div>
     </div>
+    
+    <div class="col-md-5">
+        <label for="generalRadius">Radius (km)</label>
+        <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
+            asp-for="Radius" value="@Model.Radius">
+    </div>
+</div>
     <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
             asp-page-handler="Search">Suchen</button>
@@ -373,6 +377,12 @@
         new bootstrap.Tooltip(tooltipTriggerEl)
         })
     });
+    document.addEventListener('DOMContentLoaded', function () {
+    const geoButton = document.getElementById("geoButton");
+        if (geoButton) {
+            geoButton.addEventListener("click", getLocation);
+        }
+        });
 
     function switchView() {
         let mapInitialized = false;
@@ -441,6 +451,49 @@
         }
     }
 
+  function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(sendPositionToServer, handleError);
+  } else {
+    alert("Geolocation wird nicht unterstützt.");
+  }
+}
+
+async function sendPositionToServer(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  const response = await fetch("?handler=UpdateLocation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ latitude: lat, longitude: lon })
+  });
+
+  if (response.ok) {
+    const result = await response.json();
+    if (result.success && result.address) {
+      document.getElementById("generalLocation").value = result.address;
+    }
+  } else {
+    alert("Serverfehler bei Standortabfrage.");
+  }
+}
+
+function handleError(error) {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      alert("Nutzer hat die Standortfreigabe abgelehnt.");
+      break;
+    case error.POSITION_UNAVAILABLE:
+      alert("Standortinformationen nicht verfügbar.");
+      break;
+    case error.TIMEOUT:
+      alert("Standortabfrage hat zu lange gedauert.");
+      break;
+    default:
+      alert("Unbekannter Fehler.");
+  }
+}
 
 </script>
 <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->

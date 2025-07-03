@@ -173,12 +173,19 @@
         <div class="col-md-6" style="padding: 20px;">
             @if (Model.CheapestResultStations.Any())
             {
-                <div class="mb-3">
-                    <label  class="form-label">Ansicht</label>
-                    <select id="viewMode" class="form-select" onchange="switchView()">
+                <div class="mb-3 d-flex align-items-center gap-2">
+                    <label for="viewMode" class="form-label mb-0 me-2">Ansicht</label>
+                    <select id="viewMode" class="form-select w-auto" onchange="switchView()">
                         <option value="list">Liste</option>
                         <option value="map">Karte</option>
                     </select>
+                    <span id="mapTooltip"
+                        class="input-group-text-icon"
+                        data-bs-toggle="tooltip"
+                        style="display: none; cursor: pointer;"
+                        title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle">
+                        ⓘ
+                    </span>
                 </div>
                 <div id="listView">
                     <ul class="station-list">
@@ -395,14 +402,19 @@
     });
 
     function switchView() {
-        let mapInitialized = false;
         const selected = document.getElementById("viewMode").value;
         document.getElementById("listView").style.display = selected === "list" ? "block" : "none";
         document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
 
-        if (selected === "map" && !mapInitialized) {
-            initMap();
-            mapInitialized = true;
+        if (selected === "map") {
+            if(!mapInitialized){
+                initMap();
+                mapInitialized = true;
+            }
+            document.getElementById("mapTooltip").style.display = "inline-block";
+        }
+        else{
+            document.getElementById("mapTooltip").style.display = "none";
         }
     }
     function initMap() {

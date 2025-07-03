@@ -60,8 +60,8 @@ public class GeoLocationService
 
     public async Task<string> GetAddressFromCoordinatesAsync(double latitude, double longitude)
     {
-            string latKey = latitude.ToString("F2", CultureInfo.InvariantCulture);
-            string lonKey = longitude.ToString("F2", CultureInfo.InvariantCulture);
+            string latKey = latitude.ToString("F3", CultureInfo.InvariantCulture);
+            string lonKey = longitude.ToString("F3", CultureInfo.InvariantCulture);
             string cacheKey = $"geo:reverse:{latKey}:{lonKey}";
 
             // Prüfe Redis-Cache

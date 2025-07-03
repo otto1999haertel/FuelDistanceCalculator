@@ -173,9 +173,9 @@
         <div class="col-md-6" style="padding: 20px;">
             @if (Model.CheapestResultStations.Any())
             {
-                <div class="view-switch">
-                    <label for="viewMode">Ansicht:</label>
-                    <select id="viewMode" onchange="switchView()">
+                <div class="mb-3">
+                    <label  class="form-label">Ansicht</label>
+                    <select id="viewMode" class="form-select" onchange="switchView()">
                         <option value="list">Liste</option>
                         <option value="map">Karte</option>
                     </select>
@@ -270,10 +270,12 @@
         if (radio.value === "Manual") {
             manualFields.style.display = "block";
             autoFields.style.display = "none";
+            averageCost.style.display ="block";
         }
         else {
             manualFields.style.display = "none";
             autoFields.style.display = "block";
+            averageCost.style.display ="none";
         }
     }
 

@@ -71,7 +71,7 @@ public class IndexModel : PageModel
 
 
     [BindProperty]
-    public InputMode SelectInputMode { get; set; } = InputMode.man;
+    public InputMode SelectInputMode { get; set; } = InputMode.auto;
 
     [BindProperty]
     public VolumeUnit VolumeUnit

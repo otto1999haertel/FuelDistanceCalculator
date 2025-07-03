@@ -4,6 +4,6 @@ namespace FuelDistanceCalculator.Constants;
 
 public enum InputMode
 {
-    man,
-    auto
+    auto,
+    man
 }

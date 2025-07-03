@@ -89,23 +89,25 @@
                             <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..."
                                 list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
                             <div id="suggestions" class="suggestions-box"></div>
-
                         </div>
                     </div>
+                </div>
+                <div class="mb-3">
+                 <label asp-for="@Model.SelectInputMode" class="form-label">Modus</label>
+                    <select asp-for="@Model.SelectInputMode" class="form-select"
+                            asp-items="@(Enum.GetValues(typeof(InputMode))
+                                            .Cast<InputMode>()
+                                            .Select(mode => new SelectListItem
+                                            {
+                                                Value = mode.ToString(),
+                                                Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
+                                            }))"
+                            onchange="toggleInputMethod(this)">
+                    </select>
                 </div>
             </div>
         </div>
 
-        <div class="form-group d-flex justify-content-center radio-spacing">
-            <label>
-                <input type="radio" name="SelectInputMode" id="autoInput" value="Auto" @(Model.SelectInputMode ==
-                                                                                                           InputMode.auto ? "checked" : "") onchange="toggleInputMethod(this)"> Optimale Suche
-            </label>
-            <label>
-                <input type="radio" name="SelectInputMode" id="manualInput" value="Manual" @(Model.SelectInputMode ==
-                                                                                                               InputMode.man ? "checked" : "") onchange="toggleInputMethod(this)"> Standortvergleich
-            </label>
-        </div>
 
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
         <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
@@ -274,15 +276,20 @@
     function toggleInputMethod(radio) {
         var manualFields = document.getElementById("manualInputFields");
         var autoFields = document.getElementById("autoInputFields");
-        if (radio.value === "Manual") {
+        var averageCost = document.getElementById("averageCost");
+        if (radio.value === "man") {
             manualFields.style.display = "block";
             autoFields.style.display = "none";
-            averageCost.style.display ="block";
+            if(averageCost!=null){
+                averageCost.style.display ="block";
+            }
         }
-        else {
+        if(radio.value === "auto") {
             manualFields.style.display = "none";
             autoFields.style.display = "block";
-            averageCost.style.display ="none";
+            if(averageCost!=null){
+                averageCost.style.display ="none";
+            }
         }
     }
 

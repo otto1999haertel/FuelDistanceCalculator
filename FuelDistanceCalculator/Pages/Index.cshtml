@@ -270,7 +270,7 @@
     let mapInitialized = false;
     let map;
     let Tiles;
-    let locationIndex = 2;
+    let locationIndex = @Model.NamePlaces.Count;
     function updateRadius(input) {
         // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
         if (!input.value.trim()) {

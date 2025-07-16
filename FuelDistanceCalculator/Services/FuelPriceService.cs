@@ -16,7 +16,7 @@ public class FuelPriceService
             return 0.0;
         }
 
-        return gasStations.Average(gs => gs.Price);
+        return gasStations.OrderBy(gs => gs.Price).ToList().Take(10).Average(gs => gs.Price);
     }
 
     public double CalculateEntireCost(double pricePerLiter, double distance){

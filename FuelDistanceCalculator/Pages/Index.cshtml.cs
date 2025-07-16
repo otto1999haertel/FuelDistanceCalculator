@@ -39,14 +39,13 @@ public class IndexModel : PageModel
     public string NamePlace1 { get; set; }
 
     [BindProperty]
-    public int RadiusPlace1 { get; set; }
-
-
-    [BindProperty]
-    public string NamePlace2 { get; set; }
+    public List<string> NamePlaces { get; set; } 
 
     [BindProperty]
-    public int RadiusPlace2 { get; set; }
+    public List<double> RadiusPlaces { get; set; } 
+
+    [BindProperty]
+    public Dictionary<string, double> CalculatedAverageCosts { get; set; }
 
     [BindProperty]
     public bool CalculationSucessful { get; set; }
@@ -106,20 +105,32 @@ public class IndexModel : PageModel
         _context = context;
         _MarketfuelPriceService = marketFuelPriceService;
         _geoLocationService = geoLocationService;
+        if (NamePlaces == null || !NamePlaces.Any())
+        {
+            NamePlaces = new List<string>();
+        }
+
+        if (RadiusPlaces == null || !RadiusPlaces.Any())
+        {
+            RadiusPlaces = new List<double>();
+        }
+
+        CalculatedAverageCosts = new Dictionary<string, double>();
     }
 
     public async Task OnGetAsync()
     {
+        Console.WriteLine("get was executed and overwirte of values");
         ViewData["ContactName"] = ContactInfo.Name;
-        NamePlace1 = "";
-        RadiusPlace1 = 10;
-        NamePlace2 = "";
-        RadiusPlace2 = 10;
+        NamePlaces.Add("");
+        RadiusPlaces.Add(10);
+        NamePlaces.Add("");
+        RadiusPlaces.Add(10);
         SelectedFuelType = FuelType.Diesel;
         SelectInputMode = InputMode.auto;
 
 
-        Console.WriteLine("get was executed and overwirte of values");
+
         FuelAmount = 0;
         PricePerKm = 0.25;
         FuelPrice1 = 0;
@@ -140,80 +151,6 @@ public class IndexModel : PageModel
             CalculationSucessful = true; // Falls es berechnete Werte gibt, setze auf erfolgreich
         }
         await GetCarsAndRespectivePricePerkm();
-    }
-
-    public async Task OnPostCalculateAverageCost()
-    {
-        await GetCarsAndRespectivePricePerkm();
-        _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
-        Console.WriteLine("calculate average cost with seperate methode");
-        Console.WriteLine("Name Place 1 " + NamePlace1);
-        Console.WriteLine("Radius Place 1 " + RadiusPlace1);
-        Console.WriteLine("Name Place 2 " + NamePlace2);
-        Console.WriteLine("Radius Place 2 " + RadiusPlace2);
-
-        // API-Aufruf zur Koordinatensuche
-        ApiThrottle geoThrottle = new ApiThrottle();
-        ApiThrottle fuelThrottle = new ApiThrottle();
-        string fuelTypeForAPI = GetFuelTypeForAPI();
-        var coordinatesPlace1 = await _geoLocationService.GetCoordinatesAsync(NamePlace1);
-        var coordinatesPlace2 = await _geoLocationService.GetCoordinatesAsync(NamePlace2);
-        if (coordinatesPlace1 != null && coordinatesPlace2 != null)
-        {
-            var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace1.Latitude, coordinatesPlace1.Longitude, RadiusPlace1, fuelTypeForAPI));
-            var gasStationsPlace2 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace2.Latitude, coordinatesPlace2.Longitude, RadiusPlace2, fuelTypeForAPI));
-            if(gasStationsPlace1.IsSuccess && gasStationsPlace2.IsSuccess){
-                    Console.WriteLine("Gasstaion place 1 count" + " : " + gasStationsPlace1.Stations.Count);
-                    Console.WriteLine("Gasstaion place 2 count" + " : " + gasStationsPlace2.Stations.Count);
-                    double? averageCostPlace1 = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations);
-                    double? averageCostPlace2 = _fuelPriceService.CalculateAverageCost(gasStationsPlace2.Stations);
-                    if (averageCostPlace1 != null && averageCostPlace2 != null)
-                    {
-                        CalculationSucessful = true;
-                        AverageCostPlace1 = (double)averageCostPlace1;
-                        AverageCostPlace2 = (double)averageCostPlace2;
-                    }
-            }
-            else{
-                Console.WriteLine("Error in search Tanker-API Request" + gasStationsPlace1.ErrorMessage);
-                TempData["ToastType"] = "error";
-                TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
-            }
-        }
-    }
-    public void OnPostSave()
-    {
-        Console.WriteLine("save with seperate method");
-        // Speichern durchführen
-        //DateTime dateTime = new DateTime().Date;
-        //DateTime dbTime = dateTime;
-        DateTime germanTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"));
-        DateTime dbTime = DateTime.SpecifyKind(germanTime, DateTimeKind.Local); // Wichtig für PostgreSQL!
-
-        Console.WriteLine($"{NamePlace1} : {FuelPrice1}");
-        Console.WriteLine($"{NamePlace2} : {FuelPrice2}");
-        Console.WriteLine($"Ausgewählte Spritart: {SelectedFuelType}");
-        Console.WriteLine($"Zu tankende Menge: {FuelAmount}");
-        Console.WriteLine(dbTime.ToString("HH:mm dd.MM.yyyy"));
-        var tankinfo = new tankinfomodel
-        {
-            // date = DateTime.SpecifyKind(dbTime, DateTimeKind.Unspecified),
-            timesaved = dbTime.ToString("dd.MM.yyyy HH:mm"),
-            fueltype = SelectedFuelType.ToString(),
-            fuelamount = FuelAmount,
-            namegasstation1 = NamePlace1,
-            fuelprice1 = FuelPrice1,
-            namegasstation2 = NamePlace2,
-            fuelprice2 = FuelPrice2
-        };
-
-        // Speichern in der Datenbank
-        _context.TankinfoModel.Add(tankinfo);
-        _context.SaveChanges();
-
-        TempData["Message"] = "Daten wurden erfolgreich gespeichert!";
     }
 
     public async Task OnPostSearch()
@@ -324,6 +261,37 @@ public class IndexModel : PageModel
         Console.WriteLine("Filtered results: " + filteredCars.Count);
 
         return new JsonResult(new { filteredCars });
+    }
+
+    public async Task OnPostCalculateAverageCost()
+    {
+        foreach (var key in Request.Form.Keys)
+        {
+            Console.WriteLine($"FORM: {key} = {Request.Form[key]}");
+        }
+        Console.WriteLine("Anzahl der Orte: " + NamePlaces.Count);
+        CalculatedAverageCosts = new Dictionary<string, double>();
+        ApiThrottle geoThrottle = new ApiThrottle();
+        ApiThrottle fuelThrottle = new ApiThrottle();
+
+        await GetCarsAndRespectivePricePerkm();
+        _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
+         string fuelTypeForAPI = GetFuelTypeForAPI();
+        for (int i = 0; i < NamePlaces.Count; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(NamePlaces[i]))
+            {
+                var coordinatesPlace = await _geoLocationService.GetCoordinatesAsync(NamePlaces[i]);
+
+                if (coordinatesPlace != null)
+                {
+                    double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] <= 0) ? 10 : RadiusPlaces[i];
+                    var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
+                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
+                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations)?? 0.0 ;
+                }
+            }
+        }
     }
 
     private async Task GetCarsAndRespectivePricePerkm()

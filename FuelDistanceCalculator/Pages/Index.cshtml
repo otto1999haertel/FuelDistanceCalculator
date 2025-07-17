@@ -112,7 +112,7 @@
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
         <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
             <div class="row">
-                @if (string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
+                @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
                     <!-- Standort 1 -->
                     <div class="col-md-5 offset-md-1">

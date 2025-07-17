@@ -276,7 +276,7 @@ public class IndexModel : PageModel
 
         await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
-         string fuelTypeForAPI = GetFuelTypeForAPI();
+        string fuelTypeForAPI = GetFuelTypeForAPI();
         for (int i = 0; i < NamePlaces.Count; i++)
         {
             if (!string.IsNullOrWhiteSpace(NamePlaces[i]))
@@ -288,10 +288,11 @@ public class IndexModel : PageModel
                     double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] <= 0) ? 10 : RadiusPlaces[i];
                     var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
-                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations)?? 0.0 ;
+                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
                 }
             }
         }
+        Console.WriteLine("Calculated Average Costs: " + CalculatedAverageCosts.Count);
     }
 
     private async Task GetCarsAndRespectivePricePerkm()

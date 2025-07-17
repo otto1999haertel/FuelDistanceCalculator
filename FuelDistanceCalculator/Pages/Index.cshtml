@@ -164,7 +164,7 @@
             </div>
             <!-- Plus-Button -->
             <div class="row justify-content-center mt-3">
-                <button type="button" class="btn btn-primary mx-2" style="width: 200px" onclick="addLocation()">Standort
+                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px" onclick="addLocation()">Standort
                     hinzufügen</button>
             </div>
 
@@ -556,8 +556,8 @@
 
     function addLocation() {
     const container = document.getElementById("dynamicLocations");
-
-    const html = `
+        if(locationIndex < 4){
+        const html = `
         <div class="col-md-5 offset-md-1 mt-3">
             <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Ort">
         </div>
@@ -568,6 +568,13 @@
 
             container.insertAdjacentHTML("beforeend", html);
             locationIndex++; // Wichtig!
+        }
+        if(locationIndex>=4){
+            const button = document.getElementById("addStandort");
+            button.disabled = true;
+            button.classList.add("disabled");
+            button.textContent = "Maximale Standorte erreicht";
+        }
     }
 
 </script>

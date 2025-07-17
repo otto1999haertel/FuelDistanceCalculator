@@ -293,7 +293,8 @@ public class IndexModel : PageModel
 
                 if (coordinatesPlace != null)
                 {
-                    double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] <= 0) ? 10 : RadiusPlaces[i];
+                    double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] ==null) ? 10 : RadiusPlaces[i];
+                    RadiusPlaces[i] = radiusPlace; 
                     var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
                     if (gasStationsPlace1.IsSuccess)

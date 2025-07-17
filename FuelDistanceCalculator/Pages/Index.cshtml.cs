@@ -279,6 +279,7 @@ public class IndexModel : PageModel
         string fuelTypeForAPI = GetFuelTypeForAPI();
         for (int i = 0; i < NamePlaces.Count; i++)
         {
+            Console.WriteLine($"NamePlaces[{i}]: {NamePlaces[i]}, Radius: {RadiusPlaces[i]}");
             if (!string.IsNullOrWhiteSpace(NamePlaces[i]))
             {
                 var coordinatesPlace = await _geoLocationService.GetCoordinatesAsync(NamePlaces[i]);

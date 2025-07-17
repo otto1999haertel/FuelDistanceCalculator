@@ -178,7 +178,8 @@ public class IndexModel : PageModel
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
             () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
-            if(gasStations.IsSuccess){
+            if (gasStations.IsSuccess)
+            {
                 Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);
                 CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
                 foreach (var station in CheapestResultStations)
@@ -187,11 +188,17 @@ public class IndexModel : PageModel
                     Console.WriteLine(finalAnswer);
                 }
             }
-            else{
+            else
+            {
                 Console.WriteLine("Error in search Tanker-API Request" + gasStations.ErrorMessage);
                 TempData["ToastType"] = "error";
                 TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
+        }
+        else
+        {
+             TempData["ToastType"] = "error";
+             TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
         }
     }
 
@@ -289,7 +296,22 @@ public class IndexModel : PageModel
                     double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] <= 0) ? 10 : RadiusPlaces[i];
                     var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
-                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
+                    if (gasStationsPlace1.IsSuccess)
+                    {
+                        CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
+                    }
+                    else
+                    {
+                        CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+                        TempData["ToastType"] = "error";
+                        TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
+                    }
+                    Console.WriteLine($"Calculated Average Cost for {NamePlaces[i]}: {CalculatedAverageCosts[NamePlaces[i]]}");
+                }
+                else
+                {
+                    TempData["ToastType"] = "error";
+                    TempData["ToastMessage"] = "Fehler bei Koordaintenabfrage";
                 }
             }
         }

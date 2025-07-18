@@ -126,7 +126,7 @@
                     <div class="col-md-5">
                         <label for="RadiusPlace1">Radius (km)</label>
                         <input type="number" name="RadiusPlaces[0]" class="form-control"
-                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" />
+                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25"/>
                     </div>
 
                     <!-- Standort 2 -->
@@ -138,7 +138,7 @@
                     <div class="col-md-5 mt-3">
                         <label for="RadiusPlace2">Radius (km)</label>
                         <input type="number" name="RadiusPlaces[1]" class="form-control"
-                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" />
+                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25"/>
                     </div>
                 }
                 else
@@ -164,7 +164,7 @@
                         <div class="col-md-5 mt-3">
                             <label>Radius</label>
                             <input type="number" name="RadiusPlaces[@i]" class="form-control"
-                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" />
+                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25"/>
                         </div>
                     }
                 }
@@ -202,7 +202,7 @@
 
                 <div class="col-md-5">
                     <label for="generalRadius">Radius (km)</label>
-                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
+                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1" max="25"
                         asp-for="Radius" value="@Model.Radius">
                 </div>
             </div>
@@ -580,7 +580,7 @@
             <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Ort">
         </div>
         <div class="col-md-5 mt-3">
-            <input type="number" name="RadiusPlaces[${locationIndex}]" class="form-control" placeholder="Radius in km">
+            <input type="number" name="RadiusPlaces[${locationIndex}]" class="form-control" placeholder="Radius in km" min="1" max="25">
         </div>
             `;
 

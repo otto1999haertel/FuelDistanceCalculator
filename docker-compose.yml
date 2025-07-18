@@ -40,7 +40,8 @@ services:
     depends_on:
       - fuelgo-webapp
     networks:
-      - fuel-network
+      fuel-network:
+       ipv4_address: 172.19.0.5
 
   db:
     image: postgres:latest
@@ -58,6 +59,9 @@ services:
 networks:
   fuel-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/24
 
 volumes:
   postgres-data:

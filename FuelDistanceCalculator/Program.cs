@@ -3,6 +3,8 @@ using FuelDistanceCalculator.Data;
 using Npgsql;
 using FuelDistanceCalculator.Services;
 using Microsoft.Extensions.Caching.Distributed;
+using FuelDistanceCalculator;
+using Microsoft.AspNetCore.HttpOverrides;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,25 +39,44 @@ builder.Services.AddScoped<GeoLocationService>(provider =>
     return new GeoLocationService(httpClientFactory);
 });
 
-
-
-
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// 🔐 ForwardedHeaders-Setup (soll IMMER vor Middleware kommen)
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
 
+if (app.Environment.IsDevelopment())
+{
+    // 🔓 In Dev: keine Proxy-Beschränkung → erlaubt Tests über localhost / :8080
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+}
+else
+{
+    // 🔒 In Production: Nur IP des NGINX-Proxys vertrauen (Docker Bridge IP)
+    forwardedHeadersOptions.KnownProxies.Add(System.Net.IPAddress.Parse("172.19.0.5"));
+}
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
+
+app.UseHttpsRedirection();
 app.UseRouting();
+
+// Wichtig: Vor allen anderen Middlewares aufrufen
+// 🛡 Eigene Middleware, z. B. für Rate Limiting
+app.UseMiddleware<RequestProtectionMiddleware>();
 
 app.UseAuthorization();
 

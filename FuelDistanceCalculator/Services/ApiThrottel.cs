@@ -17,6 +17,7 @@ public class ApiThrottle
         if (timeSinceLastCall < intervalToUse)
         {
             // Warten, bis der Mindestzeitraum abgelaufen ist
+            Console.WriteLine("Delay added");
             await Task.Delay(intervalToUse - timeSinceLastCall);
         }
         // Zufällige Verzögerung hinzufügen (z. B. zwischen 10 und 30 Sekunden)

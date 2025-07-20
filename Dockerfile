@@ -16,7 +16,7 @@ COPY . .
 RUN dotnet restore "FuelDistanceCalculator/FuelDistanceCalculator.csproj"
 
 # Baue die Anwendung
-RUN dotnet publish "FuelDistanceCalculator/FuelDistanceCalculator.csproj" -c Release -o /app/publish --restore
+RUN dotnet publish "FuelDistanceCalculator/FuelDistanceCalculator.csproj" -c Release -o /app/publish --no-restore
 
 # Verwende das .NET Runtime-Image für die finale App
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base

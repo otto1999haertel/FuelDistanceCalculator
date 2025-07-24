@@ -33,7 +33,7 @@ public class GeoLocationService
         var cachedData = await _redisDb.HashGetAllAsync(cacheKey);
         if (cachedData.Length > 0)
         {
-            Console.WriteLine($"Cache-Hit für {place}!");
+            Console.WriteLine($"[Redis HIT for place]  {place}!");
 
             return new CoordinatesDTO
             {
@@ -70,7 +70,7 @@ public class GeoLocationService
         var cachedAddress = await _redisDb.StringGetAsync(cacheKey);
         if (cachedAddress.HasValue)
         {
-            Console.WriteLine($"[Redis HIT] {cacheKey}");
+            Console.WriteLine($"[Redis HIT for coordinates] {cacheKey}");
             return cachedAddress;
         }
 

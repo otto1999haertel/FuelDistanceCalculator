@@ -57,6 +57,13 @@ public class GeoLocationService
         // Ablaufzeit setzen (optional)
         await _redisDb.KeyExpireAsync(cacheKey, cacheDuration);
 
+        // Reverse-Cache setzen (Koordinaten -> Ort)
+        string latKey = coordinates.Latitude.ToString("F3", CultureInfo.InvariantCulture);
+        string lonKey = coordinates.Longitude.ToString("F3", CultureInfo.InvariantCulture);
+        string reverseKey = $"geo:reverse:{latKey}:{lonKey}";
+
+        await _redisDb.StringSetAsync(reverseKey, place, cacheDuration);
+
         return coordinates;
     }
 
@@ -100,7 +107,22 @@ public class GeoLocationService
         // Caching in Redis
         if (!string.IsNullOrWhiteSpace(fullAddress))
         {
-            await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+            // Reverse-Cache setzen (Koordinaten -> Adresse)
+        await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+
+        // Forward-Cache setzen (Ort -> Koordinaten), falls noch nicht vorhanden
+        string forwardKey = $"geo:{NormalizeAddressKey(fullAddress)}";
+        bool forwardExists = await _redisDb.KeyExistsAsync(forwardKey);
+
+        if (!forwardExists)
+        {
+            await _redisDb.HashSetAsync(forwardKey, new HashEntry[]
+            {
+                new HashEntry("lat", latitude),
+                new HashEntry("lon", longitude)
+            });
+            await _redisDb.KeyExpireAsync(forwardKey, cacheDuration);
+        }
         }
 
         return fullAddress;
@@ -155,6 +177,6 @@ public class GeoLocationService
             // Sonderzeichen rausfiltern (optional)
             normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
 
-            return normalized;
+            return normalized.ToLower();
     }
 }

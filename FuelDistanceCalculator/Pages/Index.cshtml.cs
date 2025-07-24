@@ -216,7 +216,7 @@ public class IndexModel : PageModel
 
         // Serverseitig Adresse ermitteln
         Place = await _geoLocationService.GetAddressFromCoordinatesAsync(latitude, longitude);
-        Console.WriteLine("Place recevied from ccordinates" + Place);
+        Console.WriteLine("Place recevied from ccordinates " + Place);
         return new JsonResult(new { success = true, address = Place });
     }
     // Speichern-Methode, wird durch den Speichern-Button ausgelöst

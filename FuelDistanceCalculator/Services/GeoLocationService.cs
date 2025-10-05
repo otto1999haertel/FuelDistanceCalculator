@@ -177,6 +177,6 @@ public class GeoLocationService
             // Sonderzeichen rausfiltern (optional)
             normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
 
-            return normalized.ToLower();
+        return normalized;
     }
 }

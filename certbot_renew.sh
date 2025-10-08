@@ -10,4 +10,4 @@ sudo /usr/bin/certbot renew --quiet
 sudo nginx -s stop
 
 # Starte Docker Compose mit der angegebenen .env-Datei
-sudo docker compose --env-file /home/FuelDistanceCalculator/.env.server up --build -d
+sudo docker compose --env-file /home/FuelDistanceClaulator/.env.server up --build -d

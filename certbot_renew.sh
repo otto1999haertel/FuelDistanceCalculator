@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# Stoppe den fuelgo-nginx Container
-sudo docker stop fuelgo-nginx
+# Stop the fuelgo-nginx container (if it exists)
+if docker ps -q -f name=fuelgo-nginx > /dev/null; then
+    docker stop fuelgo-nginx
+fi
 
-# Führe Certbot-Renew aus (ohne --force-renewal für normale Erneuerungen)
+# Renew SSL certificates
 sudo /usr/bin/certbot renew --quiet
 
-# Optional: Stoppe native NGINX-Instanz (falls vorhanden, sonst auskommentieren)
-sudo nginx -s stop
+# Stop native NGINX (if running)
+if pgrep nginx > /dev/null; then
+    sudo nginx -s stop
+fi
 
-# Starte Docker Compose mit der angegebenen .env-Datei
-sudo docker compose --env-file /home/FuelDistanceClaulator/.env.server up --build -d
+# Start Docker Compose services
+cd /home/ottohartel/FuelDistanceClaulator
+docker compose --env-file /home/ottohartel/FuelDistanceClaulator/.env.server up --build -d

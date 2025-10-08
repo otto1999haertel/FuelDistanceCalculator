@@ -16,3 +16,9 @@ For a successfull connection to the gas station price service you have to create
 
 # Building on the server
 -  execute: docker compose --env-file .env.server up --build
+
+# Update CertB Bot automatically via Crone Job
+- sudo docker stop fuelgo-nginx
+- sudo /usr/bin/certbot renew --force-renewal --quiet
+- sudo nginx -s stop
+- sudo docker compose --env-file .env.server up --build

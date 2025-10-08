@@ -15,4 +15,4 @@ fi
 
 # Start Docker Compose services
 cd /home/ottohartel/FuelDistanceClaulator
-docker compose --env-file /home/ottohartel/FuelDistanceClaulator/.env.server up --build -d
+sudo docker compose --env-file /home/ottohartel/FuelDistanceClaulator/.env.server up --build -d

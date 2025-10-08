@@ -1,35 +1,26 @@
 public static class TankCostService{
     public static List<GasStation> GetCheapestStations(List<GasStation> stations, double fuelAmount, double costPerKm)
     {
-        if (fuelAmount <= 0)
-        {
-            return stations.OrderBy(sc => sc.Price).Take(10).ToList();
-        }
-        var stationCosts = new List<(GasStation Station, double TotalCost)>();
-
-        foreach (var station in stations)
-        {
-            if (station.IsOpen)
+            if (fuelAmount <= 0)
             {
-                // Spritkosten (Preis pro Liter * Menge des getankten Sprits)
-                double fuelCost = (station.Price ?? 0.0) * fuelAmount;
-
-                // Wegkosten (Entfernung in km * Kosten pro Kilometer)
-                double travelCost = (station.Distance ?? 0.0) * costPerKm;
-
-                // Gesamtkosten (Spritkosten + Wegkosten)
-                double totalCost = fuelCost + travelCost;
-
-                // Füge die Tankstelle und die Gesamtkosten zur Liste hinzu
-                stationCosts.Add((station, totalCost));
+                return stations.OrderBy(sc => sc.Price).Take(10).ToList();
             }
-        }
-        Console.WriteLine("Anzahl TS in Total Cost Caluculation: " + stationCosts.Count);
-        // Sortiere die Tankstellen nach den Gesamtkosten (aufsteigend)
+            Console.WriteLine("Parallel working started");
+            var stationCosts = stations
+                .AsParallel() // Aktiviert parallele Verarbeitung
+                .Where(station => station.IsOpen) // Filtert offene Tankstellen
+                .Select(station => (
+                    Station: station,
+                    TotalCost: (station.Price ?? 0.0) * fuelAmount + (station.Distance ?? 0.0) * costPerKm
+                ))
+                .ToList();
 
-        return stationCosts.OrderBy(sc => sc.TotalCost)
+            Console.WriteLine("Anzahl TS in Total Cost Calculation: " + stationCosts.Count);
+
+            // Sortiere die Tankstellen nach den Gesamtkosten (aufsteigend)
+            return stationCosts.OrderBy(sc => sc.TotalCost)
                             .Take(10)
-                           .Select(sc => sc.Station)
-                           .ToList();
+                            .Select(sc => sc.Station)
+                            .ToList();
     }
 }

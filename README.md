@@ -17,8 +17,9 @@ For a successfull connection to the gas station price service you have to create
 # Building on the server
 -  execute: docker compose --env-file .env.server up --build
 
-# Update CertB Bot automatically via Crone Job
-- sudo docker stop fuelgo-nginx
-- sudo /usr/bin/certbot renew --force-renewal --quiet
-- sudo nginx -s stop
+# Update certificate with certbot automatically via Crone Job
+- script has to have execution rights for user with sudo rights
+- sudo docker stop fuelgo-nginx => stops nginx docker container 
+- sudo /usr/bin/certbot renew --force-renewal --quiet => renewed certificate and restarts nginx on server
+- sudo nginx -s stop => stops nginx on server for docker nginx to be able to start
 - sudo docker compose --env-file .env.server up --build

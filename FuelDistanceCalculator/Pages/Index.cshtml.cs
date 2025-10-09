@@ -285,8 +285,8 @@ public class IndexModel : PageModel
         }
         Console.WriteLine("Anzahl der Orte: " + NamePlaces.Count);
         CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
-        ApiThrottle geoThrottle = new ApiThrottle();
-        ApiThrottle fuelThrottle = new ApiThrottle(1);
+        ApiThrottle geoThrottle = new ApiThrottle(maxConcurrentCalls:1);
+        ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls:1);
 
         await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);

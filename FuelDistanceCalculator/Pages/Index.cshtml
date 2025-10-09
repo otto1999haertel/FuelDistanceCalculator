@@ -119,13 +119,13 @@
                         <label>Standort 1</label>
                         <div class="input-group">
                             <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
-                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")" />
+                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")" placeholder="Geben Sie einen Ort ein"/>
                             <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
                         </div>
                     </div>
                     <div class="col-md-5">
                         <label for="RadiusPlace1">Radius (km)</label>
-                        <input type="number" name="RadiusPlaces[0]" class="form-control"
+                        <input type="number" name="RadiusPlaces[0]" class="form-control" placeholder="Radius in km" 
                             value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25"/>
                     </div>
 
@@ -133,11 +133,11 @@
                     <div class="col-md-5 offset-md-1 mt-3">
                         <label>Standort 2</label>
                         <input type="text" name="NamePlaces[1]" class="form-control"
-                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")" />
+                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")" placeholder="Geben Sie einen Ort ein"/>
                     </div>
                     <div class="col-md-5 mt-3">
                         <label for="RadiusPlace2">Radius (km)</label>
-                        <input type="number" name="RadiusPlaces[1]" class="form-control"
+                        <input type="number" name="RadiusPlaces[1]" class="form-control" placeholder="Radius in km" 
                             value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25"/>
                     </div>
                 }
@@ -147,11 +147,11 @@
                     {
                         <div class="col-md-5 offset-md-1 mt-3">
                                 <label>Standort @(i+1)</label>
-                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]" />
+                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]" placeholder="Geben Sie einen Ort ein"/>
                         </div>
                         <div class="col-md-5 mt-3">
                             <label>Radius (km)</label>
-                            <input type="number" name="RadiusPlaces[@i]" class="form-control"
+                            <input type="number" name="RadiusPlaces[@i]" class="form-control" placeholder="Radius in km" 
                                 value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25"/>
                         </div>
                     }
@@ -569,7 +569,7 @@
         const html = `
         <div class="col-md-5 offset-md-1 mt-3">
             <label>Standort ${locationIndex + 1}</label>
-            <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Ort">
+            <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Geben Sie einen Ort ein">
         </div>
         <div class="col-md-5 mt-3">
             <label>Radius (km)</label>

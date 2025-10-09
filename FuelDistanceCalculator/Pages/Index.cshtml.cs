@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Data;
@@ -9,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace FuelDistanceCalculator.Pages;
 
-[IgnoreAntiforgeryToken] 
+[IgnoreAntiforgeryToken]
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
@@ -19,6 +20,8 @@ public class IndexModel : PageModel
 
     private readonly MarketFuelPriceService _MarketfuelPriceService;
     private readonly GeoLocationService _geoLocationService;
+
+    private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
 
     [BindProperty]
     public double FuelAmount { get; set; } // Globale Tankmenge für beide Tankstellen
@@ -39,13 +42,14 @@ public class IndexModel : PageModel
     public string NamePlace1 { get; set; }
 
     [BindProperty]
-    public List<string> NamePlaces { get; set; } 
+    public List<string> NamePlaces { get; set; }
 
     [BindProperty]
-    public List<double> RadiusPlaces { get; set; } 
+    public List<double> RadiusPlaces { get; set; }
 
+    //Thread-safe Dictionary für parallele Berechnungen
     [BindProperty]
-    public Dictionary<string, double> CalculatedAverageCosts { get; set; }
+    public ConcurrentDictionary<string, double> CalculatedAverageCosts { get; set; }
 
     [BindProperty]
     public bool CalculationSucessful { get; set; }
@@ -87,7 +91,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public double LongitudePlace { get; set; }
 
-     [BindProperty]
+    [BindProperty]
     public double LatitudePlace { get; set; }
 
     [BindProperty]
@@ -115,7 +119,7 @@ public class IndexModel : PageModel
             RadiusPlaces = new List<double>();
         }
 
-        CalculatedAverageCosts = new Dictionary<string, double>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
     }
 
     public async Task OnGetAsync()
@@ -197,8 +201,8 @@ public class IndexModel : PageModel
         }
         else
         {
-             TempData["ToastType"] = "error";
-             TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
+            TempData["ToastType"] = "error";
+            TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
         }
     }
 
@@ -272,51 +276,76 @@ public class IndexModel : PageModel
 
     public async Task OnPostCalculateAverageCost()
     {
+        ThreadPool.SetMinThreads(10, 10);
+        ThreadPool.GetAvailableThreads(out int workerThreads, out int completionPortThreads);
+        Console.WriteLine($"[Calculation Post Thread {Thread.CurrentThread.ManagedThreadId}] Available Worker Threads: {workerThreads}, Completion Port Threads: {completionPortThreads} at {DateTime.Now:HH:mm:ss.fff}");
         foreach (var key in Request.Form.Keys)
         {
             Console.WriteLine($"FORM: {key} = {Request.Form[key]}");
         }
         Console.WriteLine("Anzahl der Orte: " + NamePlaces.Count);
-        CalculatedAverageCosts = new Dictionary<string, double>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
         ApiThrottle geoThrottle = new ApiThrottle();
-        ApiThrottle fuelThrottle = new ApiThrottle();
+        ApiThrottle fuelThrottle = new ApiThrottle(1);
 
         await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
         string fuelTypeForAPI = GetFuelTypeForAPI();
-        for (int i = 0; i < NamePlaces.Count; i++)
+        object lockObj = new object();
+        List<Task> tasks = NamePlaces
+            .Select((name, index) => (Name: name, Index: index))
+            .Where(x => !string.IsNullOrWhiteSpace(x.Name))
+            .Select(x => Task.Run(()=>CalculateAverageCost(lockObj, x.Index, fuelThrottle, fuelTypeForAPI)))
+            .ToList();
+            
+        await Task.WhenAll(tasks);
+        foreach (var (type, message) in _toastMessages)
         {
-            if (!string.IsNullOrWhiteSpace(NamePlaces[i]))
-            {
-                Console.WriteLine($"If clause entered with: {NamePlaces[i]}");
-                var coordinatesPlace = await _geoLocationService.GetCoordinatesAsync(NamePlaces[i]);
+            TempData["ToastType"] = type;
+            TempData["ToastMessage"] = message;
+        }
+        Console.WriteLine("Calculated Average Costs: " + CalculatedAverageCosts.Count);
+    }
 
-                if (coordinatesPlace != null)
+    private async Task CalculateAverageCost(object lockObj, int i, ApiThrottle fuelThrottle, string fuelTypeForAPI)
+    {
+        try
+        {
+            Console.WriteLine($"[Calculation Thread {Thread.CurrentThread.ManagedThreadId}] Task for {NamePlaces[i]} started at {DateTime.Now:HH:mm:ss.fff}");
+            var coordinatesPlace = await _geoLocationService.GetCoordinatesAsync(NamePlaces[i]);
+
+            if (coordinatesPlace != null)
+            {
+                double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces.ElementAt(i) == null) ? 10 : RadiusPlaces.ElementAt(i);
+                lock (lockObj)
                 {
-                    double radiusPlace = (i >= RadiusPlaces.Count || RadiusPlaces[i] ==null) ? 10 : RadiusPlaces[i];
-                    RadiusPlaces[i] = radiusPlace; 
-                    var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
+                    RadiusPlaces[i] = radiusPlace;
+                }
+                var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
-                    if (gasStationsPlace1.IsSuccess)
-                    {
-                        CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
-                    }
-                    else
-                    {
-                        CalculatedAverageCosts[NamePlaces[i]] = 0.0;
-                        TempData["ToastType"] = "error";
-                        TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
-                    }
-                    Console.WriteLine($"Calculated Average Cost for {NamePlaces[i]}: {CalculatedAverageCosts[NamePlaces[i]]}");
+                if (gasStationsPlace1.IsSuccess)
+                {
+                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
                 }
                 else
                 {
-                    TempData["ToastType"] = "error";
-                    TempData["ToastMessage"] = "Fehler bei Koordaintenabfrage";
+                    CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+                    _toastMessages.Add(("error","Fehler bei Tankstellenabfrage"));
                 }
+                Console.WriteLine($"Calculated Average Cost for {NamePlaces[i]}: {CalculatedAverageCosts[NamePlaces[i]]}");
+            }
+            else
+            {
+                CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+                _toastMessages.Add(("error","Fehler bei Koordinatenabfrage"));
             }
         }
-        Console.WriteLine("Calculated Average Costs: " + CalculatedAverageCosts.Count);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler bei {NamePlaces[i]}: {ex.Message}");
+            CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+            _toastMessages.Add(("error", $"Fehler bei der Verarbeitung von {NamePlaces[i]}: {ex.Message}"));
+        }
     }
 
     private async Task GetCarsAndRespectivePricePerkm()

@@ -8,24 +8,39 @@ public class ApiThrottle
     // Gemeinsame Random-Instanz, um Mehrfachinitialisierungen zu vermeiden.
     private static readonly Random _random = new Random();
 
+    private readonly SemaphoreSlim _semaphore;
+
+    //Only one thread at a time can access the API
+    public ApiThrottle(int maxConcurrentCalls = 1)
+    {
+        _semaphore = new SemaphoreSlim(maxConcurrentCalls, maxConcurrentCalls);
+    }
+
     public async Task<T> ExecuteWithThrottle<T>(string apiKey, Func<Task<T>> apiCall, TimeSpan? interval = null)
     {
-        Console.WriteLine("API-Throttle entered");
+        Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] API-Throttle entered for {apiKey} at {DateTime.Now:HH:mm:ss.fff}, Semaphore Count: {_semaphore.CurrentCount}");
         var intervalToUse = interval ?? _defaultInterval;
-        var timeSinceLastCall = DateTime.Now - _lastCallTimes.GetOrAdd(apiKey, DateTime.MinValue);
 
-        if (timeSinceLastCall < intervalToUse)
+        await _semaphore.WaitAsync();
+        try
         {
-            // Warten, bis der Mindestzeitraum abgelaufen ist
-            Console.WriteLine("Delay added");
-            await Task.Delay(intervalToUse - timeSinceLastCall);
-        }
-        // Zufällige Verzögerung hinzufügen (z. B. zwischen 10 und 30 Sekunden)
-        int randomDelaySeconds = _random.Next(100, 300); // 10 bis 30 Sekunden
-        await Task.Delay(TimeSpan.FromMilliseconds(randomDelaySeconds));
+            var timeSinceLastCall = DateTime.Now - _lastCallTimes.GetOrAdd(apiKey, DateTime.MinValue);
+            if (timeSinceLastCall < intervalToUse)
+            {
+                Console.WriteLine($"[API CallThread {Thread.CurrentThread.ManagedThreadId}] Delay added for {apiKey} ({intervalToUse - timeSinceLastCall}) at {DateTime.Now:HH:mm:ss.fff}");
+                await Task.Delay(intervalToUse - timeSinceLastCall);
+            }
 
-        // Führe den API-Aufruf aus
-        _lastCallTimes[apiKey] = DateTime.Now;
-        return await apiCall();
+            Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] Executing API call for {apiKey} at {DateTime.Now:HH:mm:ss.fff}");
+            _lastCallTimes[apiKey] = DateTime.Now;
+            var result = await apiCall();
+            Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] API call for {apiKey} completed at {DateTime.Now:HH:mm:ss.fff}");
+            return result;
+        }
+        finally
+        {
+            Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] Releasing semaphore for {apiKey} at {DateTime.Now:HH:mm:ss.fff}, New Semaphore Count: {_semaphore.CurrentCount + 1}");
+            _semaphore.Release();
+        }
     }
 }

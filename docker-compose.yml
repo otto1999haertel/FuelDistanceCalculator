@@ -25,6 +25,12 @@ services:
     command: ["./start.sh"]  # Hier wird das Skript ausgeführt
     networks:
       - fuel-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+        reservations:
+          cpus: '0.5' # Reserviere 50 % eines Kerns
 
   nginx:
     image: nginx:latest

@@ -141,28 +141,16 @@
                             value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25"/>
                     </div>
                 }
-                else
+                @if(Model.NamePlaces.Count > 2)
                 {
-                    @for (int i = 0; i < Model.NamePlaces.Count; i++)
+                    @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
-                        @if(i==0){
-                             <div class="col-md-5 offset-md-1">
-                                <label>Standort</label>
-                                <div class="input-group">
-                                    <input type="text" id="GeoStandort" class="form-control"
-                                        value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")" />
-                                    <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
-                                </div>
-                            </div>
-                        }
-                        else{
-                            <div class="col-md-5 offset-md-1 mt-3">
-                                <label>Standort</label>
+                        <div class="col-md-5 offset-md-1 mt-3">
+                                <label>Standort @(i+1)</label>
                                 <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]" />
-                            </div>
-                        }
+                        </div>
                         <div class="col-md-5 mt-3">
-                            <label>Radius</label>
+                            <label>Radius (km)</label>
                             <input type="number" name="RadiusPlaces[@i]" class="form-control"
                                 value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25"/>
                         </div>
@@ -175,8 +163,11 @@
             </div>
             <!-- Plus-Button -->
             <div class="row justify-content-center mt-3">
-                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px" onclick="addLocation()">Standort
-                    hinzufügen</button>
+                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px" 
+                        onclick="addLocation()" 
+                        @(Model.CalculatedAverageCosts.Count >= 4 ? "disabled" : "")>
+                    @(Model.CalculatedAverageCosts.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
+                </button>
             </div>
 
             <!-- Berechnen-Button -->
@@ -577,9 +568,11 @@
         if(locationIndex < 4){
         const html = `
         <div class="col-md-5 offset-md-1 mt-3">
+            <label>Standort ${locationIndex + 1}</label>
             <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Ort">
         </div>
         <div class="col-md-5 mt-3">
+            <label>Radius (km)</label>
             <input type="number" name="RadiusPlaces[${locationIndex}]" class="form-control" placeholder="Radius in km" min="1" max="25">
         </div>
             `;

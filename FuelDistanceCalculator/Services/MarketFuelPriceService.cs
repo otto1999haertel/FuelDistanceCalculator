@@ -25,7 +25,7 @@ public class MarketFuelPriceService
     try
     {
         if(DateTime.Now.Second==0){
-            await Task.Delay(new Random().Next(400, 1000));
+            await Task.Delay(new Random().Next(400, 750));
         }
         var response = await _httpClient.GetAsync(requestUrl);
 

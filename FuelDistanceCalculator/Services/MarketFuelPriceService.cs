@@ -19,9 +19,8 @@ public class MarketFuelPriceService
     
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
 {
-    Console.WriteLine("Called from API method");
+    Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
     Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
-    Console.WriteLine("API Key " + _apiKey); 
     
     var requestUrl = $"https://creativecommons.tankerkoenig.de/json/list.php?lat={latitude}&lng={longitude}&rad={radius}&sort=dist&type={fueltype}&apikey={_apiKey}";
 

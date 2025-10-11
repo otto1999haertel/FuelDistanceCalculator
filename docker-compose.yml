@@ -29,9 +29,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
-        reservations:
-          cpus: '0.5' # Reserviere 50 % eines Kerns
+          cpus: '1.00'
 
   nginx:
     image: nginx:latest

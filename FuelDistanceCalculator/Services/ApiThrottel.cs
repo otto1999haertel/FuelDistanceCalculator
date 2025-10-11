@@ -25,10 +25,20 @@ public class ApiThrottle
         try
         {
             var timeSinceLastCall = DateTime.Now - _lastCallTimes.GetOrAdd(apiKey, DateTime.MinValue);
-            if (timeSinceLastCall < intervalToUse)
+            var baseDelay = intervalToUse - timeSinceLastCall;
+            if (baseDelay > TimeSpan.Zero)
             {
-                Console.WriteLine($"[API CallThread {Thread.CurrentThread.ManagedThreadId}] Delay added for {apiKey} ({intervalToUse - timeSinceLastCall}) at {DateTime.Now:HH:mm:ss.fff}");
-                await Task.Delay(intervalToUse - timeSinceLastCall);
+                // Jitter hinzufügen: z. B. random zwischen -20% und +20% des baseDelays
+                double jitterFactor = 0.2; // Anpassbar, z. B. 0.2 für ±20%
+                double jitter = (2 * _random.NextDouble() - 1) * jitterFactor * baseDelay.TotalMilliseconds; // Zufällig positiv/negativ
+                var delayWithJitter = baseDelay.Add(TimeSpan.FromMilliseconds(jitter));
+
+                // Stelle sicher, dass Delay nicht negativ wird
+                if (delayWithJitter > TimeSpan.Zero)
+                {
+                    Console.WriteLine($"[API CallThread {Thread.CurrentThread.ManagedThreadId}] Delay added for {apiKey} ({delayWithJitter}) at {DateTime.Now:HH:mm:ss.fff} (including jitter)");
+                    await Task.Delay(delayWithJitter);
+                }
             }
 
             Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] Executing API call for {apiKey} at {DateTime.Now:HH:mm:ss.fff}");

@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using FluentMigrator.Builders.IfDatabase;
 
 namespace FuelDistanceCalculator.Services;
 
@@ -7,11 +8,13 @@ public class MarketFuelPriceService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
+    private readonly string _mode;
     public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient)
     {
         _httpClient = httpClient;
         _apiKey = configuration["ApiSettings:TankApiKey"]
                   ?? throw new Exception("API Key missing");
+        _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
     }
     
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
@@ -27,20 +30,26 @@ public class MarketFuelPriceService
         if(DateTime.Now.Second==0 && DateTime.Now.Minute%5==0){
             await Task.Delay(new Random().Next(400, 750));
         }
-        var response = await _httpClient.GetAsync(requestUrl);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return new GasStationResult
+        string responseContent;
+        Console.WriteLine("Mode " + _mode);
+            if (_mode == "Production")
             {
-                IsSuccess = false,
-                ErrorMessage = $"API request failed with HTTP status code {response.StatusCode}",
-                Stations = new List<GasStation>()
-            };
-        }
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("Response in Service: " + responseContent);
+                // Production: Echte HTTP-Anfrage
+                HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
+                response.EnsureSuccessStatusCode();  // Wirft Exception bei Fehlern (z. B. 404)
+                responseContent = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                // Development/Test: Lade JSON aus File
+                string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Fuel_price_API_response.json");
+                if (!File.Exists(jsonFilePath))
+                {
+                    throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+                }
+                responseContent = await File.ReadAllTextAsync(jsonFilePath);
+            }
+        Console.WriteLine("API Response: " + responseContent);
 
         // Versuche, allgemeines Fehlerobjekt zu lesen
         var errorCheck = JsonSerializer.Deserialize<ResponseModelMarketFuelPriceService>(responseContent, new JsonSerializerOptions

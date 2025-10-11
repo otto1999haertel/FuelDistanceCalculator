@@ -297,8 +297,9 @@ public class IndexModel : PageModel
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
             .Select(x => Task.Run(()=>CalculateAverageCost(lockObj, x.Index, fuelThrottle, fuelTypeForAPI)))
             .ToList();
-            
+
         await Task.WhenAll(tasks);
+        CalculatedAverageCosts.AsParallel().OrderBy(pair => pair.Value);
         foreach (var (type, message) in _toastMessages)
         {
             TempData["ToastType"] = type;

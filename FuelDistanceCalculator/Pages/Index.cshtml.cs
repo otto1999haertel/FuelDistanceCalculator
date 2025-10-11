@@ -167,6 +167,7 @@ public class IndexModel : PageModel
         Console.WriteLine("Fuel type  " + SelectedFuelType.ToString().ToLower());
         Console.WriteLine("Fuel Amount " + FuelAmount);
         Console.WriteLine("Price pro kilometer " + PricePerKm);
+        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
 
 

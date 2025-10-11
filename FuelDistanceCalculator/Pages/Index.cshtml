@@ -594,7 +594,7 @@
 {
     <div id="averageCost" class="mt-4 text-center">
         <h4>Ergebnisse:</h4>
-        @foreach (KeyValuePair<string, double> place in Model.CalculatedAverageCosts)
+        @foreach (KeyValuePair<string, double> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
         {
             <p>@place.Key- @(place.Value > 0 ? $"Durchschnittspreis: {Model.ToDisplay(place.Value.ToString("0.000"))} €" :
                         "Keine Preise verfügbar")</p>

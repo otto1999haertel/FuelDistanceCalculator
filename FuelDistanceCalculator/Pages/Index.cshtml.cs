@@ -299,7 +299,6 @@ public class IndexModel : PageModel
             .ToList();
 
         await Task.WhenAll(tasks);
-        CalculatedAverageCosts.AsParallel().OrderBy(pair => pair.Value);
         foreach (var (type, message) in _toastMessages)
         {
             TempData["ToastType"] = type;

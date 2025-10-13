@@ -67,18 +67,6 @@
                 <!-- Preis pro Kilometer -->
                 <div class="row">
                     <div class="col-md-6">
-                        <!-- Preis pro Kilometer -->
-                        <div class="form-group">
-                            <label for="PricePerKm">Kosten pro Kilometer (€)</label>
-                            <span class="input-group-text-icon" data-bs-toggle="tooltip"
-                                title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Suche">
-                                ⓘ
-                            </span>
-                            <input class="form-control" id="PricePerKm" name="PricePerKm" required
-                                onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="SelectedCarType">Fahrzeugtyp </label>
                             <span>
@@ -91,24 +79,34 @@
                             <div id="suggestions" class="suggestions-box"></div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <!-- Preis pro Kilometer -->
+                        <div class="form-group">
+                            <label for="PricePerKm">Kosten pro Kilometer (€)</label>
+                            <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                                title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
+                                ⓘ
+                            </span>
+                            <input class="form-control" id="PricePerKm" name="PricePerKm" required
+                                onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
+                        </div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label asp-for="@Model.SelectInputMode" class="form-label">Modus</label>
                     <select asp-for="@Model.SelectInputMode" class="form-select"
                         asp-items="@(Enum.GetValues(typeof(InputMode))
-                                                                                                                                                                                                                             .Cast<InputMode>()
-                                                                                                                                                                                                                             .Select(mode => new SelectListItem
-                                                                                                                                                                                                                             {
-                                                                                                                                                                                                                                 Value = mode.ToString(),
-                                                                                                                                                                                                                                 Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
-                                                                                                                                                                                                                             }))"
+                                                                                                                                                                                                                                                     .Cast<InputMode>()
+                                                                                                                                                                                                                                                     .Select(mode => new SelectListItem
+                                                                                                                                                                                                                                                     {
+                                                                                                                                                                                                                                                         Value = mode.ToString(),
+                                                                                                                                                                                                                                                         Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
+                                                                                                                                                                                                                                                     }))"
                         onchange="toggleInputMethod(this)">
                     </select>
                 </div>
             </div>
         </div>
-
-
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
         <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
             <div class="row">
@@ -119,40 +117,43 @@
                         <label>Standort 1</label>
                         <div class="input-group">
                             <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
-                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")" placeholder="Geben Sie einen Ort ein"/>
+                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
+                                placeholder="Geben Sie einen Ort ein" />
                             <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
                         </div>
                     </div>
                     <div class="col-md-5">
                         <label for="RadiusPlace1">Radius (km)</label>
-                        <input type="number" name="RadiusPlaces[0]" class="form-control" placeholder="Radius in km" 
-                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25"/>
+                        <input type="number" name="RadiusPlaces[0]" class="form-control" placeholder="Radius in km"
+                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25" />
                     </div>
 
                     <!-- Standort 2 -->
                     <div class="col-md-5 offset-md-1 mt-3">
                         <label>Standort 2</label>
                         <input type="text" name="NamePlaces[1]" class="form-control"
-                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")" placeholder="Geben Sie einen Ort ein"/>
+                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
+                            placeholder="Geben Sie einen Ort ein" />
                     </div>
                     <div class="col-md-5 mt-3">
                         <label for="RadiusPlace2">Radius (km)</label>
-                        <input type="number" name="RadiusPlaces[1]" class="form-control" placeholder="Radius in km" 
-                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25"/>
+                        <input type="number" name="RadiusPlaces[1]" class="form-control" placeholder="Radius in km"
+                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25" />
                     </div>
                 }
-                @if(Model.NamePlaces.Count > 2)
+                @if (Model.NamePlaces.Count > 2)
                 {
                     @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
                         <div class="col-md-5 offset-md-1 mt-3">
-                                <label>Standort @(i+1)</label>
-                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]" placeholder="Geben Sie einen Ort ein"/>
+                            <label>Standort @(i + 1)</label>
+                            <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
+                                placeholder="Geben Sie einen Ort ein" />
                         </div>
                         <div class="col-md-5 mt-3">
                             <label>Radius (km)</label>
-                            <input type="number" name="RadiusPlaces[@i]" class="form-control" placeholder="Radius in km" 
-                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25"/>
+                            <input type="number" name="RadiusPlaces[@i]" class="form-control" placeholder="Radius in km"
+                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25" />
                         </div>
                     }
                 }
@@ -163,9 +164,8 @@
             </div>
             <!-- Plus-Button -->
             <div class="row justify-content-center mt-3">
-                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px" 
-                        onclick="addLocation()" 
-                        @(Model.CalculatedAverageCosts.Count >= 4 ? "disabled" : "")>
+                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px"
+                    onclick="addLocation()" @(Model.CalculatedAverageCosts.Count >= 4 ? "disabled" : "")>
                     @(Model.CalculatedAverageCosts.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
                 </button>
             </div>
@@ -193,8 +193,8 @@
 
                 <div class="col-md-5">
                     <label for="generalRadius">Radius (km)</label>
-                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1" max="25"
-                        asp-for="Radius" value="@Model.Radius">
+                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
+                        max="25" asp-for="Radius" value="@Model.Radius">
                 </div>
             </div>
             <div class="d-flex justify-content-center">
@@ -254,7 +254,7 @@
                         </div>
                         <div id="mapView" style="display: none;">
                             @* TODO add Tool tip with click option*@
-                            <div id="map_div" style="height: 500px;"/>
+                            <div id="map_div" style="height: 500px;" />
                         </div>
                     }
                     else
@@ -505,7 +505,7 @@
                     .openTooltip()
                     .on('click',function(){
                         window.open("https://www.google.com/maps?q=@lat,@lng", "_blank");
-                                        });
+                                            });
 
                 </text>
         }
@@ -532,13 +532,13 @@
         if (response.ok) {
             const result = await response.json();
             if (result.success && result.address) {
-                if(document.getElementById("generalLocation")) {
+                if (document.getElementById("generalLocation")) {
                     document.getElementById("generalLocation").value = result.address;
                 }
-                if(document.getElementById("GeoStandort")){
+                if (document.getElementById("GeoStandort")) {
                     document.getElementById("GeoStandort").value = result.address;
                 }
-                if(document.getElementById("FirstComparePlace")) {
+                if (document.getElementById("FirstComparePlace")) {
                     document.getElementById("FirstComparePlace").value = result.address;
                 }
             }
@@ -564,9 +564,9 @@
     }
 
     function addLocation() {
-    const container = document.getElementById("dynamicLocations");
-        if(locationIndex < 4){
-        const html = `
+        const container = document.getElementById("dynamicLocations");
+        if (locationIndex < 4) {
+            const html = `
         <div class="col-md-5 offset-md-1 mt-3">
             <label>Standort ${locationIndex + 1}</label>
             <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Geben Sie einen Ort ein">
@@ -580,7 +580,7 @@
             container.insertAdjacentHTML("beforeend", html);
             locationIndex++; // Wichtig!
         }
-        if(locationIndex>=4){
+        if (locationIndex >= 4) {
             const button = document.getElementById("addStandort");
             button.disabled = true;
             button.classList.add("disabled");

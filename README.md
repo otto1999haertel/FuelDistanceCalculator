@@ -1,5 +1,5 @@
 # FuelDistanceCalculator
-ASP .NET-Core Web-App with razor pages for calculating the optimal gas station regarding the price, the amount you have to buy and your average cost per kilometer
+ASP .NET-Core Web-App with razor pages (.cshtml) for calculating the optimal gas station regarding the price, the amount you have to buy and your average cost per kilometer
 To start the app navigate to the root folder, where docker-compose.yml file is located and enter:
 docker compose up --build
 For a successfull connection to the gas station price service you have to create a appsettings.json file and enter your API Key in the following format:
@@ -8,7 +8,7 @@ For a successfull connection to the gas station price service you have to create
     } 
 
 # Design Updates
-- to update the bootstrap design run 'libman restore' on your machine
+- to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 
 # Build
 - appsettings.Development.json need to be in FuelDistanceCalculator

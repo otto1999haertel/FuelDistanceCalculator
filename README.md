@@ -8,7 +8,7 @@ For a successfull connection to the gas station price service you have to create
     } 
 
 # Design Updates
-- to update the bootstrap design run 'libman restore' on your machine
+- to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 
 # Build
 - appsettings.Development.json need to be in FuelDistanceCalculator

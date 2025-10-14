@@ -18,7 +18,7 @@ public static class TankCostService{
                 .Where(station => station.IsOpen && station.FuelTypePrice.HasValue && station.Dist.HasValue) // Filtert offene Tankstellen
                 .Select(station => (
                 Station: station,
-                TotalCost: station.CalculateTotalCost(fuelAmount, costPerKm)
+                TotalCost: station.CalculateTotalCostDoubleWay(fuelAmount, costPerKm)
                 ))
             .ToList();
 

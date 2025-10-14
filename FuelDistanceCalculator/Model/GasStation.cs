@@ -85,10 +85,26 @@ public class GasStation
         private set { m_lastUpdate = value; }
     }
 
-    public decimal CalculateTotalCost(decimal fuelAmount, decimal pricePerKm)
+    public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
     {
-        _totalCoast = _fuelprice * fuelAmount + (pricePerKm * (decimal)(Dist ?? 0) * 2);
-        Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast} (Fuel Price: {_fuelprice}, Fuel Amount: {fuelAmount}, Price per Km: {pricePerKm}, Distance: {Dist})");  
+        if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
+        {
+            throw new ArgumentException("Ungültige Eingabewerte: FuelAmount muss positiv sein, PricePerKm nicht negativ, Dist vorhanden und nicht negativ.");
+        }
+
+        decimal dist = (decimal)Dist.Value;  // Sicheres Cast zu decimal (Dist ist double?)
+
+        decimal fuelCost = _fuelprice * fuelAmount;  // Kraftstoffkosten (nicht gerundet)
+        decimal travelCost = pricePerKm * dist * 2m;  // Fahrtkosten hin/rück (nicht gerundet)
+
+        decimal rawTotal = fuelCost + travelCost;
+        _totalCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);  // Endgültige Rundung auf 2 Dezimalen
+
+        // Verbessertes Logging mit 2 Dezimalen (für Klarheit)
+        Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
+                          $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
+                          $"Fuel Price: {_fuelprice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
+
         return _totalCoast;
     }
 

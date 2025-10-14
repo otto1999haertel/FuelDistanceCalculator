@@ -213,6 +213,15 @@
                                 <option value="list">Liste</option>
                                 <option value="map">Karte</option>
                             </select>
+                            @if(Model.FuelAmount>0)
+                            {
+                                <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
+                                    style="cursor: pointer;"
+                                    title="Die Wegkosten werden für Hin- und Rückfahrt angesetzte">
+                                    ⓘ
+                                </span>
+                            }
+
                             <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
                                 style="display: none; cursor: pointer;"
                                 title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle">
@@ -459,9 +468,11 @@
                 mapInitialized = true;
             }
             document.getElementById("mapTooltip").style.display = "inline-block";
+            document.getElementById("listTooltip").style.display = "none";
         }
         else {
             document.getElementById("mapTooltip").style.display = "none";
+            document.getElementById("listTooltip").style.display = "inline-block";
         }
     }
     function initMap() {

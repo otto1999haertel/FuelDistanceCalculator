@@ -1,8 +1,10 @@
 ﻿@page
 @using FuelDistanceCalculator.Constants
+@using System.Globalization
 @model IndexModel
 @{
     ViewData["Title"] = "FuelGo";
+    var culture = new CultureInfo("de-DE");
 }
 
 <!-- Google tag (gtag.js) -->
@@ -226,27 +228,35 @@
                                             <strong>@station.Name</strong> -
                                             @if (Model.FuelAmount > 0)
                                             {
-                                                <span>Gesamtkosten: @Model.ToDisplay(station.CalculateTotalCost(Model.FuelAmount,
-                                                                                            Model.PricePerKm).ToString()) €</span>
+                                                <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>
                                                                         }
                                             else
                                             {
-                                                <span>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString()) €</span>
+                                                <span>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString()).ToString() €</span>
                                             }
                                         </div>
                                         <div class="station-details" style="display:none;">
                                             @if (Model.FuelAmount > 0)
                                             {
-                                                <p>Einzelpreis pro Liter: @Model.ToDisplay(station.Price.ToString())€</p>
+                                                <p>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString())€</p>
                                             }
-                                            <p>Entfernung: @Model.ToDisplay(station.Distance.ToString()) km</p>
+                                            @if(!string.IsNullOrEmpty(station.LastUpdate))
+                                            {
+                                                DateTimeOffset dto = DateTimeOffset.Parse(@station.LastUpdate);
+                                                <p>Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", culture)</p>
+                                            }
+                                            <p>Entfernung: @Model.ToDisplay(station.Dist.ToString()) km</p>
                                             <p>Ort:
-                                                <a href="https://www.google.com/maps?q=@station.Place,@station.Street+@station.HouseNumber"
+                                                <a href="https://www.google.com/maps?q=@station.Place,@station.Street"
                                                     target="_blank">
-                                                    @station.Place, @station.Street @station.HouseNumber
+                                                    @station.Place, @station.Street, 
                                                 </a>
                                             </p>
-
+                                            @if(!string.IsNullOrEmpty(station.ClosesAt))
+                                            {
+                                                 DateTimeOffset dto = DateTimeOffset.Parse(@station.ClosesAt);
+                                                <p>Schließt um @dto.ToString("HH:mm 'Uhr'",culture)</p>
+                                            }
                                         </div>
                                     </li>
                                 }
@@ -489,12 +499,12 @@
 
         @foreach (var station in Model.CheapestResultStations)
             {
-                var lat = station.Latitude.ToString().Replace(",", ".");
-                var lng = station.Longitude.ToString().Replace(",", ".");
+                var lat = station.Coords.Lat.ToString().Replace(",", ".");
+                var lng = station.Coords.Lng.ToString().Replace(",", ".");
                 var name = Html.Raw(Json.Serialize(station.Name));
                 var price = Model.FuelAmount > 0
-                ? Model.ToDisplay(station.CalculateTotalCost(Model.FuelAmount, Model.PricePerKm).ToString())
-                : Model.ToDisplay(station.Price.ToString());
+                ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
+                : Model.ToDisplay(station.FuelTypePrice.ToString());
 
                 var isCheapest = station == Model.CheapestResultStations.First();
 
@@ -594,7 +604,7 @@
 {
     <div id="averageCost" class="mt-4 text-center">
         <h4>Ergebnisse:</h4>
-        @foreach (KeyValuePair<string, double> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
+        @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
         {
             <p>@place.Key- @(place.Value > 0 ? $"Durchschnittspreis: {Model.ToDisplay(place.Value.ToString("0.000"))} €" :
                         "Keine Preise verfügbar")</p>

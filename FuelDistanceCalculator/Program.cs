@@ -19,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Registrieren des FuelPriceService in der DI-Container
 // 🚀 Registriere FuelPriceService als Singleton, ABER mit einem Factory-Provider
 builder.Services.AddSingleton<FuelPriceService>(provider =>
-    new FuelPriceService(10, 2.5));
+    new FuelPriceService(10, 2.5m));
 
 // 🚀 Registriere MarketFuelPriceService mit HttpClientFactory
 builder.Services.AddHttpClient<MarketFuelPriceService>();

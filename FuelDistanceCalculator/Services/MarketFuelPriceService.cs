@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using FluentMigrator.Builders.IfDatabase;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FuelDistanceCalculator.Services;
 
@@ -21,9 +22,9 @@ public class MarketFuelPriceService
 {
     Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
     Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
-    
-    var requestUrl = $"https://creativecommons.tankerkoenig.de/json/list.php?lat={latitude}&lng={longitude}&rad={radius}&sort=dist&type={fueltype}&apikey={_apiKey}";
 
+        var requestUrl = $"https://creativecommons.tankerkoenig.de/api/v4/stations/search?apikey={_apiKey}&lat={latitude}&lng={longitude}&rad={radius}";
+        Console.WriteLine("Request URL: " + requestUrl);
     try
     {
         if(DateTime.Now.Second==0 && DateTime.Now.Minute%5==0){
@@ -31,7 +32,7 @@ public class MarketFuelPriceService
         }
         string responseContent;
         Console.WriteLine("Mode " + _mode);
-            if (_mode == "Production")
+            if (_mode == "Development")
             {
                 // Production: Echte HTTP-Anfrage
                 HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
@@ -48,36 +49,37 @@ public class MarketFuelPriceService
                 }
                 responseContent = await File.ReadAllTextAsync(jsonFilePath);
             }
-        Console.WriteLine("API Response: " + responseContent);
+            Console.WriteLine("API Response: " + responseContent);
 
-        // Versuche, allgemeines Fehlerobjekt zu lesen
-        var errorCheck = JsonSerializer.Deserialize<ResponseModelMarketFuelPriceService>(responseContent, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (errorCheck == null || !errorCheck.ok)
-        {
-            return new GasStationResult
-            {
-                IsSuccess = false,
-                ErrorMessage = errorCheck?.message ?? "API returned error without message",
-                Stations = new List<GasStation>()
-            };
-        }
-
-        // Versuche, die eigentlichen Tankstellen-Daten zu lesen
-        var gasStationResponse = JsonSerializer.Deserialize<GasStationResponse>(responseContent, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
+            // Versuche, allgemeines Fehlerobjekt zu lesen
+            // Versuche, die eigentlichen Tankstellen-Daten zu lesen
+            GasStationResponse gasStationResponse = null;
+            try
+                {
+                    gasStationResponse = JsonSerializer.Deserialize<GasStationResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    Console.WriteLine("Deserialisierung erfolgreich. Stations-Anzahl: " + (gasStationResponse?.Stations?.Count ?? 0));
+                }
+                catch (JsonException ex)
+                {
+                    Console.WriteLine("Deserialisierungs-Fehler: " + ex.Message);
+                    // Logge responseContent hier, um das JSON zu inspizieren
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Allgemeiner Fehler: " + ex.Message);
+                }
         List<GasStation> openStations = gasStationResponse?.Stations?
-            .Where(station => station.IsOpen && station.Price.HasValue && station.Distance.HasValue)
+            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
             .ToList() ?? new List<GasStation>();
-
         foreach (GasStation gS in openStations)
         {
+            Console.WriteLine("Open Gasstations in Service " + gS.ToString());
+            Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
+            gS.SetPrice(fueltype);
+            gS.SetUpdateTime(fueltype);
             Console.WriteLine("Open Gasstations in Service " + gS.ToString());
         }
 

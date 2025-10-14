@@ -24,9 +24,9 @@ public class IndexModel : PageModel
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
 
     [BindProperty]
-    public double FuelAmount { get; set; } // Globale Tankmenge für beide Tankstellen
+    public decimal FuelAmount { get; set; } // Globale Tankmenge für beide Tankstellen
     [BindProperty]
-    public double PricePerKm { get; set; } // Preis pro Kilometer für beide Tankstellen
+    public decimal PricePerKm { get; set; } // Preis pro Kilometer für beide Tankstellen
 
     [BindProperty]
     public double Distance1 { get; set; }
@@ -49,7 +49,7 @@ public class IndexModel : PageModel
 
     //Thread-safe Dictionary für parallele Berechnungen
     [BindProperty]
-    public ConcurrentDictionary<string, double> CalculatedAverageCosts { get; set; }
+    public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; set; }
 
     [BindProperty]
     public bool CalculationSucessful { get; set; }
@@ -97,7 +97,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public List<GasStation> CheapestResultStations { get; set; }
 
-    public Dictionary<string, double> CarsAndRespectivePricePerkm { get; private set; } = new Dictionary<string, double>();
+    public Dictionary<string, decimal> CarsAndRespectivePricePerkm { get; private set; } = new Dictionary<string, decimal>();
 
     [BindProperty]
     public string SelectedCarType { get; set; }
@@ -119,7 +119,7 @@ public class IndexModel : PageModel
             RadiusPlaces = new List<double>();
         }
 
-        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
     }
 
     public async Task OnGetAsync()
@@ -136,7 +136,7 @@ public class IndexModel : PageModel
 
 
         FuelAmount = 0;
-        PricePerKm = 0.25;
+        PricePerKm = 0.25m;
         FuelPrice1 = 0;
         Distance1 = 0;
         FuelPrice2 = 0;
@@ -167,7 +167,7 @@ public class IndexModel : PageModel
         Console.WriteLine("Fuel type  " + SelectedFuelType.ToString().ToLower());
         Console.WriteLine("Fuel Amount " + FuelAmount);
         Console.WriteLine("Price pro kilometer " + PricePerKm);
-        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
 
 
@@ -187,11 +187,6 @@ public class IndexModel : PageModel
             {
                 Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);
                 CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
-                foreach (var station in CheapestResultStations)
-                {
-                    string finalAnswer = $"{station.Name}, {station.Place}, {station.Street}, {station.HouseNumber} Gesamtkosten: {(station.Price * FuelAmount + station.Distance * PricePerKm):F2} EUR, Entfernung {station.Distance}, Latitude {station.Latitude}, Longitude {station.Longitude}";
-                    Console.WriteLine(finalAnswer);
-                }
             }
             else
             {
@@ -285,7 +280,7 @@ public class IndexModel : PageModel
             Console.WriteLine($"FORM: {key} = {Request.Form[key]}");
         }
         Console.WriteLine("Anzahl der Orte: " + NamePlaces.Count);
-        CalculatedAverageCosts = new ConcurrentDictionary<string, double>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         ApiThrottle geoThrottle = new ApiThrottle(maxConcurrentCalls:1);
         ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls:1);
 
@@ -326,25 +321,25 @@ public class IndexModel : PageModel
                     () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
                 if (gasStationsPlace1.IsSuccess)
                 {
-                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0;
+                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0m;
                 }
                 else
                 {
-                    CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+                    CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
                     _toastMessages.Add(("error","Fehler bei Tankstellenabfrage"));
                 }
                 Console.WriteLine($"Calculated Average Cost for {NamePlaces[i]}: {CalculatedAverageCosts[NamePlaces[i]]}");
             }
             else
             {
-                CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+                CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
                 _toastMessages.Add(("error","Fehler bei Koordinatenabfrage"));
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Fehler bei {NamePlaces[i]}: {ex.Message}");
-            CalculatedAverageCosts[NamePlaces[i]] = 0.0;
+            CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
             _toastMessages.Add(("error", $"Fehler bei der Verarbeitung von {NamePlaces[i]}: {ex.Message}"));
         }
     }
@@ -359,7 +354,7 @@ public class IndexModel : PageModel
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
         Console.WriteLine("Combined Path: " + filePath);
         var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
-        CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, double>>(jsonContent);
+        CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(jsonContent);
     }
 
     private string GetFuelTypeForAPI()
@@ -367,11 +362,11 @@ public class IndexModel : PageModel
         switch (SelectedFuelType)
         {
             case FuelType.Diesel:
-                return SelectedFuelType.ToString().ToLower();
+                return SelectedFuelType.ToString();
             case FuelType.SuperE5:
-                return "e5";
+                return "Super E5";
             case FuelType.SuperE10:
-                return "e10";
+                return "Super E10";
         }
         return string.Empty;
     }

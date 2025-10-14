@@ -1,5 +1,5 @@
 public static class TankCostService{
-    public static List<GasStation> GetCheapestStations(List<GasStation> stations, double fuelAmount, double costPerKm)
+    public static List<GasStation> GetCheapestStations(List<GasStation> stations, decimal fuelAmount, decimal costPerKm)
     {
         if (stations == null || !stations.Any())
         {
@@ -8,17 +8,17 @@ public static class TankCostService{
         if (fuelAmount <= 0)
         {
             return stations.Where(station => station.IsOpen)
-                        .OrderBy(station => station.Price ?? double.MaxValue)
+                        .OrderBy(station => station.FuelTypePrice)
                         .Take(10)
                         .ToList();
         }
             Console.WriteLine("Parallel working started");
             var stationCosts = stations
                 .AsParallel() // Aktiviert parallele Verarbeitung
-                .Where(station => station.IsOpen && station.Price.HasValue && station.Distance.HasValue) // Filtert offene Tankstellen
+                .Where(station => station.IsOpen && station.FuelTypePrice.HasValue && station.Dist.HasValue) // Filtert offene Tankstellen
                 .Select(station => (
                     Station: station,
-                    TotalCost: (station.Price ?? 0.0) * fuelAmount + (station.Distance ?? 0.0) * costPerKm
+                    TotalCost: station.FuelTypePrice * fuelAmount + station.FuelTypePrice * costPerKm
                 ))
                 .ToList();
 

@@ -43,10 +43,25 @@ public class GasStation
     [JsonPropertyName("volatility")]
     public int Volatility { get; set; }
 
-    public decimal TotalCalculatedCoast { get; private set; }
+    public decimal TotalCalculatedCoast
+    {
+        get
+        {
+            return _totalCoast;
+        }
+        private set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException("Price cannot be negative.");
+            }
+            _fuelprice = (decimal)value;
+        }
+    }
+    private decimal _totalCoast;
 
     private decimal _fuelprice;
-    
+
     public decimal? FuelTypePrice
     {
         get
@@ -70,10 +85,11 @@ public class GasStation
         private set { m_lastUpdate = value; }
     }
 
-    public decimal CalculateTotalCost(double fuelAmount, double pricePerKm)
+    public decimal CalculateTotalCost(decimal fuelAmount, decimal pricePerKm)
     {
-        TotalCalculatedCoast = 0;
-        return TotalCalculatedCoast;
+        _totalCoast = _fuelprice * fuelAmount + (pricePerKm * (decimal)(Dist ?? 0) * 2);
+        Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast} (Fuel Price: {_fuelprice}, Fuel Amount: {fuelAmount}, Price per Km: {pricePerKm}, Distance: {Dist})");  
+        return _totalCoast;
     }
 
     public void SetPrice(string fuelType)
@@ -82,11 +98,11 @@ public class GasStation
                      .Select(x => (decimal)x.Price)
                      .FirstOrDefault();
     }
-    
+
     public void SetUpdateTime(string fuelType)
     {
-        m_lastUpdate = Fuels.Where(x=>x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
-                     .Select(x=> x.LastChange.Timestamp)
+        m_lastUpdate = Fuels.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
+                     .Select(x => x.LastChange.Timestamp)
                      .FirstOrDefault();
     }
 
@@ -104,7 +120,7 @@ public class GasStation
            $"- Distance: {Dist} km\n" +
            $"- Is Open: {(IsOpen ? "Yes" : "No")}\n" +
            $"- PostCode: {PostalCode}\n" +
-           $"- Cloases At: {ClosesAt}\n" + 
+           $"- Cloases At: {ClosesAt}\n" +
            $"- Last Update: {LastUpdate}\n";
     }
 }

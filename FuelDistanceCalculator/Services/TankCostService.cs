@@ -17,10 +17,10 @@ public static class TankCostService{
                 .AsParallel() // Aktiviert parallele Verarbeitung
                 .Where(station => station.IsOpen && station.FuelTypePrice.HasValue && station.Dist.HasValue) // Filtert offene Tankstellen
                 .Select(station => (
-                    Station: station,
-                    TotalCost: station.FuelTypePrice * fuelAmount + station.FuelTypePrice * costPerKm
+                Station: station,
+                TotalCost: station.CalculateTotalCost(fuelAmount, costPerKm)
                 ))
-                .ToList();
+            .ToList();
 
             Console.WriteLine("Anzahl TS in Total Cost Calculation: " + stationCosts.Count);
 

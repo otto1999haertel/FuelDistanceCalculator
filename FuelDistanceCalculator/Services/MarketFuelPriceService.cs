@@ -32,7 +32,7 @@ public class MarketFuelPriceService
         }
         string responseContent;
         Console.WriteLine("Mode " + _mode);
-            if (_mode == "Production")
+            if (_mode == "Development")
             {
                 // Production: Echte HTTP-Anfrage
                 HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
@@ -72,7 +72,7 @@ public class MarketFuelPriceService
                     Console.WriteLine("Allgemeiner Fehler: " + ex.Message);
                 }
         List<GasStation> openStations = gasStationResponse?.Stations?
-            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
+            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue && x.Price>0) && station.Dist.HasValue)
             .ToList() ?? new List<GasStation>();
         foreach (GasStation gS in openStations)
         {

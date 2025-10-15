@@ -10,9 +10,13 @@ public class ContactModel : PageModel
     public string Name => ContactInfo.Name;
     public string Email => ContactInfo.Email;
 
+    [BindProperty]
+    public bool  IsProduction { get; private set; }
+
     public ContactModel(ILogger<ContactModel> logger)
     {
         _logger = logger;
+        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
     }
 
 

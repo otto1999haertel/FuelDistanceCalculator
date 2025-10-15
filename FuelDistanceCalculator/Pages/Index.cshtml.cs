@@ -102,6 +102,9 @@ public class IndexModel : PageModel
     [BindProperty]
     public string SelectedCarType { get; set; }
 
+    [BindProperty]
+    public bool  IsProduction { get; private set; }
+
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, GeoLocationService geoLocationService)
     {
         _logger = logger;
@@ -118,7 +121,7 @@ public class IndexModel : PageModel
         {
             RadiusPlaces = new List<double>();
         }
-
+        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
     }
 

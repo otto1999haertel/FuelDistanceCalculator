@@ -1,6 +1,7 @@
 ﻿@page
 @using FuelDistanceCalculator.Constants
 @using System.Globalization
+@using Microsoft.CodeAnalysis.CSharp.Syntax
 @model IndexModel
 @{
     ViewData["Title"] = "FuelGo";
@@ -8,7 +9,9 @@
 }
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
+@if(Model.IsProduction){
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
+}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />

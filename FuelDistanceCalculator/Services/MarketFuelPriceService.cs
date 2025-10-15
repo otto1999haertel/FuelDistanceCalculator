@@ -72,7 +72,7 @@ public class MarketFuelPriceService
                     Console.WriteLine("Allgemeiner Fehler: " + ex.Message);
                 }
         List<GasStation> openStations = gasStationResponse?.Stations?
-            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue && x.Price>0) && station.Dist.HasValue)
+            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
             .ToList() ?? new List<GasStation>();
         foreach (GasStation gS in openStations)
         {
@@ -82,11 +82,12 @@ public class MarketFuelPriceService
             gS.SetUpdateTime(fueltype);
             Console.WriteLine("Open Gasstations in Service " + gS.ToString());
         }
+        
 
         return new GasStationResult
         {
             IsSuccess = true,
-            Stations = openStations
+            Stations = openStations.Where(station=>station.FuelTypePrice>0).ToList(),
         };
     }
     catch (HttpRequestException httpEx)

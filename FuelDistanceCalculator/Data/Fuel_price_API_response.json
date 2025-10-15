@@ -2,49 +2,313 @@
   "stations": [
     {
       "country": "de",
-      "id": "fc767ed9-4bf9-42cf-891f-c405f54c185b",
-      "name": "Aral Tankstelle, BAT AURACH NORD",
-      "brand": "ARAL",
-      "street": "A 3",
-      "postalCode": "91056",
-      "place": "Erlangen",
+      "id": "655808af-4ddb-4a52-b7fd-6a2276f17e97",
+      "name": "Esso Station",
+      "brand": "ESSO",
+      "street": "Bruckwiesen 12 ",
+      "postalCode": "91088",
+      "place": "Bubenreuth",
       "coords": {
-        "lat": 49.5803,
-        "lng": 10.930001
+        "lat": 49.627979,
+        "lng": 11.009162
       },
       "isOpen": true,
-      "openingTimes": [],
-      "dist": 7.45,
+      "closesAt": "2025-10-15T23:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri"
+          ],
+          "times": [
+            {
+              "open": "05:00",
+              "close": "23:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sat"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "23:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "07:00",
+              "close": "22:00"
+            }
+          ]
+        }
+      ],
+      "dist": 4.18,
       "fuels": [
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 2.239,
+          "price": 1.759,
           "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T07:01:52+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 2.179,
+          "price": 1.699,
           "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T07:01:52+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 2.099,
+          "price": 1.619,
           "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T07:01:52+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         }
       ],
-      "volatility": 22
+      "volatility": 223
+    },
+    {
+      "country": "de",
+      "id": "5d749ab6-fdd0-429a-afe6-9d1ec81bf1ae",
+      "name": "Esso Station",
+      "brand": "ESSO",
+      "street": "Erlanger Str. 17 ",
+      "postalCode": "91077",
+      "place": "Neunkirchen",
+      "coords": {
+        "lat": 49.610514,
+        "lng": 11.127713
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T21:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "21:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sat"
+          ],
+          "times": [
+            {
+              "open": "07:00",
+              "close": "21:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "08:00",
+              "close": "20:00"
+            }
+          ]
+        }
+      ],
+      "dist": 7.2,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.759,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.699,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.619,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
+          }
+        }
+      ],
+      "volatility": 191
+    },
+    {
+      "country": "de",
+      "id": "cd08aa1a-c845-4c26-a7ac-77c7ac11bab1",
+      "name": "Aral Tankstelle",
+      "brand": "ARAL",
+      "street": "Äuß. Brucker Straße 171",
+      "postalCode": "91058",
+      "place": "Erlangen",
+      "coords": {
+        "lat": 49.577007,
+        "lng": 10.986522
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T22:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri",
+            "sat",
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "22:00"
+            }
+          ]
+        }
+      ],
+      "dist": 3.71,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.779,
+          "lastChange": {
+            "amount": -0.04,
+            "timestamp": "2025-10-15T09:11:37+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.719,
+          "lastChange": {
+            "amount": -0.04,
+            "timestamp": "2025-10-15T09:11:37+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.639,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:36:57+02"
+          }
+        }
+      ],
+      "volatility": 278
+    },
+    {
+      "country": "de",
+      "id": "d4cfbbf1-eda6-43ec-a965-f8d3300a4e9d",
+      "name": "Esso Station",
+      "brand": "ESSO",
+      "street": "Wiesbadener Str. 43 ",
+      "postalCode": "90427",
+      "place": "Nürnberg",
+      "coords": {
+        "lat": 49.522881,
+        "lng": 11.007149
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T22:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri",
+            "sat"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "22:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "08:00",
+              "close": "22:00"
+            }
+          ]
+        }
+      ],
+      "dist": 8.02,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.739,
+          "lastChange": {
+            "amount": -0.03,
+            "timestamp": "2025-10-15T08:47:19+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.679,
+          "lastChange": {
+            "amount": -0.03,
+            "timestamp": "2025-10-15T08:47:19+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.599,
+          "lastChange": {
+            "amount": -0.06,
+            "timestamp": "2025-10-15T08:47:19+02"
+          }
+        }
+      ],
+      "volatility": 200
     },
     {
       "country": "de",
@@ -104,32 +368,200 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.709,
+          "price": 1.759,
           "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:29:00+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.649,
+          "price": 1.699,
           "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:29:00+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.569,
+          "price": 1.619,
           "lastChange": {
-            "amount": -0.08,
-            "timestamp": "2025-10-15T08:29:00+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         }
       ],
       "volatility": 212
+    },
+    {
+      "country": "de",
+      "id": "076ce186-c8bb-4f38-9cd9-fbbc3586a22c",
+      "name": "Esso Tankstelle",
+      "brand": "ESSO",
+      "street": "WICHERNSTR. 2 ",
+      "postalCode": "91052",
+      "place": "ERLANGEN",
+      "coords": {
+        "lat": 49.582556,
+        "lng": 10.993876
+      },
+      "isOpen": true,
+      "openingTimes": [],
+      "dist": 2.96,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.809,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:28:50+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.749,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:28:50+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.689,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:28:50+02"
+          }
+        }
+      ],
+      "volatility": 234
+    },
+    {
+      "country": "de",
+      "id": "fc796377-059d-41a0-96c1-e243b95d0790",
+      "name": "AVIA Tankstelle",
+      "brand": "AVIA",
+      "street": "Forchheimer Str. 16",
+      "postalCode": "91090",
+      "place": "Effeltrich",
+      "coords": {
+        "lat": 49.6619,
+        "lng": 11.09127
+      },
+      "isOpen": true,
+      "openingTimes": [],
+      "dist": 8.77,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.729,
+          "lastChange": {
+            "amount": 0.04,
+            "timestamp": "2025-10-15T09:33:54+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.669,
+          "lastChange": {
+            "amount": 0.04,
+            "timestamp": "2025-10-15T09:33:54+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.599,
+          "lastChange": {
+            "amount": 0.04,
+            "timestamp": "2025-10-15T09:33:54+02"
+          }
+        }
+      ],
+      "volatility": 194
+    },
+    {
+      "country": "de",
+      "id": "89f93610-d753-4993-af05-9e6e2decf62b",
+      "name": "NÜRNBERG - BOXDORFER HAUPTSTR. 51",
+      "brand": "SUPOL",
+      "street": "Boxdorfer Hauptstr. 51",
+      "postalCode": "90427",
+      "place": "Nürnberg",
+      "coords": {
+        "lat": 49.51543,
+        "lng": 11.030703
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T21:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri"
+          ],
+          "times": [
+            {
+              "open": "07:00",
+              "close": "21:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sat",
+            "sun",
+            "hol"
+          ],
+          "times": [
+            {
+              "open": "08:00",
+              "close": "21:00"
+            }
+          ]
+        }
+      ],
+      "dist": 8.65,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.679,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.619,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.539,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        }
+      ],
+      "volatility": 263
     },
     {
       "country": "de",
@@ -182,8 +614,8 @@
           "name": "Super E5",
           "price": 1.709,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         },
         {
@@ -191,17 +623,17 @@
           "name": "Super E10",
           "price": 1.649,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.579,
+          "price": 1.569,
           "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         }
       ],
@@ -226,69 +658,32 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.729,
+          "price": 1.709,
           "lastChange": {
-            "amount": 0.02,
-            "timestamp": "2025-10-15T09:09:35+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:39:00+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.669,
+          "price": 1.649,
           "lastChange": {
-            "amount": 0.02,
-            "timestamp": "2025-10-15T09:09:35+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:39:00+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.599,
+          "price": 1.569,
           "lastChange": {
-            "amount": 0.02,
-            "timestamp": "2025-10-15T09:09:35+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:39:00+02"
           }
         }
       ],
       "volatility": 211
-    },
-    {
-      "country": "de",
-      "id": "0eee36e7-7c1d-454d-a712-686b606a06c4",
-      "name": "Graf Nürnberg",
-      "brand": "Graf",
-      "street": "In der Schmalau 1",
-      "postalCode": "90427",
-      "place": "Nürnberg",
-      "coords": {
-        "lat": 49.516126141,
-        "lng": 11.005511284
-      },
-      "isOpen": true,
-      "openingTimes": [],
-      "dist": 8.78,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.759,
-          "lastChange": {
-            "amount": 0.07,
-            "timestamp": "2025-10-15T06:50:41+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.669,
-          "lastChange": {
-            "amount": 0.12,
-            "timestamp": "2025-10-15T06:50:41+02"
-          }
-        }
-      ],
-      "volatility": 250
     },
     {
       "country": "de",
@@ -338,49 +733,197 @@
     },
     {
       "country": "de",
-      "id": "076ce186-c8bb-4f38-9cd9-fbbc3586a22c",
-      "name": "Esso Tankstelle",
-      "brand": "ESSO",
-      "street": "WICHERNSTR. 2 ",
-      "postalCode": "91052",
-      "place": "ERLANGEN",
+      "id": "36460e30-03cc-44f2-a408-2f74a81b0233",
+      "name": "TotalEnergies Autohof Tennenlohe",
+      "brand": "TotalEnergies Autohof",
+      "street": "Sebastianstr. 28",
+      "postalCode": "91058",
+      "place": "Erlangen",
       "coords": {
-        "lat": 49.582556,
-        "lng": 10.993876
+        "lat": 49.545202,
+        "lng": 11.029889
       },
       "isOpen": true,
       "openingTimes": [],
-      "dist": 2.96,
+      "dist": 5.34,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.749,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.689,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.609,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:16:40+02"
+          }
+        }
+      ],
+      "volatility": 273
+    },
+    {
+      "country": "de",
+      "id": "5506231b-d001-4238-6d89-8ccc7cf069e2",
+      "name": "ELO Uttenreuth",
+      "brand": "ELO",
+      "street": "Leitenäckerstraße 1",
+      "postalCode": "91080",
+      "place": "Uttenreuth-Weiher",
+      "coords": {
+        "lat": 49.594731,
+        "lng": 11.092034
+      },
+      "isOpen": true,
+      "openingTimes": [],
+      "dist": 4.37,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.749,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:34:55+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.689,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:34:55+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.609,
+          "lastChange": {
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:34:55+02"
+          }
+        }
+      ],
+      "volatility": 213
+    },
+    {
+      "country": "de",
+      "id": "0eee36e7-7c1d-454d-a712-686b606a06c4",
+      "name": "Graf Nürnberg",
+      "brand": "Graf",
+      "street": "In der Schmalau 1",
+      "postalCode": "90427",
+      "place": "Nürnberg",
+      "coords": {
+        "lat": 49.516126141,
+        "lng": 11.005511284
+      },
+      "isOpen": true,
+      "openingTimes": [],
+      "dist": 8.78,
       "fuels": [
         {
           "category": "gasoline",
           "name": "Super E5",
           "price": 1.759,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:48:19+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.699,
-          "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:48:19+02"
+            "amount": 0.07,
+            "timestamp": "2025-10-15T06:50:41+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.639,
+          "price": 1.669,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T07:43:26+02"
+            "amount": 0.12,
+            "timestamp": "2025-10-15T06:50:41+02"
           }
         }
       ],
-      "volatility": 234
+      "volatility": 250
+    },
+    {
+      "country": "de",
+      "id": "b87af7b1-2059-452b-b28c-651292f3e6f5",
+      "name": "Aral Tankstelle",
+      "brand": "ARAL",
+      "street": "Drausnickstraße 60",
+      "postalCode": "91052",
+      "place": "Erlangen",
+      "coords": {
+        "lat": 49.59576,
+        "lng": 11.031701
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T22:00:00+02",
+      "openingTimes": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri",
+            "sat",
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "22:00"
+            }
+          ]
+        }
+      ],
+      "dist": 0.28,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.789,
+          "lastChange": {
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:07:34+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.729,
+          "lastChange": {
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:07:34+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.649,
+          "lastChange": {
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:07:34+02"
+          }
+        }
+      ],
+      "volatility": 237
     },
     {
       "country": "de",
@@ -430,28 +973,28 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.739,
+          "price": 1.799,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:27:59+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.679,
+          "price": 1.739,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:27:59+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.589,
+          "price": 1.649,
           "lastChange": {
-            "amount": -0.08,
-            "timestamp": "2025-10-15T08:19:53+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         }
       ],
@@ -544,19 +1087,77 @@
     },
     {
       "country": "de",
-      "id": "89f93610-d753-4993-af05-9e6e2decf62b",
-      "name": "NÜRNBERG - BOXDORFER HAUPTSTR. 51",
-      "brand": "SUPOL",
-      "street": "Boxdorfer Hauptstr. 51",
-      "postalCode": "90427",
-      "place": "Nürnberg",
+      "id": "b661723c-d220-412e-f33a-1ba04e28ebe3",
+      "name": "ELO Fürth",
+      "brand": "ELO",
+      "street": "Stadelner Hauptstraße 160",
+      "postalCode": "90765",
+      "place": "Fürth",
       "coords": {
-        "lat": 49.51543,
-        "lng": 11.030703
+        "lat": 49.522003,
+        "lng": 10.97647
       },
       "isOpen": true,
-      "closesAt": "2025-10-15T21:00:00+02",
+      "openingTimes": [],
+      "dist": 8.86,
+      "fuels": [
+        {
+          "category": "gasoline",
+          "name": "Super E5",
+          "price": 1.679,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:23:46+02"
+          }
+        },
+        {
+          "category": "gasoline",
+          "name": "Super E10",
+          "price": 1.619,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:23:46+02"
+          }
+        },
+        {
+          "category": "diesel",
+          "name": "Diesel",
+          "price": 1.539,
+          "lastChange": {
+            "amount": -0.01,
+            "timestamp": "2025-10-15T09:23:46+02"
+          }
+        }
+      ],
+      "volatility": 264
+    },
+    {
+      "country": "de",
+      "id": "de784540-d7e3-4e3d-97f8-1735342af8d6",
+      "name": "Aral Tankstelle",
+      "brand": "ARAL",
+      "street": "Weisendorfer Straße 16",
+      "postalCode": "91056",
+      "place": "Erlangen",
+      "coords": {
+        "lat": 49.625683,
+        "lng": 10.940643
+      },
+      "isOpen": true,
+      "closesAt": "2025-10-15T22:00:00+02",
       "openingTimes": [
+        {
+          "days": [
+            "sat",
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "22:00"
+            }
+          ]
+        },
         {
           "days": [
             "mon",
@@ -567,56 +1168,43 @@
           ],
           "times": [
             {
-              "open": "07:00",
-              "close": "21:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sat",
-            "sun",
-            "hol"
-          ],
-          "times": [
-            {
-              "open": "08:00",
-              "close": "21:00"
+              "open": "05:00",
+              "close": "22:00"
             }
           ]
         }
       ],
-      "dist": 8.65,
+      "dist": 7.47,
       "fuels": [
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.689,
+          "price": 1.759,
           "lastChange": {
             "amount": -0.01,
-            "timestamp": "2025-10-15T09:01:29+02"
+            "timestamp": "2025-10-15T09:07:34+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.629,
+          "price": 1.699,
           "lastChange": {
             "amount": -0.01,
-            "timestamp": "2025-10-15T09:01:29+02"
+            "timestamp": "2025-10-15T09:07:34+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.549,
+          "price": 1.629,
           "lastChange": {
             "amount": -0.01,
-            "timestamp": "2025-10-15T09:01:29+02"
+            "timestamp": "2025-10-15T09:08:35+02"
           }
         }
       ],
-      "volatility": 263
+      "volatility": 277
     },
     {
       "country": "de",
@@ -687,28 +1275,28 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.709,
+          "price": 1.729,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:58:27+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.649,
+          "price": 1.669,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:58:27+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.579,
+          "price": 1.599,
           "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:58:27+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         }
       ],
@@ -735,8 +1323,8 @@
           "name": "Super E5",
           "price": 1.709,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:57:25+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         },
         {
@@ -744,67 +1332,21 @@
           "name": "Super E10",
           "price": 1.649,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:57:25+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.579,
+          "price": 1.569,
           "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:57:25+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:41:03+02"
           }
         }
       ],
       "volatility": 234
-    },
-    {
-      "country": "de",
-      "id": "36460e30-03cc-44f2-a408-2f74a81b0233",
-      "name": "TotalEnergies Autohof Tennenlohe",
-      "brand": "TotalEnergies Autohof",
-      "street": "Sebastianstr. 28",
-      "postalCode": "91058",
-      "place": "Erlangen",
-      "coords": {
-        "lat": 49.545202,
-        "lng": 11.029889
-      },
-      "isOpen": true,
-      "openingTimes": [],
-      "dist": 5.34,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.699,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:53:23+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.639,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:53:23+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.559,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:53:23+02"
-          }
-        }
-      ],
-      "volatility": 273
     },
     {
       "country": "de",
@@ -865,78 +1407,32 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.709,
+          "price": 1.729,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.649,
+          "price": 1.669,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.579,
+          "price": 1.599,
           "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:55:24+02"
+            "amount": 0.02,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         }
       ],
       "volatility": 229
-    },
-    {
-      "country": "de",
-      "id": "b661723c-d220-412e-f33a-1ba04e28ebe3",
-      "name": "ELO Fürth",
-      "brand": "ELO",
-      "street": "Stadelner Hauptstraße 160",
-      "postalCode": "90765",
-      "place": "Fürth",
-      "coords": {
-        "lat": 49.522003,
-        "lng": 10.97647
-      },
-      "isOpen": true,
-      "openingTimes": [],
-      "dist": 8.86,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.689,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.629,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.549,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        }
-      ],
-      "volatility": 264
     },
     {
       "country": "de",
@@ -1025,31 +1521,19 @@
     },
     {
       "country": "de",
-      "id": "de784540-d7e3-4e3d-97f8-1735342af8d6",
-      "name": "Aral Tankstelle",
-      "brand": "ARAL",
-      "street": "Weisendorfer Straße 16",
-      "postalCode": "91056",
-      "place": "Erlangen",
+      "id": "713dd8cc-5cb9-43c9-8424-18211ae38ee8",
+      "name": "Esso Tankstelle",
+      "brand": "ESSO",
+      "street": "GEBBERTSTR. 86 ",
+      "postalCode": "91052",
+      "place": "ERLANGEN",
       "coords": {
-        "lat": 49.625683,
-        "lng": 10.940643
+        "lat": 49.587112,
+        "lng": 11.017038
       },
       "isOpen": true,
-      "closesAt": "2025-10-15T22:00:00+02",
+      "closesAt": "2025-10-15T23:00:00+02",
       "openingTimes": [
-        {
-          "days": [
-            "sat",
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "22:00"
-            }
-          ]
-        },
         {
           "days": [
             "mon",
@@ -1061,42 +1545,54 @@
           "times": [
             {
               "open": "05:00",
-              "close": "22:00"
+              "close": "23:00"
+            }
+          ]
+        },
+        {
+          "days": [
+            "sat",
+            "sun"
+          ],
+          "times": [
+            {
+              "open": "06:00",
+              "close": "23:00"
             }
           ]
         }
       ],
-      "dist": 7.47,
+      "dist": 1.24,
       "fuels": [
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.759,
+          "price": 1.809,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:07:34+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.699,
+          "price": 1.749,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:07:34+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.629,
+          "price": 1.689,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:08:35+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         }
       ],
-      "volatility": 277
+      "volatility": 214
     },
     {
       "country": "de",
@@ -1159,17 +1655,17 @@
           "name": "Super E5",
           "price": 1.779,
           "lastChange": {
-            "amount": 0.06,
-            "timestamp": "2025-10-15T06:31:24+02"
+            "amount": -0.05,
+            "timestamp": "2025-10-15T09:29:50+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.649,
+          "price": 1.639,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:06:43+02"
+            "amount": -0.06,
+            "timestamp": "2025-10-15T09:29:50+02"
           }
         }
       ],
@@ -1234,97 +1730,32 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.669,
+          "price": 1.719,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:13:38+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.609,
+          "price": 1.659,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T09:13:38+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.529,
+          "price": 1.579,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T09:03:30+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:22:45+02"
           }
         }
       ],
       "volatility": 243
-    },
-    {
-      "country": "de",
-      "id": "b87af7b1-2059-452b-b28c-651292f3e6f5",
-      "name": "Aral Tankstelle",
-      "brand": "ARAL",
-      "street": "Drausnickstraße 60",
-      "postalCode": "91052",
-      "place": "Erlangen",
-      "coords": {
-        "lat": 49.59576,
-        "lng": 11.031701
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T22:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri",
-            "sat",
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "22:00"
-            }
-          ]
-        }
-      ],
-      "dist": 0.28,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.789,
-          "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.729,
-          "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.649,
-          "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        }
-      ],
-      "volatility": 237
     },
     {
       "country": "de",
@@ -1374,480 +1805,49 @@
     },
     {
       "country": "de",
-      "id": "5506231b-d001-4238-6d89-8ccc7cf069e2",
-      "name": "ELO Uttenreuth",
-      "brand": "ELO",
-      "street": "Leitenäckerstraße 1",
-      "postalCode": "91080",
-      "place": "Uttenreuth-Weiher",
-      "coords": {
-        "lat": 49.594731,
-        "lng": 11.092034
-      },
-      "isOpen": true,
-      "openingTimes": [],
-      "dist": 4.37,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.699,
-          "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:31:02+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.639,
-          "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:31:02+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.559,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:42:16+02"
-          }
-        }
-      ],
-      "volatility": 213
-    },
-    {
-      "country": "de",
-      "id": "713dd8cc-5cb9-43c9-8424-18211ae38ee8",
-      "name": "Esso Tankstelle",
-      "brand": "ESSO",
-      "street": "GEBBERTSTR. 86 ",
-      "postalCode": "91052",
-      "place": "ERLANGEN",
-      "coords": {
-        "lat": 49.587112,
-        "lng": 11.017038
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T23:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri"
-          ],
-          "times": [
-            {
-              "open": "05:00",
-              "close": "23:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sat",
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "23:00"
-            }
-          ]
-        }
-      ],
-      "dist": 1.24,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.759,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:55:24+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.699,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:55:24+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.639,
-          "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T07:59:38+02"
-          }
-        }
-      ],
-      "volatility": 214
-    },
-    {
-      "country": "de",
-      "id": "655808af-4ddb-4a52-b7fd-6a2276f17e97",
-      "name": "Esso Station",
-      "brand": "ESSO",
-      "street": "Bruckwiesen 12 ",
-      "postalCode": "91088",
-      "place": "Bubenreuth",
-      "coords": {
-        "lat": 49.627979,
-        "lng": 11.009162
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T23:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri"
-          ],
-          "times": [
-            {
-              "open": "05:00",
-              "close": "23:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sat"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "23:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "07:00",
-              "close": "22:00"
-            }
-          ]
-        }
-      ],
-      "dist": 4.18,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.709,
-          "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:25:57+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.649,
-          "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:25:57+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.569,
-          "lastChange": {
-            "amount": -0.08,
-            "timestamp": "2025-10-15T08:25:57+02"
-          }
-        }
-      ],
-      "volatility": 223
-    },
-    {
-      "country": "de",
-      "id": "5d749ab6-fdd0-429a-afe6-9d1ec81bf1ae",
-      "name": "Esso Station",
-      "brand": "ESSO",
-      "street": "Erlanger Str. 17 ",
-      "postalCode": "91077",
-      "place": "Neunkirchen",
-      "coords": {
-        "lat": 49.610514,
-        "lng": 11.127713
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T21:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "21:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sat"
-          ],
-          "times": [
-            {
-              "open": "07:00",
-              "close": "21:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "08:00",
-              "close": "20:00"
-            }
-          ]
-        }
-      ],
-      "dist": 7.2,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.709,
-          "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:25:57+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.649,
-          "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:25:57+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.569,
-          "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:32:03+02"
-          }
-        }
-      ],
-      "volatility": 191
-    },
-    {
-      "country": "de",
-      "id": "cd08aa1a-c845-4c26-a7ac-77c7ac11bab1",
-      "name": "Aral Tankstelle",
+      "id": "fc767ed9-4bf9-42cf-891f-c405f54c185b",
+      "name": "Aral Tankstelle, BAT AURACH NORD",
       "brand": "ARAL",
-      "street": "Äuß. Brucker Straße 171",
-      "postalCode": "91058",
+      "street": "A 3",
+      "postalCode": "91056",
       "place": "Erlangen",
       "coords": {
-        "lat": 49.577007,
-        "lng": 10.986522
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T22:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri",
-            "sat",
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "22:00"
-            }
-          ]
-        }
-      ],
-      "dist": 3.71,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.779,
-          "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T09:11:37+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.719,
-          "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T09:11:37+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.649,
-          "lastChange": {
-            "amount": -0.07,
-            "timestamp": "2025-10-15T09:07:34+02"
-          }
-        }
-      ],
-      "volatility": 278
-    },
-    {
-      "country": "de",
-      "id": "d4cfbbf1-eda6-43ec-a965-f8d3300a4e9d",
-      "name": "Esso Station",
-      "brand": "ESSO",
-      "street": "Wiesbadener Str. 43 ",
-      "postalCode": "90427",
-      "place": "Nürnberg",
-      "coords": {
-        "lat": 49.522881,
-        "lng": 11.007149
-      },
-      "isOpen": true,
-      "closesAt": "2025-10-15T22:00:00+02",
-      "openingTimes": [
-        {
-          "days": [
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri",
-            "sat"
-          ],
-          "times": [
-            {
-              "open": "06:00",
-              "close": "22:00"
-            }
-          ]
-        },
-        {
-          "days": [
-            "sun"
-          ],
-          "times": [
-            {
-              "open": "08:00",
-              "close": "22:00"
-            }
-          ]
-        }
-      ],
-      "dist": 8.02,
-      "fuels": [
-        {
-          "category": "gasoline",
-          "name": "Super E5",
-          "price": 1.739,
-          "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T08:47:19+02"
-          }
-        },
-        {
-          "category": "gasoline",
-          "name": "Super E10",
-          "price": 1.679,
-          "lastChange": {
-            "amount": -0.03,
-            "timestamp": "2025-10-15T08:47:19+02"
-          }
-        },
-        {
-          "category": "diesel",
-          "name": "Diesel",
-          "price": 1.599,
-          "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:47:19+02"
-          }
-        }
-      ],
-      "volatility": 200
-    },
-    {
-      "country": "de",
-      "id": "fc796377-059d-41a0-96c1-e243b95d0790",
-      "name": "AVIA Tankstelle",
-      "brand": "AVIA",
-      "street": "Forchheimer Str. 16",
-      "postalCode": "91090",
-      "place": "Effeltrich",
-      "coords": {
-        "lat": 49.6619,
-        "lng": 11.09127
+        "lat": 49.5803,
+        "lng": 10.930001
       },
       "isOpen": true,
       "openingTimes": [],
-      "dist": 8.77,
+      "dist": 7.45,
       "fuels": [
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.689,
+          "price": 2.239,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:56:25+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T07:01:52+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.629,
+          "price": 2.179,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:56:25+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T07:01:52+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.559,
+          "price": 2.099,
           "lastChange": {
-            "amount": -0.01,
-            "timestamp": "2025-10-15T08:20:53+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T07:01:52+02"
           }
         }
       ],
-      "volatility": 194
+      "volatility": 22
     },
     {
       "country": "de",
@@ -1898,28 +1898,28 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.709,
+          "price": 1.759,
           "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:35:05+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.649,
+          "price": 1.699,
           "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:35:05+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.569,
+          "price": 1.619,
           "lastChange": {
-            "amount": -0.06,
-            "timestamp": "2025-10-15T08:35:05+02"
+            "amount": 0.05,
+            "timestamp": "2025-10-15T09:27:49+02"
           }
         }
       ],
@@ -1976,8 +1976,8 @@
           "name": "Super E5",
           "price": 1.709,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:50:21+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:21:45+02"
           }
         },
         {
@@ -1985,17 +1985,17 @@
           "name": "Super E10",
           "price": 1.649,
           "lastChange": {
-            "amount": -0.04,
-            "timestamp": "2025-10-15T08:50:21+02"
+            "amount": -0.02,
+            "timestamp": "2025-10-15T09:21:45+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.579,
+          "price": 1.569,
           "lastChange": {
-            "amount": -0.05,
-            "timestamp": "2025-10-15T08:50:21+02"
+            "amount": -0.03,
+            "timestamp": "2025-10-15T09:21:45+02"
           }
         }
       ],
@@ -2020,28 +2020,28 @@
         {
           "category": "gasoline",
           "name": "Super E5",
-          "price": 1.759,
+          "price": 1.819,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:54:23+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         },
         {
           "category": "gasoline",
           "name": "Super E10",
-          "price": 1.699,
+          "price": 1.759,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:54:23+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         },
         {
           "category": "diesel",
           "name": "Diesel",
-          "price": 1.649,
+          "price": 1.709,
           "lastChange": {
-            "amount": -0.02,
-            "timestamp": "2025-10-15T08:06:43+02"
+            "amount": 0.06,
+            "timestamp": "2025-10-15T09:31:52+02"
           }
         }
       ],
@@ -2053,6 +2053,6 @@
     "lng": 11.0314437
   },
   "apiVersion": "4.0.7",
-  "timestamp": "2025-10-15T09:15:54+02",
+  "timestamp": "2025-10-15T09:42:16+02",
   "license": "CC BY http://www.tankerkoenig.de"
 }

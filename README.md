@@ -1,4 +1,7 @@
 # FuelDistanceCalculator
+
+**Currently hosted on https://fuelgo.de/**
+
 ASP .NET-Core Web-App with razor pages (.cshtml) for calculating the optimal gas station regarding the price, the amount you have to buy and your average cost per kilometer
 To start the app navigate to the root folder, where docker-compose.yml file is located and enter:
 docker compose up --build

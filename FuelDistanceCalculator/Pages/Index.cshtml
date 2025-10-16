@@ -1,653 +1,641 @@
-﻿        @page
-        @using FuelDistanceCalculator.Constants
-        @using System.Globalization
-        @using Microsoft.CodeAnalysis.CSharp.Syntax
-        @model IndexModel
-        @{
-            ViewData["Title"] = "FuelGo";
-            var culture = new CultureInfo("de-DE");
-        }
+﻿@page
+@using FuelDistanceCalculator.Constants
+@using System.Globalization
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@model IndexModel
+@{
+    ViewData["Title"] = "FuelGo";
+    var culture = new CultureInfo("de-DE");
+}
 
-        <!-- Google tag (gtag.js) -->
-        @if(Model.IsProduction){
-            <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
-        }
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- Leaflet CSS -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Google tag (gtag.js) -->
+@if (Model.IsProduction)
+{
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        <!-- Leaflet JS -->
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-            gtag('config', 'G-JEP2Q2QZMH');
-        </script>
+    gtag('config', 'G-JEP2Q2QZMH');
+</script>
 
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <div class="text-center">
-            <h1 class="display-4">Willkommen bei FuelGo</h1>
-            <p>Finde die optimale Tankstelle oder vergleiche die durchschnittlichen Spritkosten zwischen mehreren Orten</p>
-        </div>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="text-center">
+    <h1 class="display-4">Willkommen bei FuelGo</h1>
+    <p>Finde die optimale Tankstelle oder vergleiche die durchschnittlichen Spritkosten zwischen mehreren Orten</p>
+</div>
 
-        <div class="container">
-            <form method="post">
-                <div class="row justify-content-center">
-                    <!-- Eingabefelder für globale Werte - mittig zentriert -->
+<div class="container">
+    <form method="post">
+        <div class="row justify-content-center">
+            <!-- Eingabefelder für globale Werte - mittig zentriert -->
+            <div class="col-md-6">
+                <h3>Globale Eingabewerte</h3>
+
+                <!-- Dropdown für Spritart -->
+                <div class="mb-3">
+                    <label asp-for="SelectedFuelType" class="form-label">Spritart</label>
+                    <select asp-for="SelectedFuelType" class="form-select" asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
+                                                                           {
+                                                                               Value = kvp.Key.ToString(),
+                                                                               Text = kvp.Value
+                                                                           }))">
+                    </select>
+                </div>
+
+                <!-- Eingabe für Tankmenge -->
+                <div class="form-group">
+                    <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
+                    <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                        title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
+                        ⓘ
+                    </span>
+                    <input type="text" id="FuelAmountDisplay" class="form-control" required
+                        onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
+                    <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
+
+                    <script>
+                    </script>
+
+                </div>
+
+                <!-- Preis pro Kilometer -->
+                <div class="row">
                     <div class="col-md-6">
-                        <h3>Globale Eingabewerte</h3>
-
-                        <!-- Dropdown für Spritart -->
-                        <div class="mb-3">
-                            <label asp-for="SelectedFuelType" class="form-label">Spritart</label>
-                            <select asp-for="SelectedFuelType" class="form-select" asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
-                                                                                {
-                                                                                    Value = kvp.Key.ToString(),
-                                                                                    Text = kvp.Value
-                                                                                }))">
-                            </select>
-                        </div>
-
-                        <!-- Eingabe für Tankmenge -->
                         <div class="form-group">
-                            <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
+                            <label for="SelectedCarType">Fahrzeugtyp </label>
+                            <span>
+                                <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
+                                    target="_blank">
+                                    (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
+                            </span>
+                            <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..."
+                                list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
+                            <div id="suggestions" class="suggestions-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Preis pro Kilometer -->
+                        <div class="form-group">
+                            <label for="PricePerKm">Kosten pro Kilometer (€)</label>
                             <span class="input-group-text-icon" data-bs-toggle="tooltip"
-                                title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
+                                title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
                                 ⓘ
                             </span>
-                            <input type="text" id="FuelAmountDisplay" class="form-control" required
-                                onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
-                            <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
-
-                            <script>
-                            </script>
-
-                        </div>
-
-                        <!-- Preis pro Kilometer -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="SelectedCarType">Fahrzeugtyp </label>
-                                    <span>
-                                        <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
-                                            target="_blank">
-                                            (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
-                                    </span>
-                                    <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..."
-                                        list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
-                                    <div id="suggestions" class="suggestions-box"></div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <!-- Preis pro Kilometer -->
-                                <div class="form-group">
-                                    <label for="PricePerKm">Kosten pro Kilometer (€)</label>
-                                    <span class="input-group-text-icon" data-bs-toggle="tooltip"
-                                        title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
-                                        ⓘ
-                                    </span>
-                                    <input class="form-control" id="PricePerKm" name="PricePerKm" required
-                                        onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="@Model.SelectInputMode" class="form-label">Modus</label>
-                            <select asp-for="@Model.SelectInputMode" class="form-select"
-                                asp-items="@(Enum.GetValues(typeof(InputMode))
-                                                                                                                                                                                                                                                            .Cast<InputMode>()
-                                                                                                                                                                                                                                                            .Select(mode => new SelectListItem
-                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                Value = mode.ToString(),
-                                                                                                                                                                                                                                                                Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
-                                                                                                                                                                                                                                                            }))"
-                                onchange="toggleInputMethod(this)">
-                            </select>
+                            <input class="form-control" id="PricePerKm" name="PricePerKm" required
+                                onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
                         </div>
                     </div>
                 </div>
-                <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
-                <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
-                    <div class="row">
-                        @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
-                        {
-                            <!-- Standort 1 -->
-                            <div class="col-md-5 offset-md-1">
-                                <label>Standort 1</label>
-                                <div class="input-group">
-                                    <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
-                                        value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
-                                        placeholder="Geben Sie einen Ort ein" />
-                                    <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <label for="RadiusPlace1">Radius (km)</label>
-                                <input type="number" name="RadiusPlaces[0]" class="form-control" placeholder="Radius in km"
-                                    value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25" />
-                            </div>
-
-                            <!-- Standort 2 -->
-                            <div class="col-md-5 offset-md-1 mt-3">
-                                <label>Standort 2</label>
-                                <input type="text" name="NamePlaces[1]" class="form-control"
-                                    value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
-                                    placeholder="Geben Sie einen Ort ein" />
-                            </div>
-                            <div class="col-md-5 mt-3">
-                                <label for="RadiusPlace2">Radius (km)</label>
-                                <input type="number" name="RadiusPlaces[1]" class="form-control" placeholder="Radius in km"
-                                    value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25" />
-                            </div>
-                        }
-                        @if (Model.NamePlaces.Count > 2)
-                        {
-                            @for (int i = 2; i < Model.NamePlaces.Count; i++)
-                            {
-                                <div class="col-md-5 offset-md-1 mt-3">
-                                    <label>Standort @(i + 1)</label>
-                                    <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
-                                        placeholder="Geben Sie einen Ort ein" />
-                                </div>
-                                <div class="col-md-5 mt-3">
-                                    <label>Radius (km)</label>
-                                    <input type="number" name="RadiusPlaces[@i]" class="form-control" placeholder="Radius in km"
-                                        value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25" />
-                                </div>
-                            }
-                        }
-                    </div>
-
-                    <!-- Hier kommen zusätzliche Standorte hin -->
-                    <div id="dynamicLocations" class="row mt-3">
-                    </div>
-                    <!-- Plus-Button -->
-                    <div class="row justify-content-center mt-3">
-                        <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px"
-                            onclick="addLocation()" @(Model.CalculatedAverageCosts.Count >= 4 ? "disabled" : "")>
-                            @(Model.CalculatedAverageCosts.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
-                        </button>
-                    </div>
-
-                    <!-- Berechnen-Button -->
-                    <div class="row justify-content-center mt-3">
-                        <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                            asp-page-handler="CalculateAverageCost">Vergleichen
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
-                <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
-                    <!-- Automatische Eingabe für Standort und Radius -->
-                    <div class="row align-items-end">
-                        <div class="col-md-5 offset-md-1">
-                            <label for="generalLocation" class="form-label">Standort (PLZ/ Straße, Ort)</label>
-                            <div class="input-group">
-                                <input type="text" id="generalLocation" class="form-control"
-                                    placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
-                                <button id="geoButton" class="btn btn-primary btn-sm" type="button">📍</button>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5">
-                            <label for="generalRadius">Radius (km)</label>
-                            <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
-                                max="25" asp-for="Radius" value="@Model.Radius">
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                            asp-page-handler="Search">Suchen</button>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6" style="padding: 20px;">
-                            @if (Model.CheapestResultStations.Any())
-                            {
-                                <div class="mb-3 d-flex align-items-center gap-2">
-            <label for="viewMode" class="form-label mb-0 me-2">Ansicht</label>
-            <select id="viewMode" class="form-select w-auto" onchange="switchView()">
-                <option value="list">Liste</option>
-                <option value="map">Karte</option>
-            </select>
-            @if(Model.FuelAmount>0)
-            {
-                <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
-                    style="cursor: pointer;"
-                    title="Die Wegkosten werden für Hin- und Rückfahrt angesetzte">
-                    ⓘ
-                </span>
-            }
-
-            <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
-                style="display: none; cursor: pointer;"
-                title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle">
-                ⓘ
-            </span>
-
-                        <!-- Neues Dropdown für Sortierung (nur in Listenansicht sichtbar) -->
-                    <label for="sortMode" class="form-label mb-0 me-2" id="sortLabel">Aufsteigend sortieren nach</label>
-                    <select id="sortMode" class="form-select w-auto" onchange="sortList()" id="sortModeSelect">
-                        @if (Model.FuelAmount > 0)
-                        {
-                            <option value="totalCost">Gesamtkosten</option>
-                            <option value="fuelPrice">Preis pro Liter</option>
-                            <option value="distance">Entfernung</option>
-                        }
-                        else
-                        {
-                            <option value="fuelPrice">Preis pro Liter</option>
-                            <option value="distance">Entfernung</option>
-                        }
+                <div class="mb-3">
+                    <label asp-for="@Model.SelectInputMode" class="form-label">Modus</label>
+                    <select asp-for="@Model.SelectInputMode" class="form-select"
+                        asp-items="@(Enum.GetValues(typeof(InputMode))
+                                                                                                                                                                                                                                                                                    .Cast<InputMode>()
+                                                                                                                                                                                                                                                                                    .Select(mode => new SelectListItem
+                                                                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                                                                        Value = mode.ToString(),
+                                                                                                                                                                                                                                                                                        Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
+                                                                                                                                                                                                                                                                                    }))"
+                        onchange="toggleInputMethod(this)">
                     </select>
-                    </div>
-                                <div id="listView">
-                                    <ul class="station-list">
-                                        @foreach (GasStation station in Model.CheapestResultStations)
-                                        {
-                                            <li class="station-item">
-                                                <div class="station-summary" onclick="toggleDetails(this)">
-                                                    <strong>@station.Name</strong> -
-                                                    @if (Model.FuelAmount > 0)
-                                                    {
-                                                        <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>
-                                                                                }
-                                                    else
-                                                    {
-                                                        <span>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString()).ToString() €</span>
-                                                    }
-                                                </div>
-                                                <div class="station-details" style="display:none;">
-                                                    @if (Model.FuelAmount > 0)
-                                                    {
-                                                        <p>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString())€</p>
-                                                    }
-                                                    @if(!string.IsNullOrEmpty(station.LastUpdate))
-                                                    {
-                                                        DateTimeOffset dto = DateTimeOffset.Parse(@station.LastUpdate);
-                                                        <p>Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", culture)</p>
-                                                    }
-                                                    <p>Entfernung: @Model.ToDisplay(station.Dist.ToString()) km</p>
-                                                    <p>Ort:
-                                                        <a href="https://www.google.com/maps?q=@station.Place,@station.Street"
-                                                            target="_blank">
-                                                            @station.Place, @station.Street 
-                                                        </a>
-                                                    </p>
-                                                    @if(!string.IsNullOrEmpty(station.ClosesAt))
-                                                    {
-                                                        DateTimeOffset dto = DateTimeOffset.Parse(@station.ClosesAt);
-                                                        <p>Schließt um @dto.ToString("HH:mm 'Uhr'",culture)</p>
-                                                    }
-                                                </div>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
-                                <div id="mapView" style="display: none;">
-                                    @* TODO add Tool tip with click option*@
-                                    <div id="map_div" style="height: 500px;" />
-                                </div>
-                            }
-                            else
-                            {
-                                <p>Keine offenen Tankstellen im Radius gefunden.</p>
-                            }
+                </div>
+            </div>
+        </div>
+        <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
+        <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
+            <div class="row">
+                @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
+                {
+                    <!-- Standort 1 -->
+                    <div class="col-md-5 offset-md-1">
+                        <label>Standort 1</label>
+                        <div class="input-group">
+                            <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
+                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
+                                placeholder="Geben Sie einen Ort ein" />
+                            <button id="geoButton2" class="btn btn-primary btn-sm" type="button">📍</button>
                         </div>
                     </div>
+                    <div class="col-md-5">
+                        <label for="RadiusPlace1">Radius (km)</label>
+                        <input type="number" name="RadiusPlaces[0]" class="form-control" placeholder="Radius in km"
+                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)" min="1" max="25" />
+                    </div>
 
-                </div>
-            </form>
-        </div>
-        <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
-        <script>
-            let mapInitialized = false;
-            let map;
-            let Tiles;
-            let locationIndex = @Model.NamePlaces.Count;
-            function updateRadius(input) {
-                // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
-                if (!input.value.trim()) {
-                    input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
+                    <!-- Standort 2 -->
+                    <div class="col-md-5 offset-md-1 mt-3">
+                        <label>Standort 2</label>
+                        <input type="text" name="NamePlaces[1]" class="form-control"
+                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
+                            placeholder="Geben Sie einen Ort ein" />
+                    </div>
+                    <div class="col-md-5 mt-3">
+                        <label for="RadiusPlace2">Radius (km)</label>
+                        <input type="number" name="RadiusPlaces[1]" class="form-control" placeholder="Radius in km"
+                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)" min="1" max="25" />
+                    </div>
                 }
-
-                // Aktualisiere das Modell im Hintergrund
-                var radiusPlace1 = document.querySelector('input[name="RadiusPlace1"]');
-                var radiusPlace2 = document.querySelector('input[name="RadiusPlace2"]');
-                if (input.value > 0) {
-                    radiusPlace1.value = input.value;
-                    radiusPlace2.value = input.value;  // Das Modell im Hintergrund aktualisieren
-                }
-            }
-
-            function calculateAndStore(input) {
-                try {
-                    let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                    if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                        let result = eval(expression); // Berechne den Ausdruck
-                        if (!isNaN(result)) {
-                            input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                            document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                        }
-                    }
-                } catch (e) {
-                    console.error("Ungültiger Ausdruck:", e);
-                }
-            }
-
-            function toggleInputMethod(radio) {
-                var manualFields = document.getElementById("manualInputFields");
-                var autoFields = document.getElementById("autoInputFields");
-                var averageCost = document.getElementById("averageCost");
-                if (radio.value === "man") {
-                    manualFields.style.display = "block";
-                    autoFields.style.display = "none";
-                    if (averageCost != null) {
-                        averageCost.style.display = "block";
-                    }
-                }
-                if (radio.value === "auto") {
-                    manualFields.style.display = "none";
-                    autoFields.style.display = "block";
-                    if (averageCost != null) {
-                        averageCost.style.display = "none";
-                    }
-                }
-            }
-
-            function toggleDetails(element) {
-                // Holen des Elements, das die Details enthält
-                var details = element.nextElementSibling;
-
-                // Wenn die Details sichtbar sind, verstecke sie, sonst zeige sie an
-                if (details.style.display === "none" || details.style.display === "") {
-                    details.style.display = "block";
-                } else {
-                    details.style.display = "none";
-                }
-            }
-
-            function formatPricePerKm(input) {
-                let expression = input.value.replace(",", ".");
-                document.getElementById("PricePerKm").value = expression;
-            }
-
-            $(function () {
-                let debounceTimer = null;
-                const $input = $("#CarType");
-                const $suggestionsBox = $("#suggestions");
-
-                // Input-Feld beobachten
-                $input.on('input', function () {
-                    clearTimeout(debounceTimer);
-                    const searchTerm = $(this).val().trim();
-                    $suggestionsBox.empty().hide();
-
-                    debounceTimer = setTimeout(function () {
-                        if (searchTerm.length > 0) {
-                            $.ajax({
-                                url: '?handler=FilterCarTypes',
-                                type: 'GET',
-                                dataType: 'json',
-                                data: { query: searchTerm },
-                                success: function (data) {
-                                    data.filteredCars.forEach(car => {
-                                        const item = $('<div class="suggestion-item"></div>').text(car);
-                                        $suggestionsBox.append(item);
-                                    });
-                                    if (data.filteredCars.length > 0) {
-                                        $suggestionsBox.show();
-                                    }
-                                },
-                                error: function () {
-                                    console.error("Fehler bei der Filterabfrage");
-                                }
-                            });
-                        }
-                    }, 300); // <-- Debounce von 300 ms
-                });
-
-                // Nur EIN zentraler Click-Handler für dynamische Vorschläge
-                $suggestionsBox.on('click', '.suggestion-item', function () {
-                    const selectedCarType = $(this).text();
-                    $input.val(selectedCarType);
-                    $suggestionsBox.empty().hide();
-                    if (selectedCarType === "") {
-                        $('#PricePerKm').val('');
-                        return;
-                    }
-
-                    $.ajax({
-                        url: '?handler=PricePerKm',
-                        type: 'GET',
-                        data: { carType: selectedCarType },
-                        success: function (data) {
-                            $('#PricePerKm').val(data.pricePerKm);
-                        },
-                        error: function () {
-                            console.error("Fehler beim Abrufen von PricePerKm");
-                        }
-                    });
-                });
-
-                // Click außerhalb der Box: Suggestions schließen
-                $(document).on('click', function (e) {
-                    if (!$(e.target).closest('#suggestions, #CarType').length) {
-                        $suggestionsBox.empty().hide();
-                    }
-                });
-            });
-
-            $(function () {
-                var type = '@TempData["ToastType"]';
-                var message = '@TempData["ToastMessage"]';
-
-                if (message) {
-                    toastr.options = {
-                        closeButton: true,
-                        progressBar: true,
-                        positionClass: "toast-bottom-right" // ⬅️ hier wird die Position gesetzt
-                    };
-                    toastr[type](message);
-                }
-            });
-
-            document.addEventListener('DOMContentLoaded', function () {
-                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                    new bootstrap.Tooltip(tooltipTriggerEl)
-                })
-            });
-            document.addEventListener('DOMContentLoaded', function () {
-                const geoButton = document.getElementById("geoButton");
-                if (geoButton) {
-                    geoButton.addEventListener("click", getLocation);
-                }
-
-                const geoButton2 = document.getElementById("geoButton2");
-                if (geoButton2) {
-                    geoButton2.addEventListener("click", getLocation);
-                }
-            });
-
-            function switchView() {
-                const selected = document.getElementById("viewMode").value;
-                document.getElementById("listView").style.display = selected === "list" ? "block" : "none";
-                document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
-
-                if (selected === "map") {
-                    if (!mapInitialized) {
-                        initMap();
-                        mapInitialized = true;
-                    }
-                    document.getElementById("mapTooltip").style.display = "inline-block";
-                    document.getElementById("sortLabel").style.display = "none";
-                    document.getElementById("sortMode").style.display = "none";
-                    document.getElementById("listTooltip").style.display = "none";
-                }
-                else {
-                    document.getElementById("mapTooltip").style.display = "none";
-                    document.getElementById("sortLabel").style.display = "inline-block";
-                    document.getElementById("sortMode").style.display = "inline-block";
-                    document.getElementById("listTooltip").style.display = "inline-block";
-                }
-            }
-            function initMap() {
-                var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
-                var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
-                map = L.map('map_div').setView([latitude, longitude], 12); // Zentrum (z. B. Erlangen)
-                Tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap',
-                });
-                Tiles.addTo(map);
-                if (localStorage.getItem("darkMode") === "enabled") {
-                    document.getElementById("map_div").classList.add("dark-map");
-                }
-                else {
-                    document.getElementById("map_div").classList.remove("dark-map");
-                }
-
-                const defaultIcon = new L.Icon({
-                    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-                    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    tooltipAnchor: [0, -32],
-                    shadowSize: [41, 41]
-                });
-                // Beispiel-Marker (dynamisch aus Razor erzeugt)
-                const greenIcon = new L.Icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],      // Spitze des Icons (für Popup/Tooltip Position)
-                    tooltipAnchor: [0, -32],   // <<–– das ist entscheidend!
-                    shadowSize: [41, 41]
-                });
-
-                @foreach (var station in Model.CheapestResultStations)
-                    {
-                        var lat = station.Coords.Lat.ToString().Replace(",", ".");
-                        var lng = station.Coords.Lng.ToString().Replace(",", ".");
-                        var name = Html.Raw(Json.Serialize(station.Name));
-                        var price = Model.FuelAmount > 0
-                        ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
-                        : Model.ToDisplay(station.FuelTypePrice.ToString());
-
-                        var isCheapest = station == Model.CheapestResultStations.First();
-
-                        <text>
-                            L.marker([@lat, @lng], {icon: @(isCheapest ? "greenIcon" : "defaultIcon") })
-                            .addTo(map)
-                            .bindTooltip(`@price €`, {permanent: true, direction: "top" })
-                            .openTooltip()
-                            .on('click',function(){
-                                window.open("https://www.google.com/maps?q=@lat,@lng", "_blank");
-                                                    });
-
-                        </text>
-                }
-            }
-
-            function getLocation() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(sendPositionToServer, handleError);
-                } else {
-                    alert("Geolocation wird nicht unterstützt.");
-                }
-            }
-
-            async function sendPositionToServer(position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                const response = await fetch("?handler=UpdateLocation", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ latitude: lat, longitude: lon })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success && result.address) {
-                        if (document.getElementById("generalLocation")) {
-                            document.getElementById("generalLocation").value = result.address;
-                        }
-                        if (document.getElementById("GeoStandort")) {
-                            document.getElementById("GeoStandort").value = result.address;
-                        }
-                        if (document.getElementById("FirstComparePlace")) {
-                            document.getElementById("FirstComparePlace").value = result.address;
-                        }
-                    }
-                } else {
-                    alert("Serverfehler bei Standortabfrage.");
-                }
-            }
-
-            function handleError(error) {
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert("Nutzer hat die Standortfreigabe abgelehnt.");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert("Standortinformationen nicht verfügbar.");
-                        break;
-                    case error.TIMEOUT:
-                        alert("Standortabfrage hat zu lange gedauert.");
-                        break;
-                    default:
-                        alert("Unbekannter Fehler.");
-                }
-            }
-
-            function addLocation() {
-                const container = document.getElementById("dynamicLocations");
-                if (locationIndex < 4) {
-                    const html = `
-                <div class="col-md-5 offset-md-1 mt-3">
-                    <label>Standort ${locationIndex + 1}</label>
-                    <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Geben Sie einen Ort ein">
-                </div>
-                <div class="col-md-5 mt-3">
-                    <label>Radius (km)</label>
-                    <input type="number" name="RadiusPlaces[${locationIndex}]" class="form-control" placeholder="Radius in km" min="1" max="25">
-                </div>
-                    `;
-
-                    container.insertAdjacentHTML("beforeend", html);
-                    locationIndex++; // Wichtig!
-                }
-                if (locationIndex >= 4) {
-                    const button = document.getElementById("addStandort");
-                    button.disabled = true;
-                    button.classList.add("disabled");
-                    button.textContent = "Maximale Standorte erreicht";
-                }
-            }
-
-        </script>
-        <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
-        @if (Model.SelectInputMode == InputMode.man && (Model.CalculatedAverageCosts.Any()))
-        {
-            <div id="averageCost" class="mt-4 text-center">
-                <h4>Ergebnisse:</h4>
-                @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
+                @if (Model.NamePlaces.Count > 2)
                 {
-                    <p>@place.Key- @(place.Value > 0 ? $"Durchschnittspreis: {Model.ToDisplay(place.Value.ToString("0.000"))} €" :
-                                "Keine Preise verfügbar")</p>
+                    @for (int i = 2; i < Model.NamePlaces.Count; i++)
+                    {
+                        <div class="col-md-5 offset-md-1 mt-3">
+                            <label>Standort @(i + 1)</label>
+                            <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
+                                placeholder="Geben Sie einen Ort ein" />
+                        </div>
+                        <div class="col-md-5 mt-3">
+                            <label>Radius (km)</label>
+                            <input type="number" name="RadiusPlaces[@i]" class="form-control" placeholder="Radius in km"
+                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)" min="1" max="25" />
+                        </div>
+                    }
                 }
             </div>
+
+            <!-- Hier kommen zusätzliche Standorte hin -->
+            <div id="dynamicLocations" class="row mt-3">
+            </div>
+            <!-- Plus-Button -->
+            <div class="row justify-content-center mt-3">
+                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px"
+                    onclick="addLocation()" @(Model.CalculatedAverageCosts.Count >= 4 ? "disabled" : "")>
+                    @(Model.CalculatedAverageCosts.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
+                </button>
+            </div>
+
+            <!-- Berechnen-Button -->
+            <div class="row justify-content-center mt-3">
+                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
+                    asp-page-handler="CalculateAverageCost">Vergleichen
+                </button>
+            </div>
+        </div>
+
+        <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
+        <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+            <!-- Automatische Eingabe für Standort und Radius -->
+            <div class="row align-items-end">
+                <div class="col-md-5 offset-md-1">
+                    <label for="generalLocation" class="form-label">Standort (PLZ/ Straße, Ort)</label>
+                    <div class="input-group">
+                        <input type="text" id="generalLocation" class="form-control"
+                            placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
+                        <button id="geoButton" class="btn btn-primary btn-sm" type="button">📍</button>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label for="generalRadius">Radius (km)</label>
+                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
+                        max="25" asp-for="Radius" value="@Model.Radius">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
+                    asp-page-handler="Search">Suchen</button>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-6" style="padding: 20px;">
+                @if (Model.CheapestResultStations.Any())
+                {
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <label for="viewMode" class="form-label mb-0 me-2">Ansicht</label>
+                            <select id="viewMode" class="form-select w-auto" onchange="switchView()">
+                                <option value="list">Liste</option>
+                                <option value="map">Karte</option>
+                            </select>
+                            @if (Model.FuelAmount > 0)
+                            {
+                                <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
+                                    style="cursor: pointer;" title="Die Wegkosten werden für Hin- und Rückfahrt angesetzte">
+                                    ⓘ
+                                </span>
+                            }
+
+                            <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
+                                style="display: none; cursor: pointer;"
+                                title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle">
+                                ⓘ
+                            </span>
+
+                            <!-- Neues Dropdown für Sortierung (nur in Listenansicht sichtbar) -->
+                            <label for="sortMode" class="form-label mb-0 me-2" id="sortLabel">Aufsteigend sortieren
+                                nach</label>
+                            <select id="sortMode" class="form-select w-auto" onchange="sortList(this.value)" id="sortModeSelect">
+                                @if (Model.FuelAmount > 0)
+                                {
+                                    <option value="totalCost">Gesamtkosten</option>
+                                    <option value="fuelPrice">Preis pro Liter</option>
+                                    <option value="distance">Entfernung</option>
+                                }
+                                else
+                                {
+                                    <option value="fuelPrice">Preis pro Liter</option>
+                                    <option value="distance">Entfernung</option>
+                                }
+                            </select>
+                        </div>
+                        <div id="stationListContainer">
+                            @await Html.PartialAsync("_StationListPartial", Model) @* Oder "~/Pages/Shared/_StationListPartial.cshtml" *@
+                            @{ TempData.Keep("StationsJson"); TempData.Keep("FuelAmount"); }
+                        </div>
+                        <div id="mapView" style="display: none;">
+                                    @* TODO add Tool tip with click option*@
+                                    <div id="map_div" style="height: 500px;" />
+                        </div>
+                }
+                                 </div>
+                    </div>
+    </div>
+    </form>
+    </div>
+    <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
+    <script>
+        let mapInitialized = false;
+        let map;
+        let Tiles;
+        let locationIndex = @Model.NamePlaces.Count;
+        function updateRadius(input) {
+            // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
+            if (!input.value.trim()) {
+                input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
+            }
+
+            // Aktualisiere das Modell im Hintergrund
+            var radiusPlace1 = document.querySelector('input[name="RadiusPlace1"]');
+            var radiusPlace2 = document.querySelector('input[name="RadiusPlace2"]');
+            if (input.value > 0) {
+                radiusPlace1.value = input.value;
+                radiusPlace2.value = input.value;  // Das Modell im Hintergrund aktualisieren
+            }
         }
-        <hr>
-        <ol>
-            <li id="fn1">
-                Frühjahr/ Sommer 2025
-            </li>
-        </ol>
+
+        function calculateAndStore(input) {
+            try {
+                let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
+                if (/^[0-9+\-*/().\s]*$/.test(expression)) {
+                    let result = eval(expression); // Berechne den Ausdruck
+                    if (!isNaN(result)) {
+                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
+                        document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
+                    }
+                }
+            } catch (e) {
+                console.error("Ungültiger Ausdruck:", e);
+            }
+        }
+
+        function toggleInputMethod(radio) {
+            var manualFields = document.getElementById("manualInputFields");
+            var autoFields = document.getElementById("autoInputFields");
+            var averageCost = document.getElementById("averageCost");
+            if (radio.value === "man") {
+                manualFields.style.display = "block";
+                autoFields.style.display = "none";
+                if (averageCost != null) {
+                    averageCost.style.display = "block";
+                }
+            }
+            if (radio.value === "auto") {
+                manualFields.style.display = "none";
+                autoFields.style.display = "block";
+                if (averageCost != null) {
+                    averageCost.style.display = "none";
+                }
+            }
+        }
+
+        function toggleDetails(element) {
+            // Holen des Elements, das die Details enthält
+            var details = element.nextElementSibling;
+
+            // Wenn die Details sichtbar sind, verstecke sie, sonst zeige sie an
+            if (details.style.display === "none" || details.style.display === "") {
+                details.style.display = "block";
+            } else {
+                details.style.display = "none";
+            }
+        }
+
+        function formatPricePerKm(input) {
+            let expression = input.value.replace(",", ".");
+            document.getElementById("PricePerKm").value = expression;
+        }
+
+        $(function () {
+            let debounceTimer = null;
+            const $input = $("#CarType");
+            const $suggestionsBox = $("#suggestions");
+
+            // Input-Feld beobachten
+            $input.on('input', function () {
+                clearTimeout(debounceTimer);
+                const searchTerm = $(this).val().trim();
+                $suggestionsBox.empty().hide();
+
+                debounceTimer = setTimeout(function () {
+                    if (searchTerm.length > 0) {
+                        $.ajax({
+                            url: '?handler=FilterCarTypes',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { query: searchTerm },
+                            success: function (data) {
+                                data.filteredCars.forEach(car => {
+                                    const item = $('<div class="suggestion-item"></div>').text(car);
+                                    $suggestionsBox.append(item);
+                                });
+                                if (data.filteredCars.length > 0) {
+                                    $suggestionsBox.show();
+                                }
+                            },
+                            error: function () {
+                                console.error("Fehler bei der Filterabfrage");
+                            }
+                        });
+                    }
+                }, 300); // <-- Debounce von 300 ms
+            });
+
+            // Nur EIN zentraler Click-Handler für dynamische Vorschläge
+            $suggestionsBox.on('click', '.suggestion-item', function () {
+                const selectedCarType = $(this).text();
+                $input.val(selectedCarType);
+                $suggestionsBox.empty().hide();
+                if (selectedCarType === "") {
+                    $('#PricePerKm').val('');
+                    return;
+                }
+
+                $.ajax({
+                    url: '?handler=PricePerKm',
+                    type: 'GET',
+                    data: { carType: selectedCarType },
+                    success: function (data) {
+                        $('#PricePerKm').val(data.pricePerKm);
+                    },
+                    error: function () {
+                        console.error("Fehler beim Abrufen von PricePerKm");
+                    }
+                });
+            });
+
+            // Click außerhalb der Box: Suggestions schließen
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#suggestions, #CarType').length) {
+                    $suggestionsBox.empty().hide();
+                }
+            });
+        });
+
+        $(function () {
+            var type = '@TempData["ToastType"]';
+            var message = '@TempData["ToastMessage"]';
+
+            if (message) {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-bottom-right" // ⬅️ hier wird die Position gesetzt
+                };
+                toastr[type](message);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const geoButton = document.getElementById("geoButton");
+            if (geoButton) {
+                geoButton.addEventListener("click", getLocation);
+            }
+
+            const geoButton2 = document.getElementById("geoButton2");
+            if (geoButton2) {
+                geoButton2.addEventListener("click", getLocation);
+            }
+        });
+
+        function switchView() {
+            const selected = document.getElementById("viewMode").value;
+            document.getElementById("listView").style.display = selected === "list" ? "block" : "none";
+            document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
+
+            if (selected === "map") {
+                if (!mapInitialized) {
+                    initMap();
+                    mapInitialized = true;
+                }
+                document.getElementById("mapTooltip").style.display = "inline-block";
+                document.getElementById("sortLabel").style.display = "none";
+                document.getElementById("sortMode").style.display = "none";
+                document.getElementById("listTooltip").style.display = "none";
+            }
+            else {
+                document.getElementById("mapTooltip").style.display = "none";
+                document.getElementById("sortLabel").style.display = "inline-block";
+                document.getElementById("sortMode").style.display = "inline-block";
+                document.getElementById("listTooltip").style.display = "inline-block";
+            }
+        }
+        function initMap() {
+            var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
+            var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
+            map = L.map('map_div').setView([latitude, longitude], 12); // Zentrum (z. B. Erlangen)
+            Tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+            });
+            Tiles.addTo(map);
+            if (localStorage.getItem("darkMode") === "enabled") {
+                document.getElementById("map_div").classList.add("dark-map");
+            }
+            else {
+                document.getElementById("map_div").classList.remove("dark-map");
+            }
+
+            const defaultIcon = new L.Icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                tooltipAnchor: [0, -32],
+                shadowSize: [41, 41]
+            });
+            // Beispiel-Marker (dynamisch aus Razor erzeugt)
+            const greenIcon = new L.Icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],      // Spitze des Icons (für Popup/Tooltip Position)
+                tooltipAnchor: [0, -32],   // <<–– das ist entscheidend!
+                shadowSize: [41, 41]
+            });
+
+                    @foreach (var station in Model.CheapestResultStations)
+                {
+                    var lat = station.Coords.Lat.ToString().Replace(",", ".");
+                    var lng = station.Coords.Lng.ToString().Replace(",", ".");
+                    var name = Html.Raw(Json.Serialize(station.Name));
+                    var price = Model.FuelAmount > 0
+                    ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
+                    : Model.ToDisplay(station.FuelTypePrice.ToString());
+
+                    var isCheapest = station == Model.CheapestResultStations.First();
+
+                    <text>
+                        L.marker([@lat, @lng], {icon: @(isCheapest ? "greenIcon" : "defaultIcon") })
+                        .addTo(map)
+                        .bindTooltip(`@price €`, {permanent: true, direction: "top" })
+                        .openTooltip()
+                        .on('click',function(){
+                            window.open("https://www.google.com/maps?q=@lat,@lng", "_blank");
+                                                            });
+
+                    </text>
+            }
+                }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendPositionToServer, handleError);
+            } else {
+                alert("Geolocation wird nicht unterstützt.");
+            }
+        }
+
+        async function sendPositionToServer(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            const response = await fetch("?handler=UpdateLocation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success && result.address) {
+                    if (document.getElementById("generalLocation")) {
+                        document.getElementById("generalLocation").value = result.address;
+                    }
+                    if (document.getElementById("GeoStandort")) {
+                        document.getElementById("GeoStandort").value = result.address;
+                    }
+                    if (document.getElementById("FirstComparePlace")) {
+                        document.getElementById("FirstComparePlace").value = result.address;
+                    }
+                }
+            } else {
+                alert("Serverfehler bei Standortabfrage.");
+            }
+        }
+
+        function handleError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Nutzer hat die Standortfreigabe abgelehnt.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Standortinformationen nicht verfügbar.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Standortabfrage hat zu lange gedauert.");
+                    break;
+                default:
+                    alert("Unbekannter Fehler.");
+            }
+        }
+
+        function addLocation() {
+            const container = document.getElementById("dynamicLocations");
+            if (locationIndex < 4) {
+                const html = `
+                    <div class="col-md-5 offset-md-1 mt-3">
+                        <label>Standort ${locationIndex + 1}</label>
+                        <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Geben Sie einen Ort ein">
+                    </div>
+                    <div class="col-md-5 mt-3">
+                        <label>Radius (km)</label>
+                        <input type="number" name="RadiusPlaces[${locationIndex}]" class="form-control" placeholder="Radius in km" min="1" max="25">
+                    </div>
+                        `;
+
+                container.insertAdjacentHTML("beforeend", html);
+                locationIndex++; // Wichtig!
+            }
+            if (locationIndex >= 4) {
+                const button = document.getElementById("addStandort");
+                button.disabled = true;
+                button.classList.add("disabled");
+                button.textContent = "Maximale Standorte erreicht";
+            }
+        }
+
+        function sortList(sortValue) {
+            console.log('Client: SortValue gesendet:', sortValue);
+            const container = document.getElementById('stationListContainer');  // DEFINIERT!
+            container.innerHTML = '<p>Sortiert...</p>';
+
+            const formData = new FormData();
+            formData.append('sortMode', sortValue);
+
+            fetch('?handler=Sort', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response:', response);  // Debug
+                if (!response.ok) throw new Error(response.status);
+                return response.text();
+            })
+            .then(html => {
+                console.log('HTML empfangen:', html);  // Debug: Sieh sortierte Liste?
+                container.innerHTML = html;
+                document.querySelectorAll('.station-summary').forEach(el => el.onclick = () => toggleDetails(el));
+            })
+            .catch(err => {
+                console.error('Fehler:', err);
+                container.innerHTML = '<p>Fehler: ' + err + '</p>';
+            });
+        }
+
+    </script>
+    <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->
+    @if (Model.SelectInputMode == InputMode.man && (Model.CalculatedAverageCosts.Any()))
+    {
+        <div id="averageCost" class="mt-4 text-center">
+            <h4>Ergebnisse:</h4>
+            @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
+            {
+                <p>@place.Key- @(place.Value > 0 ? $"Durchschnittspreis: {Model.ToDisplay(place.Value.ToString("0.000"))} €" :
+                            "Keine Preise verfügbar")</p>
+            }
+        </div>
+    }
+    <hr>
+    <ol>
+        <li id="fn1">
+            Frühjahr/ Sommer 2025
+        </li>
+    </ol>

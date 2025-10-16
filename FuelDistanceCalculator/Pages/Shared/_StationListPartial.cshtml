@@ -1,0 +1,49 @@
+@using System.Globalization
+@model IndexModel  // Wichtig: Dein PageModel (voll qualifiziert, z. B. FuelDistanceCalculator.Pages.IndexModel)
+
+@if (Model.CheapestResultStations == null || !Model.CheapestResultStations.Any())
+{
+    <p>Keine Stationen gefunden.</p>
+    return;
+}
+
+<ul class="station-list">
+    @foreach (GasStation station in Model.CheapestResultStations)
+    {
+        <li class="station-item">
+            <div class="station-summary" onclick="toggleDetails(this)">
+                <strong>@station.Name</strong> -
+                @if (Model.FuelAmount > 0)
+                {
+                    <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>
+                }
+                else
+                {
+                    <span>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</span>
+                }
+            </div>
+            <div class="station-details" style="display:none;">
+                @if (Model.FuelAmount > 0)
+                {
+                    <p>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
+                }
+                @if (!string.IsNullOrEmpty(station.LastUpdate))
+                {
+                    DateTimeOffset dto = DateTimeOffset.Parse(station.LastUpdate);
+                    <p>Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", new CultureInfo("de-DE"))</p>
+                }
+                <p>Entfernung: @Model.ToDisplay(station.Dist.ToString()) km</p>
+                <p>Ort:
+                    <a href="https://www.google.com/maps?q=@station.Place,@station.Street" target="_blank">
+                        @station.Place, @station.Street
+                    </a>
+                </p>
+                @if (!string.IsNullOrEmpty(station.ClosesAt))
+                {
+                    DateTimeOffset dto = DateTimeOffset.Parse(station.ClosesAt);
+                    <p>Schließt um @dto.ToString("HH:mm 'Uhr'", new CultureInfo("de-DE"))</p>
+                }
+            </div>
+        </li>
+    }
+</ul>

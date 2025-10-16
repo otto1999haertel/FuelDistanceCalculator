@@ -11,8 +11,8 @@ For a successfull connection to the gas station price service you have to create
 - to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 
 # Build
-- appsettings.Development.json need to be in FuelDistanceCalculator
-- appsettings.json need to be in FuelDistanceCalculator
+- appsettings.Development.json (with tankerkoenig API Key) need to be in FuelDistanceCalculator
+- appsettings.json (with tankerkoenig API Key)  need to be in FuelDistanceCalculator
 
 # Building local
 - copy/ create localhost certificates (*.cert/ *.key) to nginx/certs

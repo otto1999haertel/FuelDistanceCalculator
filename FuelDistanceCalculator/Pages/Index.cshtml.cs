@@ -186,6 +186,8 @@ public class IndexModel : PageModel
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
             () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
+            gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
+            () => _geoLocationService.CalculateDistance(coordinates.Latitude.ToString(), coordinates.Longitude.ToString(), gasStations.Stations));
             if (gasStations.IsSuccess)
             {
                 Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);

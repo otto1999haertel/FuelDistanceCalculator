@@ -135,48 +135,53 @@ public class GeoLocationService
         return fullAddress;
     }
 
-    public async Task<double> CalculateDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
+    public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
-        var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
-        Console.WriteLine($"Routing API Request: {url}");
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("User-Agent", "FuelGo/1.0");
-        string responseString = "";
-        if (_mode == "Production")
+        foreach (GasStation station in stations)
         {
-            var response = await _httpClient.SendAsync(request);
-            Console.WriteLine("Response from routing service " + response.StatusCode);
-            if (response.IsSuccessStatusCode)
+             var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={station.Coords.Lng},{station.Coords.Lat}"; // Example: Munich center
+                Console.WriteLine($"{station.Name} Routing API Request: {url}");
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("User-Agent", "FuelGo/1.0");
+                string responseString = "";
+                bool responseSuccess = false;
+            if (_mode == "Production")
             {
-                responseString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response String Routing Service: " + responseString);
+                var response = await _httpClient.SendAsync(request);
+                Console.WriteLine("Response from routing service " + response.StatusCode);
+                if (response.IsSuccessStatusCode)
+                {
+                    responseString = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Response String Routing Service: " + responseString);
+                    responseSuccess = true;
+                }
             }
             else
             {
-                return -1;
+                // Development/Test: Lade JSON aus File
+                string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
+                if (!File.Exists(jsonFilePath))
+                {
+                    throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+                }
+                responseString = await File.ReadAllTextAsync(jsonFilePath);
             }
-        }
-        else
-        {
-            // Development/Test: Lade JSON aus File
-            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
-            if (!File.Exists(jsonFilePath))
+            if (responseSuccess)
             {
-                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
-            }
-            responseString = await File.ReadAllTextAsync(jsonFilePath);
-        }
-        using JsonDocument doc = JsonDocument.Parse(responseString);
-        JsonElement root = doc.RootElement;
+                using JsonDocument doc = JsonDocument.Parse(responseString);
+                JsonElement root = doc.RootElement;
 
-        double totalDistance = root
-            .GetProperty("features")[0]
-            .GetProperty("properties")
-            .GetProperty("summary")
-            .GetProperty("distance")
-            .GetDouble();
-        Console.WriteLine($"Calculated distance: {totalDistance} meters");
-        return Math.Round(totalDistance / 1000.0, 2); // Convert to kilometers
+                double totalDistance = root
+                    .GetProperty("features")[0]
+                    .GetProperty("properties")
+                    .GetProperty("summary")
+                    .GetProperty("distance")
+                    .GetDouble();
+                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
+                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+            }
+        }
+        return stations;
     }
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)

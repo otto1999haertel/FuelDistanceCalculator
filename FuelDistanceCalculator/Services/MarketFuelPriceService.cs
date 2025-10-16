@@ -83,6 +83,7 @@ public class MarketFuelPriceService
             Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
             gS.SetPrice(fueltype);
             gS.SetUpdateTime(fueltype);
+            Console.WriteLine("Distance before calculation: " + gS.Dist);   
             double calculatedDistance = await _geoLocationService.CalculateDistance(latitude.ToString(), longitude.ToString(), gS.Coords.Lat.ToString(), gS.Coords.Lng.ToString());
             gS.Dist=calculatedDistance>0?calculatedDistance : gS.Dist;
             Console.WriteLine("Open Gasstations in Service " + gS.ToString());

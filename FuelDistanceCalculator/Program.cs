@@ -36,7 +36,7 @@ builder.Services.AddScoped<GeoLocationService>(provider =>
 {
     var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
     var cache = provider.GetRequiredService<IDistributedCache>();
-    return new GeoLocationService(httpClientFactory, builder.Configuration);
+    return new GeoLocationService(httpClientFactory, builder.Configuration, Environment.GetEnvironmentVariable("MODE_TYPE"));
 });
 
 // Add services to the container.

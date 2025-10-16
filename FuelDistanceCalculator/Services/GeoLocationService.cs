@@ -16,7 +16,9 @@ public class GeoLocationService
 
     private readonly string _apiKey;
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    private readonly string _mode;
+
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, string mode)
     {
         _httpClient = httpClientFactory.CreateClient();
 
@@ -25,6 +27,7 @@ public class GeoLocationService
         _redisDb = redis.GetDatabase();
         _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
                   ?? throw new Exception("API Key missing");
+        _mode = mode;
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -131,31 +134,49 @@ public class GeoLocationService
 
         return fullAddress;
     }
-    
+
     public async Task<double> CalculateDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
     {
         var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
-        Console.WriteLine($"Routing API Request: {url}");   
+        Console.WriteLine($"Routing API Request: {url}");
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
-        var response = await _httpClient.SendAsync(request);
-        Console.WriteLine("Response from routing service " + response.StatusCode);
-        if (response.IsSuccessStatusCode)
+        string responseString = "";
+        if (_mode == "Production")
         {
-            string responseString = await response.Content.ReadAsStringAsync();
-            using JsonDocument doc = JsonDocument.Parse(responseString);
-            JsonElement root = doc.RootElement;
-
-            double totalDistance = root
-                .GetProperty("features")[0]
-                .GetProperty("properties")
-                .GetProperty("summary")
-                .GetProperty("distance")
-                .GetDouble();
-            Console.WriteLine($"Calculated distance: {totalDistance} meters");
-            return Math.Round(totalDistance / 1000.0,2); // Convert to kilometers
+            var response = await _httpClient.SendAsync(request);
+            Console.WriteLine("Response from routing service " + response.StatusCode);
+            if (response.IsSuccessStatusCode)
+            {
+                responseString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Response String Routing Service: " + responseString);
+            }
+            else
+            {
+                return -1;
+            }
         }
-        return -1;
+        else
+        {
+            // Development/Test: Lade JSON aus File
+            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
+            if (!File.Exists(jsonFilePath))
+            {
+                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+            }
+            responseString = await File.ReadAllTextAsync(jsonFilePath);
+        }
+        using JsonDocument doc = JsonDocument.Parse(responseString);
+        JsonElement root = doc.RootElement;
+
+        double totalDistance = root
+            .GetProperty("features")[0]
+            .GetProperty("properties")
+            .GetProperty("summary")
+            .GetProperty("distance")
+            .GetDouble();
+        Console.WriteLine($"Calculated distance: {totalDistance} meters");
+        return Math.Round(totalDistance / 1000.0, 2); // Convert to kilometers
     }
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
@@ -187,25 +208,25 @@ public class GeoLocationService
 
         return null;
     }
-    
+
     private string NormalizeAddressKey(string place)
     {
-            if (string.IsNullOrWhiteSpace(place))
-                return "";
+        if (string.IsNullOrWhiteSpace(place))
+            return "";
 
-            var normalized = place
-                .Trim()
-                .ToLowerInvariant()
-                .Replace("ß", "ss")
-                .Replace("ä", "ae")
-                .Replace("ö", "oe")
-                .Replace("ü", "ue");
+        var normalized = place
+            .Trim()
+            .ToLowerInvariant()
+            .Replace("ß", "ss")
+            .Replace("ä", "ae")
+            .Replace("ö", "oe")
+            .Replace("ü", "ue");
 
-            // Mehrfache Leerzeichen durch eines ersetzen
-            normalized = Regex.Replace(normalized, @"\s+", " ");
+        // Mehrfache Leerzeichen durch eines ersetzen
+        normalized = Regex.Replace(normalized, @"\s+", " ");
 
-            // Sonderzeichen rausfiltern (optional)
-            normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
+        // Sonderzeichen rausfiltern (optional)
+        normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
 
         return normalized;
     }

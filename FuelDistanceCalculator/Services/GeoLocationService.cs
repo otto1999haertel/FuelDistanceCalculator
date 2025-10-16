@@ -14,13 +14,17 @@ public class GeoLocationService
     // Cache-Zeit (1 Jahr)
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory)
+    private readonly string _apiKey;
+
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClient = httpClientFactory.CreateClient();
 
         // Verbindung zu Redis herstellen (StackExchange.Redis)
         var redis = ConnectionMultiplexer.Connect("redis:6379"); // Falls Docker, sonst "localhost:6379"
         _redisDb = redis.GetDatabase();
+        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
+                  ?? throw new Exception("API Key missing");
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -108,24 +112,50 @@ public class GeoLocationService
         if (!string.IsNullOrWhiteSpace(fullAddress))
         {
             // Reverse-Cache setzen (Koordinaten -> Adresse)
-        await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+            await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
 
-        // Forward-Cache setzen (Ort -> Koordinaten), falls noch nicht vorhanden
-        string forwardKey = $"geo:{NormalizeAddressKey(fullAddress)}";
-        bool forwardExists = await _redisDb.KeyExistsAsync(forwardKey);
+            // Forward-Cache setzen (Ort -> Koordinaten), falls noch nicht vorhanden
+            string forwardKey = $"geo:{NormalizeAddressKey(fullAddress)}";
+            bool forwardExists = await _redisDb.KeyExistsAsync(forwardKey);
 
-        if (!forwardExists)
-        {
-            await _redisDb.HashSetAsync(forwardKey, new HashEntry[]
+            if (!forwardExists)
             {
+                await _redisDb.HashSetAsync(forwardKey, new HashEntry[]
+                {
                 new HashEntry("lat", latitude),
                 new HashEntry("lon", longitude)
-            });
-            await _redisDb.KeyExpireAsync(forwardKey, cacheDuration);
-        }
+                });
+                await _redisDb.KeyExpireAsync(forwardKey, cacheDuration);
+            }
         }
 
         return fullAddress;
+    }
+    
+    public async Task<double> CalculateDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
+    {
+        var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
+        Console.WriteLine($"Routing API Request: {url}");   
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "FuelGo/1.0");
+        var response = await _httpClient.SendAsync(request);
+        Console.WriteLine("Response from routing service " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            string responseString = await response.Content.ReadAsStringAsync();
+            using JsonDocument doc = JsonDocument.Parse(responseString);
+            JsonElement root = doc.RootElement;
+
+            double totalDistance = root
+                .GetProperty("features")[0]
+                .GetProperty("properties")
+                .GetProperty("summary")
+                .GetProperty("distance")
+                .GetDouble();
+            Console.WriteLine($"Calculated distance: {totalDistance} meters");
+            return Math.Round(totalDistance / 1000.0,2); // Convert to kilometers
+        }
+        return -1;
     }
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)

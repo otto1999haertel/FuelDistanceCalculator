@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Text.Json;
 using FluentMigrator.Builders.IfDatabase;
 using Microsoft.IdentityModel.Tokens;
@@ -10,12 +11,14 @@ public class MarketFuelPriceService
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly string _mode;
-    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient)
+    private readonly GeoLocationService _geoLocationService;
+    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, GeoLocationService geoLocationService)
     {
         _httpClient = httpClient;
         _apiKey = configuration["ApiSettings:TankApiKey"]
                   ?? throw new Exception("API Key missing");
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
+        _geoLocationService = geoLocationService;
     }
     
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
@@ -71,15 +74,17 @@ public class MarketFuelPriceService
                 {
                     Console.WriteLine("Allgemeiner Fehler: " + ex.Message);
                 }
-        List<GasStation> openStations = gasStationResponse?.Stations?
-            .Where(station => station.IsOpen && station.Fuels.Any(x=>!x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
-            .ToList() ?? new List<GasStation>();
+            List<GasStation> openStations = gasStationResponse?.Stations?
+                .Where(station => station.IsOpen && station.Fuels.Any(x => !x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
+                .ToList() ?? new List<GasStation>();
         foreach (GasStation gS in openStations)
         {
             Console.WriteLine("Open Gasstations in Service " + gS.ToString());
             Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
             gS.SetPrice(fueltype);
             gS.SetUpdateTime(fueltype);
+            double calculatedDistance = await _geoLocationService.CalculateDistance(latitude.ToString(), longitude.ToString(), gS.Coords.Lat.ToString(), gS.Coords.Lng.ToString());
+            gS.Dist=calculatedDistance>0?calculatedDistance : gS.Dist;
             Console.WriteLine("Open Gasstations in Service " + gS.ToString());
         }
         

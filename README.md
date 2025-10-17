@@ -7,7 +7,8 @@ To start the app navigate to the root folder, where docker-compose.yml file is l
 docker compose up --build
 For a successfull connection to the gas station price service you have to create a appsettings.json file and enter your API Key in the following format:
 "ApiSettings": {
-      "TankApiKey": "[your api key]"
+      "TankApiKey": "[your api key for Tankerkönig]"
+      "OpenRouteServiceApiKey": "[your api key for openrouteservice ]"
     } 
 
 # Design Updates

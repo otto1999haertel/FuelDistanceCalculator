@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.IdentityModel.Tokens;
 
 public class ApiThrottle
 {
@@ -19,6 +20,11 @@ public class ApiThrottle
     public async Task<T> ExecuteWithThrottle<T>(string apiKey, Func<Task<T>> apiCall, TimeSpan? interval = null)
     {
         Console.WriteLine($"[API Call Thread {Thread.CurrentThread.ManagedThreadId}] API-Throttle entered for {apiKey} at {DateTime.Now:HH:mm:ss.fff}, Semaphore Count: {_semaphore.CurrentCount}");
+        if(apiKey==null || apiKey.Trim().IsNullOrEmpty())
+        {
+            throw new ArgumentNullException("API Key cannot be null or empty", nameof(apiKey));
+        }
+        
         var intervalToUse = interval ?? _defaultInterval;
 
         await _semaphore.WaitAsync();

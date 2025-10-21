@@ -17,7 +17,19 @@ namespace FuelDistanceCalculatorTest
             List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer);
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
-            Assert.That(true, Is.True);
+            Assert.That(CheckOrderAscendingFuelAmountZero(result), Is.True);
+        }
+
+        private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
+        {
+            for (int i = 0; i < stations.Count - 1; i++)
+            {
+                if (stations[i].FuelTypePrice > stations[i + 1].FuelTypePrice)
+                {
+                    return false; // Nicht aufsteigend
+                }
+            }
+            return true; // Aufsteigend
         }
     
     }

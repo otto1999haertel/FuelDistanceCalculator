@@ -55,7 +55,7 @@ public class GasStation
             {
                 throw new ArgumentOutOfRangeException("Price cannot be negative.");
             }
-            _fuelprice = (decimal)value;
+            _totalCoast = (decimal)value;
         }
     }
     private decimal _totalCoast;
@@ -98,14 +98,14 @@ public class GasStation
         decimal travelCost = pricePerKm * dist * 2m;  // Fahrtkosten hin/rück (nicht gerundet)
 
         decimal rawTotal = fuelCost + travelCost;
-        _totalCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);  // Endgültige Rundung auf 2 Dezimalen
+        TotalCalculatedCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);  // Endgültige Rundung auf 2 Dezimalen
 
         // Verbessertes Logging mit 2 Dezimalen (für Klarheit)
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
                           $"Fuel Price: {_fuelprice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
 
-        return _totalCoast;
+        return TotalCalculatedCoast;
     }
 
     public void SetPrice(string fuelType)

@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        MODE_TYPE: ${MODE_TYPE:-Development} # Standardwert auf Development
+        MODE_TYPE: ${MODE_TYPE:-Development}
     environment:
       - MODE_TYPE=${MODE_TYPE:-Development}
       - ASPNETCORE_ENVIRONMENT=${MODE_TYPE:-Development}

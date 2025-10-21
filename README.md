@@ -21,6 +21,7 @@ For a successfull connection to the gas station price service you have to create
 # Building local
 - copy/ create localhost certificates (*.cert/ *.key) to nginx/certs
 - execute: docker compose --env-file .env.local up --build
+- test output will be stored in the container: fuelgo-webapp\app\test-output
 
 # Building on the server
 -  execute: docker compose --env-file .env.server up --build

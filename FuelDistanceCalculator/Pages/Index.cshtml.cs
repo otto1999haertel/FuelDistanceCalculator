@@ -19,7 +19,7 @@ public class IndexModel : PageModel
     private FuelPriceService _fuelPriceService;
 
     private readonly MarketFuelPriceService _MarketfuelPriceService;
-    private readonly GeoLocationService _geoLocationService;
+    private readonly IGeoLocationService _geoLocationService;
 
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
 
@@ -105,7 +105,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public bool  IsProduction { get; private set; }
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, GeoLocationService geoLocationService)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;

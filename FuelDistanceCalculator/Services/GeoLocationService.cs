@@ -1,3 +1,4 @@
+using FuelDistanceCalculator.Services;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
@@ -6,29 +7,25 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-public class GeoLocationService
+public class GeoLocationService : IGeoLocationService
 {
     private readonly IDatabase _redisDb;
     private readonly HttpClient _httpClient;
 
-    // Cache-Zeit (1 Jahr)
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
 
     private readonly string _apiKey;
 
     private readonly string _mode;
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, string mode)
-    {
-        _httpClient = httpClientFactory.CreateClient();
-
-        // Verbindung zu Redis herstellen (StackExchange.Redis)
-        var redis = ConnectionMultiplexer.Connect("redis:6379"); // Falls Docker, sonst "localhost:6379"
-        _redisDb = redis.GetDatabase();
-        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
-                  ?? throw new Exception("API Key missing");
-        _mode = mode;
-    }
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+            _redisDb = redis.GetDatabase();
+            _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
+                      ?? throw new Exception("API Key missing");
+            _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+        }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
     {

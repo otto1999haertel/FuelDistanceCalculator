@@ -11,8 +11,8 @@ public class MarketFuelPriceService
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly string _mode;
-    private readonly GeoLocationService _geoLocationService;
-    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, GeoLocationService geoLocationService)
+    private readonly IGeoLocationService _geoLocationService;
+    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, IGeoLocationService geoLocationService)
     {
         _httpClient = httpClient;
         _apiKey = configuration["ApiSettings:TankApiKey"]

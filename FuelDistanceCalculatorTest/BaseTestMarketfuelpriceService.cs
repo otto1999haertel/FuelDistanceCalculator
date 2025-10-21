@@ -62,12 +62,5 @@ namespace FuelDistanceCalculatorTest
             
             return result.IsSuccess ? result.Stations : new List<GasStation>();
         }
-
-        [Test]
-        public void Test1()
-        {
-            // Beispieltest: Prüfe, ob die Liste Tankstellen enthält
-            Assert.That(_fakeGasStationList, Is.Not.Empty, "Die Tankstellenliste sollte nicht leer sein.");
-        }
     }
 }

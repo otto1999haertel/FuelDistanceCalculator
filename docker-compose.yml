@@ -23,6 +23,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=${MODE_TYPE}
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=example;Database=FuelDatabase
       - REDIS_HOST=redis:6379
+    volumes:
+      - ./test-output:/app/test-output
     depends_on:
       - db
     command: ["./start.sh"]  # Hier wird das Skript ausgeführt

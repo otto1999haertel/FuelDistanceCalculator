@@ -17,6 +17,7 @@ namespace FuelDistanceCalculatorTest
             List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer);
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
+            Assert.That(false, Is.True);
         }
     
     }

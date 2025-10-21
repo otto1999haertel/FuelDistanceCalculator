@@ -5,8 +5,6 @@ services:
     image: "redis:latest"
     container_name: "redis"
     restart: always
-    #ports:
-      #- "6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -17,17 +15,15 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        MODE_TYPE: ${MODE_TYPE:-Production} # Übergibt MODE_TYPE an ARG im Dockerfile
+        MODE_TYPE: ${MODE_TYPE:-Development} # Standardwert auf Development
     environment:
-      - MODE_TYPE=${MODE_TYPE}
-      - ASPNETCORE_ENVIRONMENT=${MODE_TYPE}
+      - MODE_TYPE=${MODE_TYPE:-Development}
+      - ASPNETCORE_ENVIRONMENT=${MODE_TYPE:-Development}
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=example;Database=FuelDatabase
       - REDIS_HOST=redis:6379
-    volumes:
-      - ./test-output:/app/test-output
     depends_on:
       - db
-    command: ["./start.sh"]  # Hier wird das Skript ausgeführt
+    command: ["./start.sh"]
     networks:
       - fuel-network
     deploy:
@@ -50,7 +46,7 @@ services:
       - fuelgo-webapp
     networks:
       fuel-network:
-       ipv4_address: 172.19.0.5
+        ipv4_address: 172.19.0.5
 
   db:
     image: postgres:latest
@@ -60,8 +56,6 @@ services:
       POSTGRES_DB: FuelDatabase
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    #ports:
-      #- "5432:5432"  # Dies exponiert den Port 5432 für den Host
     networks:
       - fuel-network
 

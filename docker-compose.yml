@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        MODE_TYPE: ${MODE_TYPE:-Production} # Übergibt MODE_TYPE an ARG im Dockerfile
     environment:
       - MODE_TYPE=${MODE_TYPE}
       - ASPNETCORE_ENVIRONMENT=${MODE_TYPE}

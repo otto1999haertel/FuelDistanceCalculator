@@ -162,6 +162,7 @@ public class GeoLocationService : IGeoLocationService
                     throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
                 }
                 responseString = await File.ReadAllTextAsync(jsonFilePath);
+                responseSuccess = true;
             }
             if (responseSuccess)
             {

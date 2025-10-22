@@ -19,18 +19,20 @@ namespace FuelDistanceCalculatorTest
         {
             // Erstelle DI-Container
             var services = new ServiceCollection();
+            Environment.SetEnvironmentVariable("MODE_TYPE", "Development");
 
             // Mock IConfiguration
             var mockConfiguration = new Mock<IConfiguration>();
             mockConfiguration.Setup(c => c["ApiSettings:TankApiKey"]).Returns("test-api-key");
             mockConfiguration.Setup(c => c["ApiSettings:OpenRouteServiceApiKey"]).Returns("test-ors-api-key");
+            mockConfiguration.Setup(c => c["MODE_TYPE"]).Returns("Development"); // Add MODE_TYPE to configuration
             services.AddSingleton(mockConfiguration.Object); // Registriere IConfiguration
 
             // Mock IHttpClientFactory
             var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-            var httpClient = new HttpClient(); // Für Testzwecke einfacher HttpClient
+            var httpClient = new HttpClient();
             mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(httpClient);
-            services.AddSingleton(mockHttpClientFactory.Object); // Registriere IHttpClientFactory
+            services.AddSingleton(mockHttpClientFactory.Object);
 
             // Mock IConnectionMultiplexer (Redis)
             var mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
@@ -58,6 +60,13 @@ namespace FuelDistanceCalculatorTest
 
             // Validiere, dass die Liste nicht leer ist
             Assert.That(_fakeGasStationList != null && _fakeGasStationList.Count > 0, Is.True, "Die Fake-Tankstellenliste ist leer oder null.");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Clean up environment variable
+            Environment.SetEnvironmentVariable("MODE_TYPE", null);
         }
 
         private async Task<List<GasStation>> GetFakeGasStationsAsync()

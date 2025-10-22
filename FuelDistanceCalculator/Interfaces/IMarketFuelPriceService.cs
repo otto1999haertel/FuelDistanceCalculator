@@ -1,3 +1,4 @@
+using FuelDistanceCalculator.Model;
 namespace FuelDistanceCalculator.Services
 {
     public interface IMarketFuelPriceService

@@ -1,4 +1,5 @@
-namespace FuelDistanceCalculator.Model{
+namespace FuelDistanceCalculator.Model;
+
 public class tankinfomodel
 {
     public int id { get; set; }  // Primärschlüssel (ID der Zeile)
@@ -17,4 +18,4 @@ public class tankinfomodel
 
     public double fuelprice2 { get; set; } // Preis des Sprits an Tankstelle 2
 }
-}
+

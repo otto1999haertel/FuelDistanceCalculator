@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
+using FuelDistanceCalculator.Model;
 namespace FuelDistanceCalculator.Services
 {
     public interface IGeoLocationService

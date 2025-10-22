@@ -1,8 +1,6 @@
-using System;
-using System.Net.Http;
 using System.Text.Json;
-using FluentMigrator.Builders.IfDatabase;
 using Microsoft.IdentityModel.Tokens;
+using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculator.Services;
 

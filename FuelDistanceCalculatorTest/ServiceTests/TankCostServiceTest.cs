@@ -1,4 +1,6 @@
 using NUnit.Framework.Internal;
+using FuelDistanceCalculator.Services;
+using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {

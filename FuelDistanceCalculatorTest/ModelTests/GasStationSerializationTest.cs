@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FuelDistanceCalculator.Model;
 using Microsoft.IdentityModel.Tokens;
 namespace FuelDistanceCalculatorTest.ModelTests
 {

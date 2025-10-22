@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NUnit.Framework;
+using FuelDistanceCalculator.Services;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {

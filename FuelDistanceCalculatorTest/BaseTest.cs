@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using NUnit.Framework;
 using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest

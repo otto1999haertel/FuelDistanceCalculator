@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
-
+namespace FuelDistanceCalculator.Model;
 public class GasStation
 {
     [JsonPropertyName("country")]

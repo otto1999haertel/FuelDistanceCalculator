@@ -1,11 +1,11 @@
-using FuelDistanceCalculator.Services;
-using Microsoft.Extensions.Caching.Distributed;
+using FuelDistanceCalculator.Model;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
+namespace FuelDistanceCalculator.Services;
 
 public class GeoLocationService : IGeoLocationService
 {
@@ -19,13 +19,13 @@ public class GeoLocationService : IGeoLocationService
     private readonly string _mode;
 
     public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
-        {
-            _httpClient = httpClientFactory.CreateClient();
-            _redisDb = redis.GetDatabase();
-            _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
-                      ?? throw new Exception("API Key missing");
-            _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
-        }
+    {
+        _httpClient = httpClientFactory.CreateClient();
+        _redisDb = redis.GetDatabase();
+        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
+                  ?? throw new Exception("API Key missing");
+        _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+    }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
     {
@@ -136,12 +136,12 @@ public class GeoLocationService : IGeoLocationService
     {
         foreach (GasStation station in stations)
         {
-             var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={station.Coords.Lng},{station.Coords.Lat}"; // Example: Munich center
-                Console.WriteLine($"{station.Name} Routing API Request: {url}");
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-                request.Headers.Add("User-Agent", "FuelGo/1.0");
-                string responseString = "";
-                bool responseSuccess = false;
+            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={station.Coords.Lng},{station.Coords.Lat}"; // Example: Munich center
+            Console.WriteLine($"{station.Name} Routing API Request: {url}");
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "FuelGo/1.0");
+            string responseString = "";
+            bool responseSuccess = false;
             if (_mode == "Production")
             {
                 var response = await _httpClient.SendAsync(request);

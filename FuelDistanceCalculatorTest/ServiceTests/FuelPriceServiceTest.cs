@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using FuelDistanceCalculator.Services;
+using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {

@@ -38,6 +38,7 @@
 
 <div class="container">
     <form method="post">
+        @Html.AntiForgeryToken()
         <div class="row justify-content-center">
             <!-- Eingabefelder für globale Werte - mittig zentriert -->
             <div class="col-md-6">
@@ -588,10 +589,17 @@
             }
         }
 
-        function sortList(sortValue) {
+       function sortList(sortValue) {
             console.log('Client: SortValue gesendet:', sortValue);
-            const container = document.getElementById('stationListContainer');  // DEFINIERT!
+            const container = document.getElementById('stationListContainer');
             container.innerHTML = '<p>Sortiert...</p>';
+
+            const validSortModes = ['fuelPrice', 'distance', 'totalCost'];
+            if (!validSortModes.includes(sortValue)) {
+                console.error('Ungültiger sortMode:', sortValue);
+                container.innerHTML = '<p>Ungültiger Sortiermodus</p>';
+                return;
+            }
 
             const formData = new FormData();
             formData.append('sortMode', sortValue);
@@ -604,18 +612,20 @@
                 body: formData
             })
             .then(response => {
-                console.log('Response:', response);  // Debug
-                if (!response.ok) throw new Error(response.status);
+                console.log('Response:', response);
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
+                }
                 return response.text();
             })
             .then(html => {
-                console.log('HTML empfangen:', html);  // Debug: Sieh sortierte Liste?
+                console.log('HTML empfangen:', html);
                 container.innerHTML = html;
                 document.querySelectorAll('.station-summary').forEach(el => el.onclick = () => toggleDetails(el));
             })
             .catch(err => {
                 console.error('Fehler:', err);
-                container.innerHTML = '<p>Fehler: ' + err + '</p>';
+                container.innerHTML = '<p>Fehler: ' + err.message + '</p>';
             });
         }
 

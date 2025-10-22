@@ -102,7 +102,9 @@ public class IndexModel : PageModel
     public string SelectedCarType { get; set; }
 
     [BindProperty]
-    public bool  IsProduction { get; private set; }
+    public bool IsProduction { get; private set; }
+
+   private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
 
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
     {
@@ -163,38 +165,37 @@ public class IndexModel : PageModel
     {
         await GetCarsAndRespectivePricePerkm();
         Console.WriteLine("Search for optimum was executed");
-        Console.WriteLine("Input mode in search case: " + SelectInputMode.ToString());
-        Console.WriteLine("Radius " + Radius);
-        Console.WriteLine("Place " + Place);
-        Console.WriteLine("Fuel type  " + SelectedFuelType.ToString().ToLower());
-        Console.WriteLine("Fuel Amount " + FuelAmount);
-        Console.WriteLine("Price pro kilometer " + PricePerKm);
+        Console.WriteLine($"Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
 
-
-        // API-Aufruf zur Koordinatensuche
         ApiThrottle geoThrottle = new ApiThrottle();
         ApiThrottle fuelThrottle = new ApiThrottle();
 
         var coordinates = await _geoLocationService.GetCoordinatesAsync(Place);
-        LongitudePlace = (double)(coordinates?.Longitude ?? 0);
-        LatitudePlace = (double)(coordinates?.Latitude ?? 0);
-        Console.WriteLine("Koordinates from API " + coordinates);
+        LongitudePlace = coordinates?.Longitude ?? 0;
+        LatitudePlace = coordinates?.Latitude ?? 0;
+        Console.WriteLine($"Coordinates from API: {coordinates}");
+
         if (coordinates != null)
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-            () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
             gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
-            () => _geoLocationService.CalculateDistance(coordinates.Latitude.ToString(), coordinates.Longitude.ToString(), gasStations.Stations));
+                () => _geoLocationService.CalculateDistance(coordinates.Latitude.ToString(), coordinates.Longitude.ToString(), gasStations.Stations));
             if (gasStations.IsSuccess)
             {
-                Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);
+                Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
+                if (CheapestResultStations != null && CheapestResultStations.Any())
+                {
+                    // Speichere die vollständigen GasStation-Objekte in der Session
+                    HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(CheapestResultStations));
+                }
             }
             else
             {
-                Console.WriteLine("Error in search Tanker-API Request" + gasStations.ErrorMessage);
+                Console.WriteLine($"Error in Tanker-API Request: {gasStations.ErrorMessage}");
                 TempData["ToastType"] = "error";
                 TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
@@ -285,8 +286,8 @@ public class IndexModel : PageModel
         }
         Console.WriteLine("Anzahl der Orte: " + NamePlaces.Count);
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
-        ApiThrottle geoThrottle = new ApiThrottle(maxConcurrentCalls:1);
-        ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls:1);
+        ApiThrottle geoThrottle = new ApiThrottle(maxConcurrentCalls: 1);
+        ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls: 1);
 
         await GetCarsAndRespectivePricePerkm();
         _fuelPriceService = new FuelPriceService();
@@ -295,7 +296,7 @@ public class IndexModel : PageModel
         List<Task> tasks = NamePlaces
             .Select((name, index) => (Name: name, Index: index))
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .Select(x => Task.Run(()=>CalculateAverageCost(lockObj, x.Index, fuelThrottle, fuelTypeForAPI)))
+            .Select(x => Task.Run(() => CalculateAverageCost(lockObj, x.Index, fuelThrottle, fuelTypeForAPI)))
             .ToList();
 
         await Task.WhenAll(tasks);
@@ -305,6 +306,56 @@ public class IndexModel : PageModel
             TempData["ToastMessage"] = message;
         }
         Console.WriteLine("Calculated Average Costs: " + CalculatedAverageCosts.Count);
+    }
+
+    public async Task<IActionResult> OnPostSort(string sortMode)
+    {
+        try
+        {
+            Console.WriteLine($"sortMode: {sortMode}");
+            if (string.IsNullOrEmpty(sortMode))
+            {
+                return BadRequest("sortMode ist erforderlich");
+            }
+
+            // Lade die gespeicherten GasStation-Objekte aus der Session
+            var stationsJson = HttpContext.Session.GetString(StationsSessionKey);
+            if (string.IsNullOrEmpty(stationsJson))
+            {
+                return Content("<p>Keine Tankstellen in der Sitzung gespeichert</p>");
+            }
+
+            var stations = JsonConvert.DeserializeObject<List<GasStation>>(stationsJson);
+            if (stations == null || !stations.Any())
+            {
+                return Content("<p>Keine Tankstellen verfügbar</p>");
+            }
+
+            // Sortiere die Stationen
+            var sortedStations = SortService.SortStations(stations, sortMode);
+
+            // Erstelle ein IndexModel-Objekt
+            var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService)
+            {
+                CheapestResultStations = sortedStations,
+                FuelAmount = this.FuelAmount,
+                SelectedFuelType = this.SelectedFuelType,
+                PricePerKm = this.PricePerKm,
+                SelectedCarType = this.SelectedCarType
+            };
+            Console.WriteLine($"Amount of stations to sort: {model.CheapestResultStations.Count}");
+
+            // Aktualisiere die Session mit den sortierten Stationen
+            HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(sortedStations));
+
+            // Gib die Partial View mit dem IndexModel zurück
+            return Partial("_StationListPartial", model);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler in OnPostSort: {ex.Message}\n{ex.StackTrace}");
+            return StatusCode(500, $"Interner Serverfehler: {ex.Message}");
+        }
     }
 
     private async Task CalculateAverageCost(object lockObj, int i, ApiThrottle fuelThrottle, string fuelTypeForAPI)
@@ -330,14 +381,14 @@ public class IndexModel : PageModel
                 else
                 {
                     CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
-                    _toastMessages.Add(("error","Fehler bei Tankstellenabfrage"));
+                    _toastMessages.Add(("error", "Fehler bei Tankstellenabfrage"));
                 }
                 Console.WriteLine($"Calculated Average Cost for {NamePlaces[i]}: {CalculatedAverageCosts[NamePlaces[i]]}");
             }
             else
             {
                 CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
-                _toastMessages.Add(("error","Fehler bei Koordinatenabfrage"));
+                _toastMessages.Add(("error", "Fehler bei Koordinatenabfrage"));
             }
         }
         catch (Exception ex)

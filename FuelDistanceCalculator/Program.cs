@@ -31,8 +31,17 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Conn
 // Registriere IGeoLocationService mit GeoLocationService
 builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Sitzungsdauer
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Add services to the container
 builder.Services.AddRazorPages();
+
+builder.Services.AddAntiforgery();
 
 var app = builder.Build();
 
@@ -65,6 +74,9 @@ app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAntiforgery();
+
+app.UseSession();
 
 // Eigene Middleware für Rate Limiting
 app.UseMiddleware<RequestProtectionMiddleware>();

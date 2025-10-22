@@ -1,3 +1,4 @@
+namespace FuelDistanceCalculator.Model;
 public class ResponseModelMarketFuelPriceService
 {
     public string status { get; set; } = string.Empty;

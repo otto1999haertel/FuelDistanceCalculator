@@ -1,3 +1,4 @@
+namespace FuelDistanceCalculator.Model;
 public class GasStationResult
 {
     public bool IsSuccess { get; set; }

@@ -1,12 +1,11 @@
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Data;
-using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculator.Pages;
 
@@ -18,8 +17,8 @@ public class IndexModel : PageModel
     private readonly AppDbContext _context;
     private FuelPriceService _fuelPriceService;
 
-    private readonly MarketFuelPriceService _MarketfuelPriceService;
-    private readonly GeoLocationService _geoLocationService;
+    private readonly IMarketFuelPriceService _MarketfuelPriceService;
+    private readonly IGeoLocationService _geoLocationService;
 
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
 
@@ -105,7 +104,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public bool  IsProduction { get; private set; }
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, GeoLocationService geoLocationService)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
@@ -186,6 +185,8 @@ public class IndexModel : PageModel
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
             () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
+            gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
+            () => _geoLocationService.CalculateDistance(coordinates.Latitude.ToString(), coordinates.Longitude.ToString(), gasStations.Stations));
             if (gasStations.IsSuccess)
             {
                 Console.WriteLine("Response in Index, Listlänge" + gasStations.Stations.Count);
@@ -288,7 +289,7 @@ public class IndexModel : PageModel
         ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls:1);
 
         await GetCarsAndRespectivePricePerkm();
-        _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
+        _fuelPriceService = new FuelPriceService();
         string fuelTypeForAPI = GetFuelTypeForAPI();
         object lockObj = new object();
         List<Task> tasks = NamePlaces

@@ -1,26 +1,30 @@
-using Microsoft.Extensions.Caching.Distributed;
+using FuelDistanceCalculator.Model;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-public class GeoLocationService
+namespace FuelDistanceCalculator.Services;
+
+public class GeoLocationService : IGeoLocationService
 {
     private readonly IDatabase _redisDb;
     private readonly HttpClient _httpClient;
 
-    // Cache-Zeit (1 Jahr)
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory)
+    private readonly string _apiKey;
+
+    private readonly string _mode;
+
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
         _httpClient = httpClientFactory.CreateClient();
-
-        // Verbindung zu Redis herstellen (StackExchange.Redis)
-        var redis = ConnectionMultiplexer.Connect("redis:6379"); // Falls Docker, sonst "localhost:6379"
         _redisDb = redis.GetDatabase();
+        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
+                  ?? throw new Exception("API Key missing");
+        _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -108,24 +112,74 @@ public class GeoLocationService
         if (!string.IsNullOrWhiteSpace(fullAddress))
         {
             // Reverse-Cache setzen (Koordinaten -> Adresse)
-        await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
+            await _redisDb.StringSetAsync(cacheKey, fullAddress, cacheDuration);
 
-        // Forward-Cache setzen (Ort -> Koordinaten), falls noch nicht vorhanden
-        string forwardKey = $"geo:{NormalizeAddressKey(fullAddress)}";
-        bool forwardExists = await _redisDb.KeyExistsAsync(forwardKey);
+            // Forward-Cache setzen (Ort -> Koordinaten), falls noch nicht vorhanden
+            string forwardKey = $"geo:{NormalizeAddressKey(fullAddress)}";
+            bool forwardExists = await _redisDb.KeyExistsAsync(forwardKey);
 
-        if (!forwardExists)
-        {
-            await _redisDb.HashSetAsync(forwardKey, new HashEntry[]
+            if (!forwardExists)
             {
+                await _redisDb.HashSetAsync(forwardKey, new HashEntry[]
+                {
                 new HashEntry("lat", latitude),
                 new HashEntry("lon", longitude)
-            });
-            await _redisDb.KeyExpireAsync(forwardKey, cacheDuration);
-        }
+                });
+                await _redisDb.KeyExpireAsync(forwardKey, cacheDuration);
+            }
         }
 
         return fullAddress;
+    }
+
+    public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
+    {
+        foreach (GasStation station in stations)
+        {
+            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={station.Coords.Lng},{station.Coords.Lat}"; // Example: Munich center
+            Console.WriteLine($"{station.Name} Routing API Request: {url}");
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "FuelGo/1.0");
+            string responseString = "";
+            bool responseSuccess = false;
+            if (_mode == "Production")
+            {
+                var response = await _httpClient.SendAsync(request);
+                Console.WriteLine("Response from routing service " + response.StatusCode);
+                if (response.IsSuccessStatusCode)
+                {
+                    responseString = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Response String Routing Service: " + responseString);
+                    responseSuccess = true;
+                }
+            }
+            else
+            {
+                // Development/Test: Lade JSON aus File
+                string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
+                if (!File.Exists(jsonFilePath))
+                {
+                    throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+                }
+                responseString = await File.ReadAllTextAsync(jsonFilePath);
+                responseSuccess = true;
+            }
+            if (responseSuccess)
+            {
+                using JsonDocument doc = JsonDocument.Parse(responseString);
+                JsonElement root = doc.RootElement;
+
+                double totalDistance = root
+                    .GetProperty("features")[0]
+                    .GetProperty("properties")
+                    .GetProperty("summary")
+                    .GetProperty("distance")
+                    .GetDouble();
+                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
+                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+            }
+        }
+        return stations;
     }
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
@@ -157,25 +211,25 @@ public class GeoLocationService
 
         return null;
     }
-    
-    private string NormalizeAddressKey(string place)
+
+    public string NormalizeAddressKey(string place)
     {
-            if (string.IsNullOrWhiteSpace(place))
-                return "";
+        if (string.IsNullOrWhiteSpace(place))
+            return "";
 
-            var normalized = place
-                .Trim()
-                .ToLowerInvariant()
-                .Replace("ß", "ss")
-                .Replace("ä", "ae")
-                .Replace("ö", "oe")
-                .Replace("ü", "ue");
+        var normalized = place
+            .Trim()
+            .ToLowerInvariant()
+            .Replace("ß", "ss")
+            .Replace("ä", "ae")
+            .Replace("ö", "oe")
+            .Replace("ü", "ue");
 
-            // Mehrfache Leerzeichen durch eines ersetzen
-            normalized = Regex.Replace(normalized, @"\s+", " ");
+        // Mehrfache Leerzeichen durch eines ersetzen
+        normalized = Regex.Replace(normalized, @"\s+", " ");
 
-            // Sonderzeichen rausfiltern (optional)
-            normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
+        // Sonderzeichen rausfiltern (optional)
+        normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
 
         return normalized;
     }

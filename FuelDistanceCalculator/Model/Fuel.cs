@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-
+namespace FuelDistanceCalculator.Model;
 public class Fuel
 {
     [JsonPropertyName("category")]

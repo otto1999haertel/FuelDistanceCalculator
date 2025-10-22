@@ -1,3 +1,4 @@
+namespace FuelDistanceCalculator.Model;
 public class CoordinatesDTO
 {
     public double Latitude { get; set; }

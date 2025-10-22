@@ -9,13 +9,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest
 {
     public class BaseTestMarketfuelpriceService
     {
         protected List<GasStation> _fakeGasStationList;
-        protected MarketFuelPriceService _marketFuelPriceService;
+        protected IMarketFuelPriceService _marketFuelPriceService;
+
+        protected IGeoLocationService _geoLocationService;
 
         [SetUp]
         public async Task Setup()
@@ -26,21 +29,35 @@ namespace FuelDistanceCalculatorTest
             // Mock IConfiguration
             var mockConfiguration = new Mock<IConfiguration>();
             mockConfiguration.Setup(c => c["ApiSettings:TankApiKey"]).Returns("test-api-key");
+            mockConfiguration.Setup(c => c["ApiSettings:OpenRouteServiceApiKey"]).Returns("test-ors-api-key");
+            services.AddSingleton(mockConfiguration.Object); // Registriere IConfiguration
 
-            // Mock GeoLocationService
-            var mockGeoLocationService = new Mock<IGeoLocationService>();
+            // Mock IHttpClientFactory
+            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+            var httpClient = new HttpClient(); // Für Testzwecke einfacher HttpClient
+            mockHttpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(httpClient);
+            services.AddSingleton(mockHttpClientFactory.Object); // Registriere IHttpClientFactory
 
-            // HttpClient für Development-Modus (wird nicht verwendet, da JSON-Datei geladen wird)
-            services.AddHttpClient<MarketFuelPriceService>();
+            // Mock IConnectionMultiplexer (Redis)
+            var mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
+            var mockDatabase = new Mock<IDatabase>();
+            mockConnectionMultiplexer.Setup(c => c.GetDatabase(It.IsAny<int>(), It.IsAny<object>())).Returns(mockDatabase.Object);
+            services.AddSingleton(mockConnectionMultiplexer.Object); // Registriere IConnectionMultiplexer
 
-            // Registriere MarketFuelPriceService
-            services.AddScoped(_ => new MarketFuelPriceService(mockConfiguration.Object, new HttpClient(), mockGeoLocationService.Object));
+            // Registriere IGeoLocationService mit GeoLocationService
+            services.AddScoped<IGeoLocationService, GeoLocationService>();
+
+            // Registriere IMarketFuelPriceService mit MarketFuelPriceService
+            services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
 
             // Erstelle ServiceProvider
             var serviceProvider = services.BuildServiceProvider();
 
             // Hole MarketFuelPriceService
-            _marketFuelPriceService = serviceProvider.GetRequiredService<MarketFuelPriceService>();
+            _marketFuelPriceService = serviceProvider.GetRequiredService<IMarketFuelPriceService>();
+
+            // Hole GeoLocationService
+            _geoLocationService = serviceProvider.GetRequiredService<IGeoLocationService>();
 
             // Lade Tankstellen aus JSON-Datei
             _fakeGasStationList = await GetFakeGasStationsAsync();
@@ -59,7 +76,7 @@ namespace FuelDistanceCalculatorTest
 
             // Rufe GetGasStationsAsync auf
             var result = await _marketFuelPriceService.GetGasStationsAsync(latitude, longitude, radius, fuelType);
-            
+
             return result.IsSuccess ? result.Stations : new List<GasStation>();
         }
     }

@@ -211,7 +211,7 @@ public class GeoLocationService : IGeoLocationService
         return null;
     }
 
-    private string NormalizeAddressKey(string place)
+    public string NormalizeAddressKey(string place)
     {
         if (string.IsNullOrWhiteSpace(place))
             return "";

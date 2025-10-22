@@ -8,5 +8,6 @@ namespace FuelDistanceCalculator.Services
         Task<CoordinatesDTO> GetCoordinatesAsync(string place);
         Task<string> GetAddressFromCoordinatesAsync(double latitude, double longitude);
         Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations);
+        public string NormalizeAddressKey(string place);
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FuelDistanceCalculator.Services;
 
-public class MarketFuelPriceService
+public class MarketFuelPriceService : IMarketFuelPriceService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;

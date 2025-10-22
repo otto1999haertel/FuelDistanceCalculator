@@ -36,6 +36,21 @@ namespace FuelDistanceCalculatorTest
             Assert.That(CheckOrderByTotalCost(result), Is.True);
         }
 
+        [Test]
+        [TestCaseSource(nameof(GetTestCases))]
+        public async Task EmptyGasStationListReturnsEmptyListTest(List<GasStation> emptyStationList)
+        {
+            // Arrange
+            decimal fuelAmount = 50m; // Beispiel: 50 Liter
+            decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
+
+            //Act
+            List<GasStation> result = TankCostService.GetCheapestStations(emptyStationList, fuelAmount, pricePerKilometer);
+
+            //Assert
+            Assert.That(result.Count == 0);
+        }
+
         private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
         {
             for (int i = 0; i < stations.Count - 1; i++)
@@ -58,6 +73,12 @@ namespace FuelDistanceCalculatorTest
                 }
             }
             return true; // Nach Gesamtkosten sortiert
+        }
+
+        private static IEnumerable<TestCaseData> GetTestCases()
+        {
+            yield return new TestCaseData(new List<GasStation>()).SetName("EmptyList");
+            yield return new TestCaseData(null).SetName("NullList");
         }
     
     }

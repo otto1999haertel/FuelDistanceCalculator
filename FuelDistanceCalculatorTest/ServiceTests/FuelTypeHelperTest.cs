@@ -1,4 +1,4 @@
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ServiceTests
 {
     public class FuelTypeHelperTest
     {

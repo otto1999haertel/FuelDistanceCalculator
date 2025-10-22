@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ModelTests
 {
-    public class GasStationTest : BaseTestMarketfuelpriceService
+    public class GasStationTest : BaseTest
     {
         private GasStation _testStationObject;
         [SetUp]

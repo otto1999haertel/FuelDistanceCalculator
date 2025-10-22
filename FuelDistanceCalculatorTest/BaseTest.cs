@@ -13,7 +13,7 @@ using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest
 {
-    public class BaseTestMarketfuelpriceService
+    public class BaseTest
     {
         protected List<GasStation> _fakeGasStationList;
         protected IMarketFuelPriceService _marketFuelPriceService;

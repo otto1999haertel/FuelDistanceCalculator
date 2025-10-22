@@ -1,10 +1,8 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework.Internal;
 
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class TankCostServiceTest : BaseTestMarketfuelpriceService
+    public class TankCostServiceTest : BaseTest
     {
         [Test]
         public async Task SettingFuelAmountToZeroLeadsToOrderingTheListTest()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ServiceTests
 {
     [TestFixture]
     public class ApiThrottleTests

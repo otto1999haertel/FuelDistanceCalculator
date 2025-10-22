@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ModelTests
 {
     public class GasStationSerializationTest
     {

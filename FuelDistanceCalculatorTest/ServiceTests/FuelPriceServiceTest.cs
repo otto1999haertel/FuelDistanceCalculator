@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class FuelPriceServiceTest : BaseTestMarketfuelpriceService
+    public class FuelPriceServiceTest : BaseTest
     {
         [Test]
         public async Task GetGasStationsAsync_ReturnsStationsList_Test()

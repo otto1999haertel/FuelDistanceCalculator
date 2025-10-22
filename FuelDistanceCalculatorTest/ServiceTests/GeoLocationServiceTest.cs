@@ -1,6 +1,6 @@
-namespace FuelDistanceCalculatorTest
+namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class GeoLocationServiceTest : BaseTestMarketfuelpriceService
+    public class GeoLocationServiceTest : BaseTest
     {
         [Test]
         [TestCase(" 123 Main St, Anytown ", "123 main st, anytown")]

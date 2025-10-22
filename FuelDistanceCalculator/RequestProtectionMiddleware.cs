@@ -48,6 +48,7 @@ public class RequestProtectionMiddleware
         {
             _logger.LogWarning("Payload too large from {IP}: {Size} bytes", ip, context.Request.ContentLength);
             context.Response.StatusCode = 413;
+            context.Response.ContentType = "text/plain";
             await context.Response.WriteAsync("Payload too large.");
             return;
         }

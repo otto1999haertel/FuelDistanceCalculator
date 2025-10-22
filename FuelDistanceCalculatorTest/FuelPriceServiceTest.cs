@@ -1,0 +1,35 @@
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace FuelDistanceCalculatorTest
+{
+    public class FuelPriceServiceTest : BaseTestMarketfuelpriceService
+    {
+        [Test]
+        public async Task GetGasStationsAsync_ReturnsStationsList_Test()
+        {
+            // Arrange
+            double latitude = 52.5200; // Beispiel: Berlin
+            double longitude = 13.4050; // Beispiel: Berlin
+            double radius = 5.0; // 5 km Radius
+            string fueltype = "E5";
+            decimal fuelAmount = 50m; // Beispiel: 50 Liter
+
+            // Act
+            FuelPriceService fuelPriceService = new FuelPriceService();
+            decimal? calculatedAverage = fuelPriceService.CalculateAverageCost(_fakeGasStationList);
+
+            // Assert
+            Assert.That(calculatedAverage, Is.Not.Null);
+            Assert.That(calculatedAverage, Is.EqualTo(GetExpectedAverageFuelPrice(_fakeGasStationList)));
+        }
+
+        private decimal? GetExpectedAverageFuelPrice(List<GasStation> gasStations)
+        {
+            if (gasStations == null || gasStations.Count == 0)
+            {
+                return 0;
+            }
+            return gasStations.OrderBy(gs => gs.FuelTypePrice).ToList().Take(10).Average(gs => gs.FuelTypePrice);
+        }
+    }
+}

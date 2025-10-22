@@ -290,7 +290,7 @@ public class IndexModel : PageModel
         ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls:1);
 
         await GetCarsAndRespectivePricePerkm();
-        _fuelPriceService = new FuelPriceService((int)FuelAmount, PricePerKm);
+        _fuelPriceService = new FuelPriceService();
         string fuelTypeForAPI = GetFuelTypeForAPI();
         object lockObj = new object();
         List<Task> tasks = NamePlaces

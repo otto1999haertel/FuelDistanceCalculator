@@ -14,7 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Registriere FuelPriceService als Singleton
 builder.Services.AddSingleton<FuelPriceService>(provider =>
-    new FuelPriceService(10, 2.5m));
+    new FuelPriceService());
 
 // Registriere MarketFuelPriceService mit HttpClientFactory
 builder.Services.AddHttpClient<MarketFuelPriceService>();

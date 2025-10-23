@@ -153,17 +153,6 @@ public class GeoLocationService : IGeoLocationService
                     responseSuccess = true;
                 }
             }
-            else
-            {
-                // Development/Test: Lade JSON aus File
-                string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
-                if (!File.Exists(jsonFilePath))
-                {
-                    throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
-                }
-                responseString = await File.ReadAllTextAsync(jsonFilePath);
-                responseSuccess = true;
-            }
             if (responseSuccess)
             {
                 using JsonDocument doc = JsonDocument.Parse(responseString);

@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class MarketFuelPriceServiceTest : BaseTest
+    public class MarketFuelPriceServiceTest : ServiceTestBase
     {
         [Test]
         public async Task GetGasStationsAsync_DevelopmentMode_ReturnsFakeData()

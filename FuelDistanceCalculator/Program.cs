@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
+using Moq; // nur nötig, wenn du direkt im Program testweise mockst
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,27 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = "redis:6379";
 });
 
+// 🔧 Testumgebung erkennen
+var env = builder.Environment;
+
 // Registriere IConnectionMultiplexer für GeoLocationService
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("redis:6379"));
+if (env.IsEnvironment("Testing"))
+{
+    // 👉 Im Test: Mock-Redis anlegen
+    var mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
+    var mockDatabase = new Mock<IDatabase>();
+    mockConnectionMultiplexer
+        .Setup(c => c.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
+        .Returns(mockDatabase.Object);
+
+    builder.Services.AddSingleton<IConnectionMultiplexer>(mockConnectionMultiplexer.Object);
+}
+else
+{
+    // 👉 In allen anderen Umgebungen: echte Verbindung
+    builder.Services.AddSingleton<IConnectionMultiplexer>(
+        ConnectionMultiplexer.Connect("redis:6379"));
+}
 
 // Registriere IGeoLocationService mit GeoLocationService
 builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
@@ -60,13 +80,11 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 
 if (app.Environment.IsDevelopment())
 {
-    // In Dev: keine Proxy-Beschränkung
     forwardedHeadersOptions.KnownNetworks.Clear();
     forwardedHeadersOptions.KnownProxies.Clear();
 }
 else
 {
-    // In Production: Nur IP des NGINX-Proxys vertrauen
     forwardedHeadersOptions.KnownProxies.Add(System.Net.IPAddress.Parse("172.19.0.5"));
 }
 
@@ -85,4 +103,15 @@ app.UseAuthorization();
 
 app.UseStaticFiles();
 app.MapRazorPages();
-app.Run("http://0.0.0.0:8080");
+
+// ✅ Kein Portbinding in Tests
+if (app.Environment.IsEnvironment("Testing"))
+{
+    app.Run();
+}
+else
+{
+    app.Run("http://0.0.0.0:8080");
+}
+
+public partial class Program { }

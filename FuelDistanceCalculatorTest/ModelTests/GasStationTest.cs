@@ -3,7 +3,7 @@ using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ModelTests
 {
-    public class GasStationTest : BaseTest
+    public class GasStationTest : ServiceTestBase
     {
         private GasStation _testStationObject;
         [SetUp]

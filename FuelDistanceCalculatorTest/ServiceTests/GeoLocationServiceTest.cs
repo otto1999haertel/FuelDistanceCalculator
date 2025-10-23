@@ -3,7 +3,7 @@ using NUnit.Framework.Internal;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class GeoLocationServiceTest : BaseTest
+    public class GeoLocationServiceTest : ServiceTestBase
     {
         [Test]
         [TestCase(" 123 Main St, Anytown ", "123 main st, anytown")]

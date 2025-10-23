@@ -2,7 +2,7 @@ using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class SortServiceTests : BaseTest
+    public class SortServiceTests : ServiceTestBase
     {
         public override async Task Setup()
         {

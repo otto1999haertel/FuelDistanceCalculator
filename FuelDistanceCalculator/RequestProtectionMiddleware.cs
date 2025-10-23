@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace FuelDistanceCalculator;
 
 
-public class RequestProtectionMiddleware
+public class RequestProtectionMiddleware : IRequestMiddleWare
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<RequestProtectionMiddleware> _logger;

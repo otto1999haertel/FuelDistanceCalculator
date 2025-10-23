@@ -16,7 +16,7 @@ public class ContactModel : PageModel
     public ContactModel(ILogger<ContactModel> logger)
     {
         _logger = logger;
-        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
+        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE")?.Equals("Production") == true;
     }
 
 

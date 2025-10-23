@@ -7,7 +7,7 @@ using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest
 {
-    public class BaseTest
+    public class ServiceTestBase
     {
         protected List<GasStation> _fakeGasStationList;
         protected IMarketFuelPriceService _marketFuelPriceService;
@@ -57,6 +57,8 @@ namespace FuelDistanceCalculatorTest
 
             // Lade Tankstellen aus JSON-Datei
             _fakeGasStationList = await GetFakeGasStationsAsync();
+
+            services.AddRazorPages();
 
             // Validiere, dass die Liste nicht leer ist
             Assert.That(_fakeGasStationList != null && _fakeGasStationList.Count > 0, Is.True, "Die Fake-Tankstellenliste ist leer oder null.");

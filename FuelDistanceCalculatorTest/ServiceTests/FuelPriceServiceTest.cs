@@ -3,7 +3,7 @@ using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class FuelPriceServiceTest : BaseTest
+    public class FuelPriceServiceTest : ServiceTestBase
     {
         [Test]
         public async Task GetGasStationsAsync_ReturnsStationsList_Test()

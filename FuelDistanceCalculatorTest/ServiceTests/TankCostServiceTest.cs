@@ -4,7 +4,7 @@ using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
 {
-    public class TankCostServiceTest : BaseTest
+    public class TankCostServiceTest : ServiceTestBase
     {
         [Test]
         public async Task SettingFuelAmountToZeroLeadsToOrderingTheListTest()

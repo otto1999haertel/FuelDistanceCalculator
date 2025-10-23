@@ -55,7 +55,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_DB: FuelDatabase
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/18/docker
     networks:
       - fuel-network
 

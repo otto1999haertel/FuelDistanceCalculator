@@ -1,87 +1,80 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+
 namespace FuelDistanceCalculator.Model;
+
 public class GasStation
 {
-    [JsonPropertyName("country")]
+    [JsonProperty("country")]
     public string Country { get; set; }
 
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; }
 
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; }
 
-    [JsonPropertyName("brand")]
+    [JsonProperty("brand")]
     public string Brand { get; set; }
 
-    [JsonPropertyName("street")]
+    [JsonProperty("street")]
     public string Street { get; set; }
 
-    [JsonPropertyName("postalCode")]
-    public string PostalCode { get; set; }  // Als string, da Postleitzahlen führende Nullen haben könnten
+    [JsonProperty("postalCode")]
+    public string PostalCode { get; set; }
 
-    [JsonPropertyName("place")]
+    [JsonProperty("place")]
     public string Place { get; set; }
 
-    [JsonPropertyName("coords")]
+    [JsonProperty("coords")]
     public Coordinates Coords { get; set; }
 
-    [JsonPropertyName("isOpen")]
+    [JsonProperty("isOpen")]
     public bool IsOpen { get; set; }
 
-    [JsonPropertyName("closesAt")]
-    public string ClosesAt { get; set; }  // Als string, kann bei Bedarf zu DateTime geparst werden
+    [JsonProperty("closesAt")]
+    public string ClosesAt { get; set; }
 
-    [JsonPropertyName("dist")]
-    public double? Dist { get; set; }  // Umbenannt für Klarheit, nullable wie dein Distance
+    [JsonProperty("dist")]
+    public double? Dist { get; set; }
 
-    [JsonPropertyName("fuels")]
+    [JsonProperty("fuels")]
     public List<Fuel> Fuels { get; set; }
 
-    [JsonPropertyName("volatility")]
+    [JsonProperty("volatility")]
     public int Volatility { get; set; }
 
+    [JsonProperty("totalCalculatedCoast")]
     public decimal TotalCalculatedCoast
     {
-        get
-        {
-            return _totalCoast;
-        }
-        private set
+        get => _totalCoast;
+        set
         {
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException("Price cannot be negative.");
+                throw new ArgumentOutOfRangeException("TotalCalculatedCoast cannot be negative.");
             }
-            _totalCoast = (decimal)value;
+            _totalCoast = value;
         }
     }
     private decimal _totalCoast;
 
-    private decimal _fuelprice;
-
+    [JsonProperty("fuelTypePrice")]
     public decimal? FuelTypePrice
     {
-        get
-        {
-            return _fuelprice;
-        }
-
-        private set
+        get => _fuelPrice;
+        set
         {
             if (value < 0)
             {
-                throw new ArgumentOutOfRangeException("Price cannot be negative.");
+                throw new ArgumentOutOfRangeException("FuelTypePrice cannot be negative.");
             }
-            _fuelprice = (decimal)value;
+            _fuelPrice = value;
         }
     }
-    private string? m_lastUpdate;
-    public string? LastUpdate
-    {
-        get { return m_lastUpdate; }
-        private set { m_lastUpdate = value; }
-    }
+    private decimal? _fuelPrice;
+
+    [JsonProperty("lastUpdate")]
+    public string? LastUpdate { get; set; }
 
     public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
     {
@@ -90,51 +83,48 @@ public class GasStation
             throw new ArgumentException("Ungültige Eingabewerte: FuelAmount muss positiv sein, PricePerKm nicht negativ, Dist vorhanden und nicht negativ.");
         }
 
-        decimal dist = (decimal)Dist.Value;  // Sicheres Cast zu decimal (Dist ist double?)
-
-        decimal fuelCost = _fuelprice * fuelAmount;  // Kraftstoffkosten (nicht gerundet)
-        decimal travelCost = pricePerKm * dist * 2m;  // Fahrtkosten hin/rück (nicht gerundet)
-
+        decimal dist = (decimal)Dist.Value;
+        decimal fuelCost = (_fuelPrice ?? 0) * fuelAmount;
+        decimal travelCost = pricePerKm * dist * 2m;
         decimal rawTotal = fuelCost + travelCost;
-        TotalCalculatedCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);  // Endgültige Rundung auf 2 Dezimalen
+        TotalCalculatedCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);
 
-        // Verbessertes Logging mit 2 Dezimalen (für Klarheit)
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
-                          $"Fuel Price: {_fuelprice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
+                          $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
 
         return TotalCalculatedCoast;
     }
 
     public void SetPrice(string fuelType)
     {
-        FuelTypePrice = Fuels.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
+        FuelTypePrice = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
                      .Select(x => (decimal)x.Price)
-                     .FirstOrDefault();
+                     .FirstOrDefault() ?? 0;
     }
 
     public void SetUpdateTime(string fuelType)
     {
-        m_lastUpdate = Fuels.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
-                     .Select(x => x.LastChange.Timestamp)
+        LastUpdate = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
+                     .Select(x => x.LastChange?.Timestamp)
                      .FirstOrDefault();
     }
 
-
-    // Überschreiben der ToString-Methode für bessere Debug-Ausgabe
     public override string ToString()
     {
         return $"GasStation Info:\n" +
-           $"- Id: {Id}\n" +
-           $"- Name: {Name}\n" +
-           $"- Brand: {Brand}\n" +
-           $"- Street: {Street}\n" +
-           $"- Place: {Place}\n" +
-           $"- Coordinates: {Coords.Lat}, {Coords.Lng}\n" +
-           $"- Distance: {Dist} km\n" +
-           $"- Is Open: {(IsOpen ? "Yes" : "No")}\n" +
-           $"- PostCode: {PostalCode}\n" +
-           $"- Cloases At: {ClosesAt}\n" +
-           $"- Last Update: {LastUpdate}\n";
+               $"- Id: {Id}\n" +
+               $"- Name: {Name}\n" +
+               $"- Brand: {Brand}\n" +
+               $"- Street: {Street}\n" +
+               $"- Place: {Place}\n" +
+               $"- Coordinates: {Coords?.Lat}, {Coords?.Lng}\n" +
+               $"- Distance: {Dist} km\n" +
+               $"- Is Open: {(IsOpen ? "Yes" : "No")}\n" +
+               $"- PostCode: {PostalCode}\n" +
+               $"- Closes At: {ClosesAt}\n" +
+               $"- Last Update: {LastUpdate}\n" +
+               $"- FuelTypePrice: {FuelTypePrice}\n" +
+               $"- TotalCalculatedCoast: {TotalCalculatedCoast}";
     }
 }

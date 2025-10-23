@@ -104,7 +104,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public bool IsProduction { get; private set; }
 
-   private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
+    private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
 
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
     {
@@ -164,8 +164,7 @@ public class IndexModel : PageModel
     public async Task OnPostSearch()
     {
         await GetCarsAndRespectivePricePerkm();
-        Console.WriteLine("Search for optimum was executed");
-        Console.WriteLine($"Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
+        Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
 
@@ -186,9 +185,15 @@ public class IndexModel : PageModel
             if (gasStations.IsSuccess)
             {
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
-                CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm);
+                CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI);
                 if (CheapestResultStations != null && CheapestResultStations.Any())
                 {
+                    // Protokolliere die Werte vor der Serialisierung
+                    foreach (var station in CheapestResultStations)
+                    {
+                        Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCalculatedCoast}, LastUpdate: {station.LastUpdate}");
+                    }
+
                     // Speichere die vollständigen GasStation-Objekte in der Session
                     HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(CheapestResultStations));
                 }
@@ -320,6 +325,7 @@ public class IndexModel : PageModel
 
             // Lade die gespeicherten GasStation-Objekte aus der Session
             var stationsJson = HttpContext.Session.GetString(StationsSessionKey);
+            Console.WriteLine($"Stations JSON from session: {stationsJson}");
             if (string.IsNullOrEmpty(stationsJson))
             {
                 return Content("<p>Keine Tankstellen in der Sitzung gespeichert</p>");
@@ -329,6 +335,13 @@ public class IndexModel : PageModel
             if (stations == null || !stations.Any())
             {
                 return Content("<p>Keine Tankstellen verfügbar</p>");
+            }
+
+            // Protokolliere die deserialisierten Werte
+            Console.WriteLine($"Deserialized stations count: {stations.Count}");
+            foreach (var station in stations)
+            {
+                Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCalculatedCoast}, LastUpdate: {station.LastUpdate}");
             }
 
             // Sortiere die Stationen

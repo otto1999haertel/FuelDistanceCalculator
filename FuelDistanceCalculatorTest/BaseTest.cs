@@ -15,7 +15,7 @@ namespace FuelDistanceCalculatorTest
         protected IGeoLocationService _geoLocationService;
 
         [SetUp]
-        public async Task Setup()
+        public virtual async Task Setup()
         {
             // Erstelle DI-Container
             var services = new ServiceCollection();

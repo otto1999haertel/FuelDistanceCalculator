@@ -14,7 +14,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
             //Act
-            List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer);
+            List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
             Assert.That(CheckOrderAscendingFuelAmountZero(result), Is.True);
@@ -29,7 +29,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
             //Act
-            List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer);
+            List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
             Assert.That(result.Count <= 10);
@@ -45,7 +45,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
             //Act
-            List<GasStation> result = TankCostService.GetCheapestStations(emptyStationList, fuelAmount, pricePerKilometer);
+            List<GasStation> result = TankCostService.GetCheapestStations(emptyStationList, fuelAmount, pricePerKilometer, "diesel");
 
             //Assert
             Assert.That(result.Count == 0);

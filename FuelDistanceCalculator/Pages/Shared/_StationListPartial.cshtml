@@ -14,7 +14,7 @@
             <li class="station-item">
                 <div class="station-summary" onclick="toggleDetails(this)">
                     <strong>@station.Name</strong> -
-                    @if (Model.FuelAmount > 0)
+                    @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
                         <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>
                     }
@@ -24,7 +24,7 @@
                     }
                 </div>
                 <div class="station-details" style="display:none;">
-                    @if (Model.FuelAmount > 0)
+                    @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
                         <p>Einzelpreis pro Liter: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
                     }

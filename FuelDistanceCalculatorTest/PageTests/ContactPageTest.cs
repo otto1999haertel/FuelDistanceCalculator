@@ -1,23 +1,15 @@
 using AngleSharp.Html.Parser;
-using FuelDistanceCalculator.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using Moq;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 namespace FuelDistanceCalculatorTest.PageTests
 {
     public class ContactPageTest : PageTestBase
     {
-       [Test]
+        [Test]
         public async Task ContactPage_LibrariesMatchLibmanVersions()
         {
             // 1. Lese libman.json
-            var libmanPath = TestContext.CurrentContext.TestDirectory +  "/libman.json"; // Pfad anpassen
+            var libmanPath = TestContext.CurrentContext.TestDirectory + "/libman.json"; // Pfad anpassen
             var libmanContent = File.ReadAllText(libmanPath);
             var libmanJson = JObject.Parse(libmanContent);
             var libraries = libmanJson["libraries"]!
@@ -53,6 +45,22 @@ namespace FuelDistanceCalculatorTest.PageTests
                 Assert.That(pageLibraries.ContainsKey(libName), $"Bibliothek {libName} nicht auf der Contact-Seite gefunden.");
                 Assert.That(pageLibraries[libName], Is.EqualTo(lib.Value), $"Version für {libName} stimmt nicht: erwartet {lib.Value}, gefunden {pageLibraries[libName]}.");
             }
+        }
+
+        [Test]
+        public async Task CopyRightYearIncludes2025AndMatchesCurrentYearTest()
+        {
+            var response = await _client.GetAsync("/Contact");
+            Assert.That(response.IsSuccessStatusCode, Is.True, "Contact-Seite konnte nicht geladen werden.");
+            var htmlContent = await response.Content.ReadAsStringAsync();
+
+            // 3. Parse das HTML mit AngleSharp
+            var parser = new HtmlParser();
+            var document = await parser.ParseDocumentAsync(htmlContent);
+            var copyrightElement = document.QuerySelector("#Copyright");
+            var text = copyrightElement.TextContent.Trim();
+            Assert.That(text.Contains($"2025 - {@DateTime.Now.Year} - FuelGo"), Is.True);
+            
         }
     }
 }

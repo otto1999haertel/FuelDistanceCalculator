@@ -8,7 +8,6 @@ public class ContactModel : PageModel
     private readonly ILogger<ContactModel> _logger;
 
     public string Name => ContactInfo.Name;
-    public string Email => ContactInfo.Email;
 
     [BindProperty]
     public bool  IsProduction { get; private set; }

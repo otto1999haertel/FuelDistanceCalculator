@@ -62,7 +62,7 @@
   }
 }
 
-body.dark-mode {
+html.dark-mode {  /* Geändert von body.dark-mode zu html.dark-mode */
   --primary-color: #b89b7b;
   --accent-color: #8b7355;
   --bg-color: #4b3f2f;
@@ -88,7 +88,7 @@ body.dark-mode {
   --placeholder-opacity: 0.5; /* Niedrigere Opacity für subtileren Dark-Mode-Effekt */
 }
 
-body.light-mode {
+html.light-mode {  /* Geändert von body.light-mode zu html.light-mode */
   --primary-color: #d2b48c;
   --accent-color: #a89b7b;
   --bg-color: #faf0e6;

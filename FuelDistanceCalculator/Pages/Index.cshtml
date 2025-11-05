@@ -463,11 +463,12 @@
                 attribution: '© OpenStreetMap',
             });
             Tiles.addTo(map);
-            if (localStorage.getItem("darkMode") === "enabled") {
-                document.getElementById("map_div").classList.add("dark-map");
-            }
-            else {
-                document.getElementById("map_div").classList.remove("dark-map");
+            const storedMode = localStorage.getItem("darkMode");
+            const mapDiv = document.getElementById("map_div");
+            if (storedMode === "dark" || (storedMode === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                mapDiv.classList.add("dark-map");
+            } else {
+                mapDiv.classList.remove("dark-map");
             }
 
             const defaultIcon = new L.Icon({

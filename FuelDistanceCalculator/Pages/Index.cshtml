@@ -115,7 +115,7 @@
             </div>
         </div>
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
-        <div id="manualInputFields" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
+        <div id="manualInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
             <div class="row">
                 @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
@@ -186,7 +186,7 @@
         </div>
 
         <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
-        <div id="autoInputFields" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+        <div id="autoInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
             <!-- Automatische Eingabe für Standort und Radius -->
             <div class="row align-items-end">
                 <div class="col-md-5 offset-md-1">

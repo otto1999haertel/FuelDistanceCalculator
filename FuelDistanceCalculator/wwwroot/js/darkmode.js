@@ -3,26 +3,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const autoButton = document.getElementById("autoDarkModeToggle");
     if (!toggleButton || !autoButton) return;
 
-    const body = document.body;
+    const root = document.documentElement;  // Änderung: Verwende <html> statt <body> für Klassen
     const table = document.getElementById("fuelTable");
     const mapContainer = document.getElementById("map_div");
 
     // Funktion, um Mode zu setzen
     function setMode(mode) {  // 'dark', 'light', or 'auto'
-        body.classList.remove("dark-mode", "light-mode");
-        table?.classList.remove("table-dark");  // Optional, since vars handle it
+        root.classList.remove("dark-mode", "light-mode");  // Änderung: Auf root anwenden
+        table?.classList.remove("table-dark");
         mapContainer?.classList.remove("dark-map");
 
         if (mode === "dark") {
-            body.classList.add("dark-mode");
+            root.classList.add("dark-mode");  // Änderung: Auf root
             table?.classList.add("table-dark");
             mapContainer?.classList.add("dark-map");
         } else if (mode === "light") {
-            body.classList.add("light-mode");
+            root.classList.add("light-mode");  // Änderung: Auf root
         }  // For 'auto', do nothing—let media query handle
 
-        // Button-Styles anpassen (basierend auf aktuellen Mode)
-        const isDark = body.classList.contains("dark-mode");
+        // Button-Styles anpassen (basierend auf dem Modus)
+        const isDark = root.classList.contains("dark-mode");  // Änderung: Auf root prüfen
         toggleButton.classList.toggle("btn-outline-light", isDark);
         toggleButton.classList.toggle("btn-outline-dark", !isDark);
         autoButton.classList.toggle("btn-outline-light", isDark);
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Status aus Local Storage abrufen
-    const storedMode = localStorage.getItem("darkMode");  // Now 'dark', 'light', or null for auto
+    const storedMode = localStorage.getItem("darkMode");  // 'dark', 'light', or null for auto
 
     if (storedMode) {
         setMode(storedMode);
@@ -57,10 +57,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Initial-Anpassung für Tabelle und Karte
-    if (table && body.classList.contains("dark-mode")) {
+    if (table && root.classList.contains("dark-mode")) {  // Änderung: Auf root prüfen
         table.classList.add("table-dark");
     }
-    if (mapContainer && body.classList.contains("dark-mode")) {
+    if (mapContainer && root.classList.contains("dark-mode")) {  // Änderung: Auf root prüfen
         mapContainer.classList.add("dark-map");
     }
 

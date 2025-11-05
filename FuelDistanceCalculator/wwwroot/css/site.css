@@ -1,300 +1,394 @@
-html {
-  font-size: 14px;
+/* Import via HTML: <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"> */
+/* CSS Reset für Harmonie (z. B. Normalize.css empfohlen, hier minimal) */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
+:root {
+  --primary-color: #d2b48c; /* Earthy beige-orange für Akzente */
+  --accent-color: #a89b7b; /* Olive-tinted neutral für Hover/Gradients */
+  --bg-color: #faf0e6; /* Soft light beige Hintergrund */
+  --text-color: #4b3f2f; /* Dark brown für Text-Kontrast */
+  --navbar-bg: #eed9c4; /* Muted beige für Navbar */
+  --navbar-text: #4b3f2f; /* Dark brown für Navbar-Text */
+  --spacing-sm: 10px;
+  --spacing-md: 20px;
+  --border-color: #d2b48c; /* Tan für Borders */
+  --shadow-neumorphic: inset 4px 4px 8px rgba(139, 115, 85, 0.1), inset -4px -4px 8px rgba(255, 240, 230, 0.5); /* Beige-Neumorphism */
+  --glass-bg: rgba(250, 240, 230, 0.2); /* Beige-Glassmorphism */
+  --hover-bg: rgba(var(--accent-color), 0.1); /* Zentrale Hover-Hintergrund */
+  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2); /* Zentrale Focus-Shadow */
+  --table-bg: white; /* Standard für Light Mode Tabellen */
+  --table-text: black; /* Standard für Light Mode Tabellen-Text */
+  --table-border: #e5e5e5; /* Standard für Light Mode Borders */
+  --table-head-bg: #f8f9fa; /* Standard für Light Mode Thead */
+  --table-row-bg: white; /* Standard für Light Mode Rows */
+  --table-row-even-bg: #f2f2f2; /* Leichte Abwechslung für Light Mode */
+  --table-hover-bg: #e9ecef; /* Standard Hover für Light Mode */
+  --btn-hover-text: #3a3125; /* Default hover text for light */
+  --input-bg: #faf0e6; /* Light mode input background */
+  font-family: 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'wght' 400; /* Variable Font Support */
+}
+/* Einheitliche Dark-Mode-Handhabung: Prefers als Basis, .dark-mode als Override */
+/* System Dark Mode Preference */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode) { /* Prevent override if manual light */
+    --primary-color: #b89b7b;
+    --accent-color: #8b7355;
+    --bg-color: #4b3f2f;
+    --text-color: #faf0e6;
+    --navbar-bg: #3a3125;
+    --navbar-text: #eed9c4;
+    --border-color: #8b7355;
+    --shadow-neumorphic: inset 4px 4px 8px rgba(0, 0, 0, 0.2), inset -4px -4px 8px rgba(139, 115, 85, 0.1);
+    --glass-bg: rgba(75, 63, 47, 0.3);
+    --hover-bg: rgba(var(--accent-color), 0.1);
+    --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
+    --table-bg: #222;
+    --table-text: white;
+    --table-border: #444;
+    --table-head-bg: #333;
+    --table-row-bg: #282828;
+    --table-row-even-bg: #1f1f1f;
+    --table-hover-bg: #333;
+    --btn-hover-text: #eed9c4; /* Lighter for dark mode contrast */
+    --input-bg: #5c4b3a; /* Cool darker beige for dark mode inputs */
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+body.dark-mode {
+  --primary-color: #b89b7b;
+  --accent-color: #8b7355;
+  --bg-color: #4b3f2f;
+  --text-color: #faf0e6;
+  --navbar-bg: #3a3125;
+  --navbar-text: #eed9c4;
+  --border-color: #8b7355;
+  --shadow-neumorphic: inset 4px 4px 8px rgba(0, 0, 0, 0.2), inset -4px -4px 8px rgba(139, 115, 85, 0.1);
+  --glass-bg: rgba(75, 63, 47, 0.3);
+  --hover-bg: rgba(var(--accent-color), 0.1);
+  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
+  --table-bg: #222;
+  --table-text: white;
+  --table-border: #444;
+  --table-head-bg: #333;
+  --table-row-bg: #282828;
+  --table-row-even-bg: #1f1f1f;
+  --table-hover-bg: #333;
+  --btn-hover-text: #eed9c4; /* Lighter for dark mode contrast */
+  --navbar-brand:#faf0e6;
+  --input-bg: #5c4b3a; /* Cool darker beige for dark mode inputs */
 }
+
+body.light-mode {
+  --primary-color: #d2b48c;
+  --accent-color: #a89b7b;
+  --bg-color: #faf0e6;
+  --text-color: #4b3f2f;
+  --navbar-bg: #eed9c4;
+  --navbar-text: #4b3f2f;
+  --border-color: #d2b48c;
+  --shadow-neumorphic: inset 4px 4px 8px rgba(139, 115, 85, 0.1), inset -4px -4px 8px rgba(255, 240, 230, 0.5);
+  --glass-bg: rgba(250, 240, 230, 0.2);
+  --hover-bg: rgba(var(--accent-color), 0.1);
+  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
+  --table-bg: white;
+  --table-text: black;
+  --table-border: #e5e5e5;
+  --table-head-bg: #f8f9fa;
+  --table-row-bg: white;
+  --table-row-even-bg: #f2f2f2;
+  --table-hover-bg: #e9ecef;
+  --btn-hover-text: #3a3125;
+}
+
 
 html {
   position: relative;
   min-height: 100%;
+  font-size: 14px;
 }
-
 body {
   margin-bottom: 60px;
-}
-
-h2 {
-  font-size: 1.75em;         /* Größer als h3 */
-  font-weight: bold;
-  margin-top: 20px;
-  margin-bottom: 15px;
-  padding-bottom: 5px;
-  border-bottom: 2px solid #ccc;  /* Deutliche Linie als Abgrenzung */
-}
-
-/* Allgemeine Formatierung für h3 */
-h3 {
-  font-size: 1.4em;          /* Etwas kleiner als h2 */
-  font-weight: bold;
-  margin-top: 25px;
-  margin-bottom: 10px;
-  color: #555;               /* Leicht abgedunkelte Schriftfarbe */
-  padding-bottom: 3px;
-  border-bottom: 1px solid #ddd;  /* Leichtere Linie zur optischen Trennung */
-}
-
-/* Anpassung im Dark Mode */
-body.dark-mode h2 {
-  border-bottom: 2px solid #555;
-}
-
-body.dark-mode h3 {
-  border-bottom: 1px solid #555;
-  color: #ccc;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-
-:root {
-  --bg-color: white;
-  --text-color: black;
-  --navbar-bg: white;
-  --navbar-text: black;
-}
-
-.dark-mode {
-  --bg-color: #121212;
-  --text-color: white;
-  --navbar-bg: #1f1f1f;
-  --navbar-text: white;
-  --footer-text:white;
-  ---bg: #1f1f1f;
-}
-
-.dark-mode input,
-.dark-mode textarea,
-.dark-mode select {
-    background-color: #333;  /* Dunkelgrauer Hintergrund */
-    color: white;  /* Weiße Schrift */
-    border: 1px solid #555;  /* Dezenter Rahmen */
-    outline: none; /* Standard-Outline entfernen */
-}
-
-.dark-mode input::placeholder,
-.dark-mode textarea::placeholder {
-    color: #bbb;  /* Heller Grauton für Platzhalter */
-}
-
-.dark-mode input:focus,
-.dark-mode textarea:focus,
-.dark-mode select:focus {
-    background-color: #333;
-    color: white;
-    border: 1px solid #258cfb;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); /* Dezenter Glow-Effekt */
-}
-
-
-body {
   background-color: var(--bg-color);
   color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
-
+/* Gruppiere Media Queries für Einheitlichkeit */
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+  .station-list {
+    grid-template-columns: repeat(2, 1fr); /* Optional: 2 Spalten auf Desktop */
+  }
+}
+@media screen and (max-width: 767px) {
+  .col-md-5.custom-col.col-12 {
+    justify-content: space-between;
+    margin-top: var(--spacing-md);
+  }
+  .row {
+    margin-bottom: 30px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .col-md-5.custom-col.col-12 {
+    justify-content: space-between;
+  }
+  .row {
+    margin-bottom: 30px;
+  }
+}
+/* Navbar und Icons */
 .navbar {
-  background-color: var(--navbar-bg) !important;
+  background-color: var(--navbar-bg);
+  box-shadow: var(--shadow-neumorphic);
 }
-
-.navbar-nav .nav-link {
-  color: var(--navbar-text) !important;
-}
-
-.btn-outline-dark {
-  border-color: var(--navbar-text);
+.navbar .nav-link {
   color: var(--navbar-text);
+  transition: color 0.2s ease;
+}
+.navbar .nav-link:hover {
+  color: var(--accent-color);
+}
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%234b3f2f' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: black; /* Standardfarbe im Light Mode */
-  text-align: center;
+.navbar-brand {
+color: var(--navbar-text);
+transition: color 0.2s ease;
+}
+.navbar-brand:hover {
+color: var(--accent-color);
 }
 
-.dark-mode .page-title {
-  color: white; /* Schriftfarbe für Dark Mode */
-  background-color: black; /* Hintergrundfarbe für Dark Mode */
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
+/* Passendes Icon für Dark Mode (nutzt die exakte --navbar-text Farbe) */
+body.dark-mode .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23eed9c4' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+/* Buttons und Interaktive Elemente (vereinheitlicht mit Variables) */
+.btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-body.dark-mode .navbar-brand {
-  color: white !important;
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-neumorphic);
+  background-color: var(--hover-bg);
+  color: var(--btn-hover-text); /* Now variable for better contrast */
 }
 
-.station-list {
-  list-style-type: none; /* Entfernt die Aufzählungspunkte */
-  padding: 0; /* Entfernt unnötigen Abstand */
+
+.btn:focus, .btn:active:focus {
+  box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.1), 0 0 0 0.25rem var(--primary-color);
 }
-
-.station-list li {
-  border-bottom: 1px solid #ddd; /* Fügt einen Strich zwischen den Listenelementen hinzu */
-  padding: 10px 10px; /* Fügt etwas Abstand oben und unten hinzu */
+.btn-primary {
+  color: white;
+  background-color: var(--primary-color);
+  border-color: var(--text-color);
 }
-
-.station-list li:nth-child(even) {
-  background-color: #f9f9f9; /* Abwechselnde Farben für jedes zweite Element */
+.btn-primary:hover {
+  background-color: darken(var(--primary-color), 15%);
 }
-
-.station-list li:last-child {
-  border-bottom: none; /* Entfernt den Strich beim letzten Element */
+/* Typography */
+h2 {
+  font-size: 1.75em;
+  font-variation-settings: 'wght' 700;
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+  background: var(--text-color);
+  -webkit-background-clip: text;
+  color: transparent;
 }
-
-/* Standardfarben für station-summary und station-details */
-.station-summary {
-  color: black;  /* Standard (Hellmodus) */
-  cursor: pointer; /* Ändert den Mauszeiger in eine Hand */
+h3 {
+  font-size: 1.4em;
+  font-variation-settings: 'wght' 600;
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
 }
-
-.station-details {
-  color: gray;  /* Standard (Hellmodus) */
+/* Forms und Inputs (gruppiert) */
+input, textarea, select, .form-select, .form-control {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-/* Dark Mode Anpassungen */
-body.dark-mode .station-summary {
-  color: white;  /* Weiße Schrift im Dark Mode */
+input:focus, textarea:focus, select:focus, .form-select:focus, .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: var(--focus-shadow);
 }
-
-body.dark-mode .station-details {
-  color: lightgray;  /* Helle Grauschrift im Dark Mode */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+  color: var(--text-color);
+  text-align: end;
+  opacity: 0.6;
 }
-
-body.dark-mode .station-item {
-  background-color: #2c2c2c; /* Dunkler Hintergrund für Listenelemente im Dark Mode */
-  border-color: #444;  /* Dunklerer Rand */
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+  text-align: start;
 }
-
-body.dark-mode .station-item:nth-child(even) {
-  background-color: #3a3a3a; /* Abwechselnde Hintergrundfarbe für jedes zweite Element */
-}
-
-body.dark-mode .station-item:hover {
-  background-color: #444; /* Hellerer Hover-Effekt */
-}
-
-body.dark-mode .station-list li {
-  border-bottom: 1px solid #444;  /* Dunklerer Trennstrich zwischen den Listenelementen */
-}
-
-body.dark-mode .station-list {
-  background-color: #1f1f1f; /* Dunkler Hintergrund für die gesamte Liste */
-}
-
-body.dark-mode .station-list li:last-child {
-  border-bottom: none; /* Entfernt den Trennstrich beim letzten Listenelement */
-}
-
-.radio-spacing {
-  display: flex;
-  gap: 15px; /* Abstand zwischen den Labels */
-}
-
-body.dark-mode .form-select {
-  background-color: #2c2c2c;
-  color: #f1f1f1;
-  border-color: #555;
-
-  /* Dropdown-Pfeil neu definieren (SVG) */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23ccc' d='M8 10.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+.form-select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='var(--text-color)' d='M8 10.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right .75rem center;
   background-size: 16px 12px;
 }
 
+.footer {
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+  background-color: var(--navbar-bg);
+  color: var(--text-color);
+  box-shadow: var(--shadow-neumorphic) inset;
+}
+/* Tables (verwende Variablen für Konsistenz in Light und Dark) */
+.table {
+  background-color: var(--table-bg);
+  color: var(--table-text);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.table thead {
+  background-color: var(--table-head-bg);
+  color: var(--table-text);
+}
+.table tbody tr {
+  background-color: var(--table-row-bg);
+  border-color: var(--table-border);
+  transition: background-color 0.2s ease;
+}
+.table tbody tr:nth-child(even) {
+  background-color: var(--table-row-even-bg);
+}
+.table tbody tr:hover {
+  background-color: var(--table-hover-bg);
+}
+.table th, .table td {
+  border: 1px solid var(--table-border);
+  padding: var(--spacing-sm);
+}
+/* Station List und Items */
+.station-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  padding: 0;
+  list-style-type: none;
+  animation-timeline: view();
+  animation: fadeIn 0.5s ease-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.station-item {
+  background-color: rgba(var(--bg-color), 0.9);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  box-shadow: var(--shadow-neumorphic);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+.station-item:hover {
+  transform: scale(1.02);
+}
+@container (min-width: 300px) {
+  .station-item {
+    font-size: 1.1em;
+  }
+}
+.station-summary {
+  color: var(--text-color);
+}
+.station-details {
+  color: rgba(var(--text-color), 0.7);
+}
+/* Radio und Spacing */
+.radio-spacing {
+  display: flex;
+  gap: 15px;
+}
+/* Suggestions und Tooltips (gruppiert) */
 .suggestions-box {
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   display: none;
   position: absolute;
-  background-color: white;
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(10px);
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
-  border-radius:5px ;
+  border-radius: 8px;
+  box-shadow: var(--shadow-neumorphic);
 }
 .suggestion-item {
-  padding: 5px;
+  padding: var(--spacing-sm);
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 .suggestion-item:hover {
-  background-color: #f0f0f0;
+  background-color: var(--hover-bg);
 }
-
-body.dark-mode .suggestions-box {
-  background-color: #2c2c2c;
-  border: 1px solid #444;
-}
-
-body.dark-mode .suggestion-item {
-  color: #f1f1f1;
-}
-
-body.dark-mode .suggestion-item:hover {
-  background-color: #444;
-}
-
 .tooltip-inner {
-  background-color: #efefef !important; /* Deine Wunschfarbe */
-  color: #000000 !important;
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(5px);
+  color: var(--text-color);
   font-size: 0.875rem;
   padding: 8px 12px;
   border-radius: 6px;
-  opacity: 1 !important; 
+  opacity: 1;
+  box-shadow: var(--shadow-neumorphic);
 }
-
-body.dark-mode .tooltip-inner {
-  background-color: #333 !important;  /* Dunkelgrauer Hintergrund */
-  color: white !important;  /* Weiße Schrift */
-  font-size: 0.875rem;
-  padding: 8px 12px;
-  border-radius: 6px;
-  opacity: 1 !important; 
-}
-
 .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
 .bs-tooltip-top .tooltip-arrow::before {
-  border-top-color: #bbb !important;
+  border-top-color: var(--border-color);
 }
-
-/* Dark Mode Map Filter */
+/* Map und Dark-Map */
 .dark-map .leaflet-layer,
 .dark-map .leaflet-control-zoom-in,
 .dark-map .leaflet-control-zoom-out,
 .dark-map .leaflet-control-attribution {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
-
-
-
-@media screen and (max-width: 767px) {
-  .col-md-5.custom-col.col-12 {
-    justify-content: space-between;
-    margin-top: 20px; 
-  }
-  .row{
-    margin-bottom: 30px; 
-  }
+/* No-Click */
+.no-click {
+  pointer-events: none;
+  color: rgba(var(--text-color), 0.5);
+  text-decoration: none;
+  cursor: default;
 }
-
-@media screen and (min-width: 768px) {
-  .col-md-5.custom-col.col-12 {
-    justify-content: space-between;
-  }
-  .row{
-    margin-bottom: 30px; 
-  }
+/* Links und Borders */
+a {
+  color: var(--primary-color);
+  transition: color 0.2s ease;
+}
+a:has(> img) {
+  border: 1px solid var(--accent-color);
+}
+.border-top {
+  border-top: 1px solid var(--border-color);
+}
+.border-bottom {
+  border-bottom: 1px solid var(--border-color);
+}
+.box-shadow {
+  box-shadow: var(--shadow-neumorphic);
+}
+.page-title {
+  font-size: 2rem;
+  font-variation-settings: 'wght' 700;
+  text-align: center;
+  margin: var(--spacing-md) 0;
+  color: var(--text-color);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  box-shadow: var(--shadow-neumorphic);
 }

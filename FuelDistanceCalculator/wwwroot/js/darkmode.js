@@ -1,110 +1,99 @@
 document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("darkModeToggle");
     const autoButton = document.getElementById("autoDarkModeToggle");
-    if (!toggleButton || !autoButton) return;  // Früher Abbruch, falls Buttons nicht existieren
+    if (!toggleButton || !autoButton) return;
 
     const body = document.body;
     const table = document.getElementById("fuelTable");
     const mapContainer = document.getElementById("map_div");
 
-    // Funktion, um Dark Mode zu aktivieren/deaktivieren
-    function setDarkMode(enabled) {
-        if (enabled) {
+    // Funktion, um Mode zu setzen
+    function setMode(mode) {  // 'dark', 'light', or 'auto'
+        body.classList.remove("dark-mode", "light-mode");
+        table?.classList.remove("table-dark");  // Optional, since vars handle it
+        mapContainer?.classList.remove("dark-map");
+
+        if (mode === "dark") {
             body.classList.add("dark-mode");
             table?.classList.add("table-dark");
-            if (mapContainer && mapContainer.classList) {
-                mapContainer.classList.add("dark-map");
-            }
-        } else {
-            body.classList.remove("dark-mode");
-            table?.classList.remove("table-dark");
-            if (mapContainer && mapContainer.classList) {
-                mapContainer.classList.remove("dark-map");
-            }
-        }
+            mapContainer?.classList.add("dark-map");
+        } else if (mode === "light") {
+            body.classList.add("light-mode");
+        }  // For 'auto', do nothing—let media query handle
 
-        // Button-Styles anpassen basierend auf dem Modus
-        toggleButton.classList.toggle("btn-outline-light", enabled);
-        toggleButton.classList.toggle("btn-outline-dark", !enabled);
-        autoButton.classList.toggle("btn-outline-light", enabled);
-        autoButton.classList.toggle("btn-outline-dark", !enabled);
+        // Button-Styles anpassen (basierend auf aktuellen Mode)
+        const isDark = body.classList.contains("dark-mode");
+        toggleButton.classList.toggle("btn-outline-light", isDark);
+        toggleButton.classList.toggle("btn-outline-dark", !isDark);
+        autoButton.classList.toggle("btn-outline-light", isDark);
+        autoButton.classList.toggle("btn-outline-dark", !isDark);
     }
 
     // Funktion, um den aktiven Modus zu highlighten
-    function highlightActiveMode(mode) {
-        if (mode === "auto") {
+    function highlightActiveMode(storedMode) {
+        if (storedMode === "auto") {
             autoButton.classList.add("active");
             toggleButton.classList.remove("active");
-            toggleButton.textContent = "Toggle Mode";  // Standard-Text für Toggle im Auto-Modus
+            toggleButton.textContent = "Toggle Mode";
         } else {
             autoButton.classList.remove("active");
             toggleButton.classList.add("active");
-            toggleButton.textContent = (mode === "enabled") ? "☀️ Mode" : "🌙 Mode";
+            toggleButton.textContent = (storedMode === "dark") ? "☀️ Mode" : "🌙 Mode";
         }
     }
 
-    // Dark Mode Status aus dem Local Storage abrufen
-    const storedMode = localStorage.getItem("darkMode");
+    // Status aus Local Storage abrufen
+    const storedMode = localStorage.getItem("darkMode");  // Now 'dark', 'light', or null for auto
 
     if (storedMode) {
-        // Manueller Override: enabled oder disabled
-        setDarkMode(storedMode === "enabled");
+        setMode(storedMode);
         highlightActiveMode(storedMode);
     } else {
-        // System-Präferenz prüfen (Auto-Modus)
+        // Auto: System prüfen
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setDarkMode(prefersDark);
+        setMode(prefersDark ? "dark" : "light");  // But since auto, actually set nothing
+        setMode(null);  // Clear classes for auto
         highlightActiveMode("auto");
     }
 
-    // Explizite Initial-Anpassung für Tabelle und Karte (wie im alten Code)
-    if (table) {
-        if (body.classList.contains("dark-mode")) {
-            table.classList.add("table-dark");
-        } else {
-            table.classList.remove("table-dark");
-        }
+    // Initial-Anpassung für Tabelle und Karte
+    if (table && body.classList.contains("dark-mode")) {
+        table.classList.add("table-dark");
     }
-    if (mapContainer && mapContainer.classList) {
-        if (body.classList.contains("dark-mode")) {
-            mapContainer.classList.add("dark-map");
-        } else {
-            mapContainer.classList.remove("dark-map");
-        }
+    if (mapContainer && body.classList.contains("dark-mode")) {
+        mapContainer.classList.add("dark-map");
     }
 
-    // Toggle-Button-Event: Wechselt zwischen Dark und Light (manuell)
+    // Toggle-Button-Event: Wechselt manuell
     toggleButton.addEventListener("click", function () {
-        const storedMode = localStorage.getItem("darkMode");
-        const isEnabled = storedMode === "enabled";
-        const newMode = isEnabled ? "disabled" : "enabled";
-        setDarkMode(!isEnabled);
+        let currentMode = localStorage.getItem("darkMode");
+        let newMode = (currentMode === "dark" || !currentMode) ? "light" : "dark";  // Toggle between dark/light
+        setMode(newMode);
         localStorage.setItem("darkMode", newMode);
         highlightActiveMode(newMode);
     });
 
-    // Auto-Button-Event: Schaltet auf Auto-Modus
+    // Auto-Button-Event
     autoButton.addEventListener("click", function () {
-        localStorage.removeItem("darkMode");
+        localStorage.setItem("darkMode", "auto");
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setDarkMode(prefersDark);
+        setMode(null);  // Clear classes
         highlightActiveMode("auto");
     });
 
-    // Listener für Änderungen am System-Modus: Nur im Auto-Modus
+    // Listener für System-Änderungen (nur in Auto)
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
-        if (!localStorage.getItem("darkMode")) {  // Nur im "System-Modus"
-            setDarkMode(e.matches);
+        if (localStorage.getItem("darkMode") === "auto") {
+            setMode(null);  // Rely on media
         }
     });
 
-    // Optional: Reset auf System-Modus via Contextmenu (auf Toggle-Button)
+    // Contextmenu Reset
     toggleButton.addEventListener("contextmenu", function (e) {
         e.preventDefault();
-        localStorage.removeItem("darkMode");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setDarkMode(prefersDark);
+        localStorage.setItem("darkMode", "auto");
+        setMode(null);
         highlightActiveMode("auto");
-        alert("Zurückgesetzt auf System-Modus");  // Oder eine Toast-Nachricht
+        alert("Zurückgesetzt auf System-Modus");
     });
 });

@@ -14,5 +14,5 @@ if pgrep nginx > /dev/null; then
 fi
 
 # Start Docker Compose services
-cd /home/ottohartel/FuelDistanceClaulator
-sudo docker compose --env-file /home/ottohartel/FuelDistanceClaulator/.env.server up --build -d
+cd /home/ottohartel/FuelDistanceCalculator
+sudo docker compose --env-file /home/ottohartel/FuelDistanceCalculator/.env.server up --build -d

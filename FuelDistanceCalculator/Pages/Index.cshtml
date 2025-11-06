@@ -101,8 +101,9 @@
                                 title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
                                 ⓘ
                             </span>
-                            <input class="form-control" id="PricePerKm" name="PricePerKm" required
-                                onblur="formatPricePerKm(this)" asp-for="PricePerKm" value="@Model.PricePerKm" />
+                            <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required 
+                            asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatPricePerKm(this)"
+                                step="any" />
                         </div>
                     </div>
                 </div>
@@ -394,6 +395,10 @@
                         input.value = result; // Zeige das Ergebnis im Eingabefeld an
                         document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
                     }
+                }
+                else{
+                    input.value=0;
+                    document.getElementById("FuelAmount").value =0;
                 }
             } catch (e) {
                 console.error("Ungültiger Ausdruck:", e);

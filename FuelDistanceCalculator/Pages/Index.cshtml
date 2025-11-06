@@ -42,18 +42,25 @@
         <div class="row justify-content-center">
             <!-- Eingabefelder für globale Werte - mittig zentriert -->
             <div class="col-md-6">
-                <h3>Globale Eingabewerte</h3>
-
-                <!-- Dropdown für Spritart -->
+                <!-- Radio buttons für Spritart -->
                 <div class="mb-3">
-                    <label asp-for="SelectedFuelType" class="form-label">Spritart</label>
-                    <select asp-for="SelectedFuelType" class="form-select" asp-items="@(FuelTypeHelper.FuelTypeNames.Select(kvp => new SelectListItem
-                                                                           {
-                                                                               Value = kvp.Key.ToString(),
-                                                                               Text = kvp.Value
-                                                                           }))">
-                    </select>
+                <label class="form-label">Spritart</label>
+                <div class="d-flex gap-4">
+                    @foreach (var kvp in FuelTypeHelper.FuelTypeNames)
+                    {
+                        <div class="form-check">
+                            <input class="styled-radio" 
+                                type="radio" 
+                                asp-for="SelectedFuelType" 
+                                value="@kvp.Key" 
+                                id="fuel_@kvp.Key" />
+                            <label class="form-check-label" for="fuel_@kvp.Key">
+                                @kvp.Value
+                            </label>
+                        </div>
+                    }
                 </div>
+            </div>
 
                 <!-- Eingabe für Tankmenge -->
                 <div class="form-group">
@@ -100,17 +107,26 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="@Model.SelectInputMode" class="form-label">Modus</label>
-                    <select asp-for="@Model.SelectInputMode" class="form-select"
-                        asp-items="@(Enum.GetValues(typeof(InputMode))
-                                                                                                                                                                                                                                                                                    .Cast<InputMode>()
-                                                                                                                                                                                                                                                                                    .Select(mode => new SelectListItem
-                                                                                                                                                                                                                                                                                    {
-                                                                                                                                                                                                                                                                                        Value = mode.ToString(),
-                                                                                                                                                                                                                                                                                        Text = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich"
-                                                                                                                                                                                                                                                                                    }))"
-                        onchange="toggleInputMethod(this)">
-                    </select>
+                    <label class="form-label">Modus</label>
+                    <div class="d-flex gap-4">
+                        @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
+                        {
+                            var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
+                            var radioId = $"mode_{mode}";
+
+                            <div class="form-check">
+                                <input class="styled-radio"
+                                    type="radio"
+                                    asp-for="SelectInputMode"
+                                    value="@mode"
+                                    id="@radioId"
+                                    onchange="toggleInputMethod(this)" />
+                                <label class="form-check-label" for="@radioId">
+                                    @displayText
+                                </label>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

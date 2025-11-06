@@ -103,7 +103,7 @@
                             </span>
                             <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required 
                             asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatPricePerKm(this)"
-                                step="any" />
+                                step="any" min="0.01"/>
                         </div>
                     </div>
                 </div>
@@ -389,16 +389,14 @@
         function calculateAndStore(input) {
             try {
                 let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
+                input.value=0;
+                document.getElementById("FuelAmount").value =0;
                 if (/^[0-9+\-*/().\s]*$/.test(expression)) {
                     let result = eval(expression); // Berechne den Ausdruck
-                    if (!isNaN(result)) {
+                    if (!isNaN(result) && result>=0) {
                         input.value = result; // Zeige das Ergebnis im Eingabefeld an
                         document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
                     }
-                }
-                else{
-                    input.value=0;
-                    document.getElementById("FuelAmount").value =0;
                 }
             } catch (e) {
                 console.error("Ungültiger Ausdruck:", e);

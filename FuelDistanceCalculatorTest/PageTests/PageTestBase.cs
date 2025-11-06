@@ -16,6 +16,8 @@ namespace FuelDistanceCalculatorTest.PageTests
         [SetUp]
         public async Task Setup()
         {
+            Environment.SetEnvironmentVariable("MODE_TYPE", "Testing");
+
             _factory = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
                 {

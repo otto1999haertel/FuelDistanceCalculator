@@ -51,9 +51,6 @@ public class IndexModel : PageModel
     public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; set; }
 
     [BindProperty]
-    public bool CalculationSucessful { get; set; }
-
-    [BindProperty]
     public double AverageCostPlace1 { get; private set; }
 
     [BindProperty]
@@ -104,6 +101,9 @@ public class IndexModel : PageModel
     [BindProperty]
     public bool IsProduction { get; private set; }
 
+    [BindProperty]
+    public bool SearchExecuted{ get; private set; }
+
     private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
 
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
@@ -124,6 +124,7 @@ public class IndexModel : PageModel
         }
         IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
+        SearchExecuted = false;
     }
 
     public async Task OnGetAsync()
@@ -156,7 +157,6 @@ public class IndexModel : PageModel
         {
             AverageCostPlace1 = Convert.ToDouble(TempData["AverageCostPlace1"]);
             AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
-            CalculationSucessful = true; // Falls es berechnete Werte gibt, setze auf erfolgreich
         }
         await GetCarsAndRespectivePricePerkm();
     }
@@ -210,6 +210,7 @@ public class IndexModel : PageModel
             TempData["ToastType"] = "error";
             TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
         }
+        SearchExecuted = true;
     }
 
     // optional bei JS-only Requests ohne Token

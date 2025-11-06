@@ -200,6 +200,18 @@ body.dark-mode .navbar-toggler-icon {
 .btn-primary:hover {
   background-color: darken(var(--primary-color), 15%);
 }
+
+.btn:disabled,
+.btn.disabled {
+  background-color: gray !important;
+  color: #ccc !important;
+  border-color: #999 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+  box-shadow: none !important;
+  transform: none !important;
+}
 /* Typography */
 h2 {
   font-size: 1.75em;

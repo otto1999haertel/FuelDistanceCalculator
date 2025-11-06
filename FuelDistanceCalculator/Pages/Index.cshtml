@@ -148,7 +148,7 @@
                     <div class="col-md-5">
                         <label for="RadiusPlace1">Radius</label>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">1</span>
+                            <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[0]"
                                 class="form-range"
@@ -161,7 +161,7 @@
                             <output class="fw-bold" style="width: 40px; text-align: right;">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
                             </output>
-                            <span class="text-muted small">km</span>
+                            <label>km</label>
                         </div>
                     </div>
 
@@ -175,7 +175,7 @@
                     <div class="col-md-5 mt-3">
                         <label for="RadiusPlace2">Radius</label>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">1</span>
+                            <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[1]"
                                 class="form-range"
@@ -188,7 +188,7 @@
                             <output class="fw-bold" style="width: 40px; text-align: right;">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)
                             </output>
-                            <span class="text-muted small">km</span>
+                            <label>km</label>
                         </div>
                     </div>
                 }
@@ -204,7 +204,7 @@
                         <div class="col-md-5 mt-3">
                         <label for="RadiusPlace2">Radius</label>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">1</span>
+                            <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[@i]"
                                 class="form-range"
@@ -217,7 +217,7 @@
                             <output class="fw-bold" style="width: 40px; text-align: right;">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)
                             </output>
-                            <span class="text-muted small">km</span>
+                            <label>km</label>
                         </div>
                     </div>
                     }
@@ -261,7 +261,7 @@
 
                         <div class="d-flex align-items-center gap-3">
                             <!-- Slider (unsichtbar für Screenreader, aber gebunden) -->
-                            <span class="text-muted small">1</span>
+                            <label>1</label>
                             <input type="range"
                                 id="generalRadius"
                                 class="form-range flex-grow-1"
@@ -668,7 +668,7 @@
                     <div class="col-md-5 mt-3">
                         <label>Radius</label>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">1</span>
+                            <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[${locationIndex}]"
                                 class="form-range"
@@ -679,7 +679,7 @@
                                 id="RadiusPlace_${locationIndex}"
                                 oninput="this.nextElementSibling.value = this.value" />
                             <output class="fw-bold" style="width: 40px; text-align: right;">10</output>
-                            <span class="text-muted small">km</span>
+                            <label>km</label>
                         </div>
                     </div>`;
                 

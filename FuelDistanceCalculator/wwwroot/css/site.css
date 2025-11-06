@@ -459,3 +459,29 @@ a:has(> img) {
   border-radius: 8px;
   box-shadow: var(--shadow-neumorphic);
 }
+.form-range {
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.form-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: black;
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 1px #999;
+}
+
+.form-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: black;
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 1px #999;
+}

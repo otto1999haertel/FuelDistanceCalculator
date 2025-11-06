@@ -214,11 +214,32 @@
                     </div>
                 </div>
 
-                <div class="col-md-5">
-                    <label for="generalRadius">Radius (km)</label>
-                    <input type="number" id="generalRadius" class="form-control" placeholder="Radius in km" min="1"
-                        max="25" asp-for="Radius" value="@Model.Radius">
-                </div>
+                    <div class="col-md-5">
+                        <label for="generalRadius" class="form-label">Radius (km)</label>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Slider (unsichtbar für Screenreader, aber gebunden) -->
+                            <input type="range"
+                                id="generalRadius"
+                                class="form-range flex-grow-1"
+                                min="1"
+                                max="25"
+                                step="1"
+                                asp-for="Radius" />
+
+                            <!-- Live-Anzeige des Werts -->
+                            <span class="value-display fw-bold" id="radiusValue">
+                                @Model.Radius km
+                            </span>
+                        </div>
+
+                        <!-- Optional: Verstecktes Number-Input für Validierung / Barrierefreiheit -->
+                        <input type="number" 
+                            asp-for="Radius" 
+                            class="d-none" 
+                            min="1" 
+                            max="25" />
+                    </div>
             </div>
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
@@ -285,6 +306,18 @@
         let map;
         let Tiles;
         let locationIndex = @Model.NamePlaces.Count;
+
+        const slider = document.getElementById('generalRadius');
+            const output = document.getElementById('radiusValue');
+
+            // Initialwert setzen
+            output.textContent = slider.value + ' km';
+
+            // Bei Änderung aktualisieren
+            slider.addEventListener('input', () => {
+                output.textContent = slider.value + ' km';
+            });
+
         function updateRadius(input) {
             // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
             if (!input.value.trim()) {

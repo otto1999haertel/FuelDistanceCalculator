@@ -154,14 +154,14 @@
                             <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[0]"
-                                class="form-range"
+                                class="form-range flex-grow-1"
                                 min="1"
                                 max="25"
                                 step="1"
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output class="fw-bold">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
                             </output>
                             <label>km</label>
@@ -181,14 +181,14 @@
                             <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[1]"
-                                class="form-range"
+                                class="form-range flex-grow-1"
                                 min="1"
                                 max="25"
                                 step="1"
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output class="fw-bold">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)
                             </output>
                             <label>km</label>
@@ -210,14 +210,14 @@
                             <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[@i]"
-                                class="form-range"
+                                class="form-range flex-grow-1"
                                 min="1"
                                 max="25"
                                 step="1"
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output class="fw-bold">
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)
                             </output>
                             <label>km</label>
@@ -261,10 +261,9 @@
                     </div>
                 </div>
 
-                    <div class="col-md-5">
+                    <div class="col-md-5 mt-3">
                         <label for="generalRadius" class="form-label">Radius</label>
-
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
                             <!-- Slider (unsichtbar für Screenreader, aber gebunden) -->
                             <label>1</label>
                             <input type="range"
@@ -274,11 +273,11 @@
                                 max="25"
                                 step="1"
                                 asp-for="Radius" />
-
                             <!-- Live-Anzeige des Werts -->
-                             <span class="value-display fw-bold" id="radiusValue">
-                                @Model.Radius km
-                            </span>
+                            <output class="fw-bold">
+                                @(Model.Radius)
+                            </output>
+                            <label>km</label>
                         </div>
 
                         <!-- Optional: Verstecktes Number-Input für Validierung / Barrierefreiheit -->
@@ -364,11 +363,11 @@
             const output = document.getElementById('radiusValue');
 
             // Initialwert setzen
-            output.textContent = slider.value + ' km';
+            output.textContent = slider.value;
 
             // Bei Änderung aktualisieren
             slider.addEventListener('input', () => {
-                output.textContent = slider.value + ' km';
+                output.textContent = slider.value;
             });
 
         function updateRadius(input) {
@@ -683,14 +682,14 @@
                             <label>1</label>
                             <input type="range"
                                 name="RadiusPlaces[${locationIndex}]"
-                                class="form-range"
+                                class="form-range flex-grow-1"
                                 min="1"
                                 max="25"
                                 step="1"
                                 value="10"
                                 id="RadiusPlace_${locationIndex}"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">10</output>
+                            <output class="fw-bold">10</output>
                             <label>km</label>
                         </div>
                     </div>`;

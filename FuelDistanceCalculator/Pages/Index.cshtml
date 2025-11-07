@@ -161,7 +161,7 @@
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output>
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
                             </output>
                             <label>km</label>
@@ -188,7 +188,7 @@
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output>
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)
                             </output>
                             <label>km</label>
@@ -217,7 +217,7 @@
                                 value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)"
                                 id="RadiusPlace1"
                                 oninput="this.nextElementSibling.value = this.value" />
-                            <output class="fw-bold" style="width: 40px; text-align: right;">
+                            <output>
                                 @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)
                             </output>
                             <label>km</label>
@@ -250,49 +250,42 @@
         <div id="autoInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
             <!-- Automatische Eingabe für Standort und Radius -->
             <div class="row g-3 align-items-start">
-                                <!-- Standort -->
-                                <div class="col-md-5 offset-md-1">
-                                    <label for="generalLocation" class="form-label">Standort (PLZ/ Straße, Ort)</label>
-                                    <div class="input-group" style="height: 38px;">
-                                        <input type="text"
-                                            id="generalLocation"
-                                            class="form-control"
-                                            placeholder="Geben Sie einen Ort ein"
-                                            asp-for="Place"
-                                            value="@Model.Place"
-                                            style="height: 38px; font-size: 0.875rem;">
-                                        <button id="geoButton"
-                                                class="btn btn-primary d-flex align-items-center justify-content-center"
-                                                type="button"
-                                                style="width: 38px; height: 38px; padding: 0;">
-                                            <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Radius -->
-                                <div class="col-md-5">
-                                    <label for="generalRadius" class="form-label">Radius</label>
-                                    <div class="d-flex align-items-center gap-2" style="height: 38px;">
-                                        <span class="text-nowrap" style="width: 20px; text-align: center;">1</span>
-                                        <input type="range"
-                                            id="generalRadius"
-                                            class="form-range flex-grow-1"
-                                            min="1"
-                                            max="25"
-                                            step="1"
-                                            asp-for="Radius" 
-                                            value="@Model.Radius"
-                                            oninput="this.nextElementSibling.textContent = this.value + ' km'" />
-                                        <span class="value-display fw-bold text-nowrap" id="radiusValue" style="width: 50px; text-align: right;">
-                                            @Model.Radius km
-                                        </span>
-                                    </div>
-
-                                    <!-- Verstecktes Input für Model-Binding -->
-                                    <input type="number" asp-for="Radius" class="d-none" min="1" max="25" />
-                                    </div>
-                                </div>
+                <div class="col-md-5 offset-md-1">
+                    <label for="generalLocation" class="form-label">Standort (PLZ/ Straße, Ort)</label>
+                    <div class="input-group">
+                        <input type="text" id="generalLocation" class="form-control"
+                            placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
+                        <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center" type="button">
+                            <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                        <label for="generalRadius" class="form-label">Radius</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Slider (unsichtbar für Screenreader, aber gebunden) -->
+                            <label>1</label>
+                            <input type="range"
+                                id="generalRadius"
+                                class="form-range flex-grow-1"
+                                min="1"
+                                max="25"
+                                step="1"
+                                asp-for="Radius" />
+                            <!-- Live-Anzeige des Werts -->
+                             <output id="radiusValue">
+                                @(Model.Radius)
+                            </output>
+                            <label>km</label>
+                        </div>
+                        <!-- Optional: Verstecktes Number-Input für Validierung / Barrierefreiheit -->
+                        <input type="number" 
+                            asp-for="Radius" 
+                            class="d-none" 
+                            min="1" 
+                            max="25" />
+                    </div>
+            </div>
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
                     asp-page-handler="Search" id="SearchBtn">Suchen</button>
@@ -368,11 +361,11 @@
             const output = document.getElementById('radiusValue');
 
             // Initialwert setzen
-            output.textContent = slider.value + ' km';
+            output.textContent = slider.value ;
 
             // Bei Änderung aktualisieren
             slider.addEventListener('input', () => {
-                output.textContent = slider.value + ' km';
+                output.textContent = slider.value;
             });
 
         function updateRadius(input) {

@@ -388,7 +388,7 @@ public class IndexModel : PageModel
                     SelectedCarType = "",
                     SavingsToCheapestStation = 0m,
                     SavingsToNearestStation = 0m,
-                    SortMode = sortMode
+                    SortMode = (string)null
                 });
             var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService)
             {
@@ -399,8 +399,20 @@ public class IndexModel : PageModel
                 SelectedCarType = inputData?.SelectedCarType ?? "",
                 SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0,
                 SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0,
-                SortMode = inputData.SortMode??"",
+                SortMode = sortMode ?? "",
             };
+
+            var updatedInputData = new
+            {
+                FuelAmount = model.FuelAmount,
+                PricePerKm = model.PricePerKm,
+                SelectedFuelType = model.SelectedFuelType,
+                SelectedCarType = model.SelectedCarType,
+                SavingsToCheapestStation = model.SavingsToCheapestStation,
+                SavingsToNearestStation = model.SavingsToNearestStation,
+                SortMode = sortMode ?? "",
+            };
+            HttpContext.Session.SetString(InputDataSessionKey, JsonConvert.SerializeObject(updatedInputData));
             Console.WriteLine($"Amount of stations to sort: {model.CheapestResultStations.Count}");
 
             // Aktualisiere die Session mit den sortierten Stationen

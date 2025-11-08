@@ -8,6 +8,22 @@
     return;
 }
 <div id="listView">
+    @if(Model.FuelAmount> 0 && Model.SortMode.Equals("totalCost")){
+        <div class="d-flex flex-nowrap gap-3 align-items-center fw-medium mb-3" style="color: #2e8b57;">
+        @if (Model.SavingsToCheapestStation > 0)
+            {
+                <span>
+                    Erspranis zur Günstigsten: <strong>@Model.SavingsToCheapestStation €</strong>
+                </span>
+            }
+            @if (Model.SavingsToNearestStation > 0)
+            {
+                <span>
+                    Erspranis zur Nächsten: <strong>@Model.SavingsToNearestStation €</strong>
+                </span>
+            }
+        </div>
+    }
     <ul class="station-list">
         @foreach (GasStation station in Model.CheapestResultStations)
         {

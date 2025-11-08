@@ -1,5 +1,4 @@
 using NUnit.Framework.Internal;
-using FuelDistanceCalculator.Services;
 using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculatorTest.ServiceTests
@@ -18,7 +17,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
             Assert.That(CheckOrderAscendingFuelAmountZero(result), Is.True);
-            Assert.That(result.Count <= 10);
+            Assert.That(result.Count>0);
         }
 
         [Test]
@@ -32,7 +31,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             List<GasStation> result = TankCostService.GetCheapestStations(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
             TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
-            Assert.That(result.Count <= 10);
+            Assert.That(result.Count >0);
             Assert.That(CheckOrderByTotalCost(result), Is.True);
         }
 
@@ -49,6 +48,19 @@ namespace FuelDistanceCalculatorTest.ServiceTests
 
             //Assert
             Assert.That(result.Count == 0);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(CalculateSavngsTestCaseSource))]
+        public void CalculateSavingsTeset(List<GasStation> gasStations)
+        {
+            decimal execpectSavingsNearest = 8.75m;
+            decimal expectedSavingsCheapest = 1.75m;
+            decimal calculatedSavingsNearest = 0;
+            decimal calculatedSavingsChepast = 0;
+            TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast);
+            Assert.That(execpectSavingsNearest.Equals(calculatedSavingsNearest));
+            Assert.That(expectedSavingsCheapest.Equals(calculatedSavingsChepast));
         }
 
         private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
@@ -79,6 +91,36 @@ namespace FuelDistanceCalculatorTest.ServiceTests
         {
             yield return new TestCaseData(new List<GasStation>()).SetName("EmptyList");
             yield return new TestCaseData(null).SetName("NullList");
+        }
+
+        private static IEnumerable<TestCaseData> CalculateSavngsTestCaseSource()
+        {
+            yield return new TestCaseData(
+            new List<GasStation>
+                        {
+                            new GasStation
+                            {
+                                Name = "Station A",
+                                FuelTypePrice = 1.60m,
+                                TotalCalculatedCoast = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
+                                Dist = 5.0
+                            },
+                            new GasStation
+                            {
+                                Name = "Station B",
+                                FuelTypePrice = 1.50m,
+                                TotalCalculatedCoast = 78.00m,  // günstigster Literpreis, aber weiter weg
+                                Dist = 15.0
+                            },
+                            new GasStation
+                            {
+                                Name = "Station C",
+                                FuelTypePrice = 1.55m,
+                                TotalCalculatedCoast = 76.25m,  // insgesamt günstigste Gesamtkosten
+                                Dist = 7.0
+                            }
+                        }
+            );
         }
     
     }

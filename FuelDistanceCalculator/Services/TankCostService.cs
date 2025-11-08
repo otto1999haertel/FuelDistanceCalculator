@@ -2,6 +2,14 @@ using FuelDistanceCalculator.Model;
 
 public static class TankCostService
 {
+    public static void CaluclateSavings(List<GasStation> stations, ref decimal SavingsToNearestStation, ref decimal SavingsToCheapestStation)
+    {
+        GasStation cheapestStationTotalCost = stations.OrderBy(x => x.TotalCalculatedCoast).FirstOrDefault();
+        GasStation nearestStation = stations.OrderBy(x => x.Dist).FirstOrDefault();
+        GasStation cheapestFuelCost = stations.OrderBy(x => x.FuelTypePrice).FirstOrDefault();
+        SavingsToCheapestStation = cheapestFuelCost.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
+        SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
+    }
     public static List<GasStation> GetCheapestStations(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType)
     {
         if (stations == null || !stations.Any())
@@ -25,7 +33,6 @@ public static class TankCostService
                 })
                 .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue) // Primär: Aufsteigend nach Preis
                 .ThenBy(station => station.Dist ?? double.MaxValue) // Sekundär: Aufsteigend nach Entfernung
-                .Take(10)
                 .ToList();
         }
 
@@ -74,7 +81,6 @@ public static class TankCostService
         // Sortiere nach TotalCalculatedCoast
         return stationCosts
             .OrderBy(sc => sc.TotalCost)
-            .Take(10)
             .Select(sc => sc.Station)
             .ToList();
     }

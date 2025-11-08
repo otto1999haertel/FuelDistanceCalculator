@@ -102,9 +102,18 @@ public class IndexModel : PageModel
     public bool IsProduction { get; private set; }
 
     [BindProperty]
-    public bool SearchExecuted{ get; private set; }
+    public bool SearchExecuted { get; private set; }
+
+    [BindProperty]
+    public decimal SavingsToNearestStation { get;  set; }
+    [BindProperty]
+    public decimal SavingsToCheapestStation { get; set; }
+    
+    public string SortMode { get; set; }
 
     private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
+
+    private const string InputDataSessionKey = "InputData";
 
     public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
     {
@@ -125,6 +134,7 @@ public class IndexModel : PageModel
         IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         SearchExecuted = false;
+        SortMode = "totalCost";
     }
 
     public async Task OnGetAsync()
@@ -186,6 +196,12 @@ public class IndexModel : PageModel
             {
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 CheapestResultStations = TankCostService.GetCheapestStations(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI);
+                decimal savingsToNearestTemp = 0;
+                decimal savingsToCheapestTemp = 0;
+                TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);
+                SavingsToNearestStation = savingsToNearestTemp;
+                SavingsToCheapestStation = savingsToCheapestTemp;
+                CheapestResultStations = CheapestResultStations.Take(10).ToList();
                 if (CheapestResultStations != null && CheapestResultStations.Any())
                 {
                     // Protokolliere die Werte vor der Serialisierung
@@ -210,6 +226,17 @@ public class IndexModel : PageModel
             TempData["ToastType"] = "error";
             TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
         }
+        var inputData = new
+        {
+            FuelAmount,
+            PricePerKm,
+            fuelTypeForAPI,
+            SelectedCarType,
+            SavingsToCheapestStation,
+            SavingsToNearestStation,
+            SortMode
+        };
+        HttpContext.Session.SetString(InputDataSessionKey, JsonConvert.SerializeObject(inputData));
         SearchExecuted = true;
     }
 
@@ -323,6 +350,7 @@ public class IndexModel : PageModel
             {
                 return BadRequest("sortMode ist erforderlich");
             }
+            SortMode = sortMode;
 
             // Lade die gespeicherten GasStation-Objekte aus der Session
             var stationsJson = HttpContext.Session.GetString(StationsSessionKey);
@@ -349,13 +377,29 @@ public class IndexModel : PageModel
             var sortedStations = SortService.SortStations(stations, sortMode);
 
             // Erstelle ein IndexModel-Objekt
+            var inputJson = HttpContext.Session.GetString(InputDataSessionKey);
+            var inputData = string.IsNullOrEmpty(inputJson) 
+                ? null 
+                : JsonConvert.DeserializeAnonymousType(inputJson, new
+                {
+                    FuelAmount = 0m,
+                    PricePerKm = 0m,
+                    SelectedFuelType = FuelType.Diesel,
+                    SelectedCarType = "",
+                    SavingsToCheapestStation = 0m,
+                    SavingsToNearestStation = 0m,
+                    SortMode = sortMode
+                });
             var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService)
             {
                 CheapestResultStations = sortedStations,
-                FuelAmount = this.FuelAmount,
-                SelectedFuelType = this.SelectedFuelType,
-                PricePerKm = this.PricePerKm,
-                SelectedCarType = this.SelectedCarType
+                FuelAmount = inputData?.FuelAmount ?? 0,
+                PricePerKm = inputData?.PricePerKm ?? 0,
+                SelectedFuelType = inputData?.SelectedFuelType ?? FuelType.Diesel,
+                SelectedCarType = inputData?.SelectedCarType ?? "",
+                SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0,
+                SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0,
+                SortMode = inputData.SortMode??"",
             };
             Console.WriteLine($"Amount of stations to sort: {model.CheapestResultStations.Count}");
 

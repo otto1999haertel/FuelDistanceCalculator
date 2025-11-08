@@ -68,11 +68,8 @@ namespace FuelDistanceCalculatorTest.ServiceTests
         {
             decimal calculatedSavingsNearest = 0;
             decimal calculatedSavingsChepast = 0;
-            var exception = Assert.Throws<ArgumentNullException>(() =>
-                    TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast)
-                );
-
-            Assert.That(exception,Is.Null); // Keine Exception → Test erfolgreich
+            Exception exceptionthrown;
+            Assert.DoesNotThrow( () => TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast));   
         }
 
         private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)

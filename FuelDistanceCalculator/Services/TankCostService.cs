@@ -4,6 +4,7 @@ public static class TankCostService
 {
     public static void CaluclateSavings(List<GasStation> stations, ref decimal SavingsToNearestStation, ref decimal SavingsToCheapestStation)
     {
+        Console.WriteLine($"Calculating savings from {stations.Count} Stations");
         GasStation cheapestStationTotalCost = stations.OrderBy(x => x.TotalCalculatedCoast).FirstOrDefault();
         GasStation nearestStation = stations.OrderBy(x => x.Dist).FirstOrDefault();
         GasStation cheapestFuelCost = stations.OrderBy(x => x.FuelTypePrice).FirstOrDefault();

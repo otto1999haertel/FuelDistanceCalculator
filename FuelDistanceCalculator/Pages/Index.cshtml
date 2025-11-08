@@ -163,10 +163,10 @@
                                             max="25"
                                             step="1"
                                             value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                            id="RadiusPlace1"
-                                            oninput="document.getElementById('outputRadius1').textContent = this.value" />
+                                            id="RadiusPlace0"
+                                            oninput="document.getElementById('outputRadius0').textContent = this.value" />
                                     </div>
-                                    <output id="outputRadius1" class="value-output">
+                                    <output id="outputRadius0" class="value-output">
                                         @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
                                     </output>
                                      <label class="text-nowrap">km</label>
@@ -201,11 +201,11 @@
                                             max="25"
                                             step="1"
                                             value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
-                                            id="RadiusPlace2"
-                                            oninput="document.getElementById('outputRadius2').textContent = this.value" />
+                                            id="RadiusPlace1"
+                                            oninput="document.getElementById('outputRadius1').textContent = this.value" />
                                     </div>
                                     
-                                    <output id="outputRadius2" class="value-output text-center">
+                                    <output id="outputRadius1" class="value-output text-center">
                                         @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)
                                     </output>
                                     
@@ -238,7 +238,7 @@
                                             max="25"
                                             step="1"
                                             value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[i] : 10)"
-                                            id="RadiusPlace2"
+                                            id="RadiusPlace@(i)"
                                             oninput="document.getElementById('outputRadius[@i]').textContent = this.value" />
                                     </div>
                                     <output  id="outputRadius[@i]" class="value-output text-center">

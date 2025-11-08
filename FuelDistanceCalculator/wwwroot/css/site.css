@@ -517,3 +517,8 @@ a:has(> img) {
     cursor: pointer;
     box-shadow: 0 0 0 1px #999;
 }
+
+.slider-container {
+    height: 38px;
+    position: relative;
+}

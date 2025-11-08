@@ -693,27 +693,38 @@
             const container = document.getElementById("dynamicLocations");
             if (locationIndex < 4) {
                 const html = `
-                    <div class="col-md-5 offset-md-1 mt-3">
-                        <label>Standort ${locationIndex + 1}</label>
-                        <input type="text" name="NamePlaces[${locationIndex}]" class="form-control" placeholder="Geben Sie einen Ort ein">
-                    </div>
-                    <div class="col-md-5 mt-3">
-                        <label>Radius</label>
-                        <div class="d-flex align-items-center gap-2 h-100">
-                            <label>1</label>
-                            <input type="range"
-                                name="RadiusPlaces[${locationIndex}]"
-                                class="form-range"
-                                min="1"
-                                max="25"
-                                step="1"
-                                value="10"
-                                id="RadiusPlace_${locationIndex}"
-                                oninput="this.nextElementSibling.value = this.value" />
-                            <output>10</output>
-                            <label>km</label>
+                        <div class="col-md-5 offset-md-1 mt-3">
+                            <div class="d-flex flex-column h-100">
+                                <label class="form-label mb-1">Standort ${locationIndex + 1}</label>
+                                <input type="text" 
+                                    name="NamePlaces[${locationIndex}]" 
+                                    class="form-control" 
+                                    placeholder="Geben Sie einen Ort ein" />
+                            </div>
                         </div>
-                    </div>`;
+                        <div class="col-md-5 mt-3">
+                            <div class="d-flex flex-column">
+                                <label class="form-label mb-1">Radius</label>
+                                <div class="d-flex align-items-center gap-2 h-100">
+                                    <label class="text-nowrap">1</label>
+                                    <div class="slider-container flex-grow-1">
+                                        <input type="range"
+                                            name="RadiusPlaces[${locationIndex}]"
+                                            class="form-range custom-range"
+                                            min="1"
+                                            max="25"
+                                            step="1"
+                                            value="10"
+                                            id="RadiusPlace${locationIndex}"
+                                            oninput="document.getElementById('outputRadius${locationIndex}').textContent = this.value" />
+                                    </div>
+                                    <output id="outputRadius${locationIndex}" class="value-output text-center">
+                                        10
+                                    </output>
+                                    <label class="text-nowrap">km</label>
+                                </div>
+                            </div>
+                        </div>`;
                 
                 container.insertAdjacentHTML("beforeend", html);
                 locationIndex++;

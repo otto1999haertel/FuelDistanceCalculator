@@ -36,7 +36,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetTestCases))]
+        [TestCaseSource(nameof(EmptyListCases))]
         public async Task EmptyGasStationListReturnsEmptyListTest(List<GasStation> emptyStationList)
         {
             // Arrange
@@ -61,6 +61,18 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast);
             Assert.That(execpectSavingsNearest.Equals(calculatedSavingsNearest));
             Assert.That(expectedSavingsCheapest.Equals(calculatedSavingsChepast));
+        }
+        [Test]
+        [TestCaseSource(nameof(EmptyListCases))]
+        public void CalculateSavingsEmptyTeset(List<GasStation> gasStations)
+        {
+            decimal calculatedSavingsNearest = 0;
+            decimal calculatedSavingsChepast = 0;
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+                    TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast)
+                );
+
+            Assert.That(exception,Is.Null); // Keine Exception → Test erfolgreich
         }
 
         private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
@@ -87,7 +99,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             return true; // Nach Gesamtkosten sortiert
         }
 
-        private static IEnumerable<TestCaseData> GetTestCases()
+        private static IEnumerable<TestCaseData> EmptyListCases()
         {
             yield return new TestCaseData(new List<GasStation>()).SetName("EmptyList");
             yield return new TestCaseData(null).SetName("NullList");

@@ -1,9 +1,11 @@
 using FuelDistanceCalculator.Model;
+using Microsoft.IdentityModel.Tokens;
 
 public static class TankCostService
 {
     public static void CaluclateSavings(List<GasStation> stations, ref decimal SavingsToNearestStation, ref decimal SavingsToCheapestStation)
     {
+        if (stations.IsNullOrEmpty()) return;
         Console.WriteLine($"Calculating savings from {stations.Count} Stations");
         GasStation cheapestStationTotalCost = stations.OrderBy(x => x.TotalCalculatedCoast).FirstOrDefault();
         GasStation nearestStation = stations.OrderBy(x => x.Dist).FirstOrDefault();

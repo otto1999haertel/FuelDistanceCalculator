@@ -133,39 +133,45 @@
         </div>
         <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
         <div id="manualInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
-            <div class="row">
+             <div class="row g-3 align-items-start">
                 @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
                     <!-- Standort 1 -->
                     <div class="col-md-5 offset-md-1">
-                        <label>Standort 1</label>
-                        <div class="input-group">
-                            <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
-                                value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
-                                placeholder="Geben Sie einen Ort ein" />
-                            <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center" type="button">
-                                <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
-                            </button>
+                        <div class="d-flex flex-column h-100">
+                                <label class="form-label mb-1">Standort 1</label>
+                                <div class="input-group">
+                                    <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
+                                        value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
+                                        placeholder="Geben Sie einen Ort ein" />
+                                    <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center" type="button">
+                                        <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
+                                    </button>
+                                </div>
                         </div>
                     </div>
                     <div class="col-md-5">
-                        <label for="RadiusPlace1">Radius</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <label>1</label>
-                            <input type="range"
-                                name="RadiusPlaces[0]"
-                                class="form-range"
-                                min="1"
-                                max="25"
-                                step="1"
-                                value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                id="RadiusPlace1"
-                                oninput="this.nextElementSibling.value = this.value" />
-                            <output>
-                                @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
-                            </output>
-                            <label>km</label>
-                        </div>
+                            <div class="d-flex flex-column h-100">
+                                <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
+                                <div class="d-flex align-items-center gap-2 h-100">
+                                    <label class="text-nowrap">1</label>
+                                    <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                        <input type="range"
+                                            name="RadiusPlaces[0]"
+                                            class="form-range"
+                                            min="1"
+                                            max="25"
+                                            step="1"
+                                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
+                                            id="RadiusPlace1"
+                                            oninput="document.getElementById('outputRadius1').textContent = this.value" />
+                                    </div>
+                                    <output id="outputRadius1" class="value-output">
+                                        @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
+                                    </output>
+                                     <label class="text-nowrap">km</label>
+                                </div>
+                            </div>
                     </div>
 
                     <!-- Standort 2 -->

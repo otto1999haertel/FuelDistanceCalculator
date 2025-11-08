@@ -62,6 +62,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             Assert.That(execpectSavingsNearest.Equals(calculatedSavingsNearest));
             Assert.That(expectedSavingsCheapest.Equals(calculatedSavingsChepast));
         }
+        
         [Test]
         [TestCaseSource(nameof(EmptyListCases))]
         public void CalculateSavingsEmptyTeset(List<GasStation> gasStations)

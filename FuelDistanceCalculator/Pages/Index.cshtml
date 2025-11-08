@@ -174,32 +174,45 @@
                             </div>
                     </div>
 
-                    <!-- Standort 2 -->
-                    <div class="col-md-5 offset-md-1 mt-3">
-                        <label>Standort 2</label>
-                        <input type="text" name="NamePlaces[1]" class="form-control"
-                            value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
-                            placeholder="Geben Sie einen Ort ein" />
-                    </div>
-                    <div class="col-md-5 mt-3">
-                        <label for="RadiusPlace2">Radius</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <label>1</label>
-                            <input type="range"
-                                name="RadiusPlaces[1]"
-                                class="form-range"
-                                min="1"
-                                max="25"
-                                step="1"
-                                value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)"
-                                id="RadiusPlace1"
-                                oninput="this.nextElementSibling.value = this.value" />
-                            <output>
-                                @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[1] : 10)
-                            </output>
-                            <label>km</label>
+                        <!-- Standort 2 -->
+                        <div class="col-md-5 offset-md-1 mt-3">
+                            <div class="d-flex flex-column h-100">
+                                <label class="form-label mb-1">Standort 2</label>
+                                <input type="text" 
+                                    name="NamePlaces[1]" 
+                                    class="form-control"
+                                    value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
+                                    placeholder="Geben Sie einen Ort ein" />
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- Radius für Standort 2 -->
+                        <div class="col-md-5 mt-3">
+                            <div class="d-flex flex-column">
+                                <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-nowrap">1</label>
+                                    
+                                    <div class="slider-container flex-grow-1">
+                                        <input type="range"
+                                            name="RadiusPlaces[1]"
+                                            class="form-range custom-range"
+                                            min="1"
+                                            max="25"
+                                            step="1"
+                                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
+                                            id="RadiusPlace2"
+                                            oninput="document.getElementById('outputRadius2').textContent = this.value" />
+                                    </div>
+                                    
+                                    <output id="outputRadius2" class="value-output text-center">
+                                        @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)
+                                    </output>
+                                    
+                                    <label class="text-nowrap">km</label>
+                                </div>
+                            </div>
+                        </div>
                 }
                 @if (Model.NamePlaces.Count > 2)
                 {

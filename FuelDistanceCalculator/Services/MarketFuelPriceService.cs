@@ -34,7 +34,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             }
             string responseContent;
             Console.WriteLine("Mode " + _mode);
-            if (_mode == "Production")
+            if (_mode.Equals("Production"))
             {
                 // Production: Echte HTTP-Anfrage
                 HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);

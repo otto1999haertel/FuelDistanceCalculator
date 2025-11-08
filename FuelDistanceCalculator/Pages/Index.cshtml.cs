@@ -378,8 +378,8 @@ public class IndexModel : PageModel
 
             // Erstelle ein IndexModel-Objekt
             var inputJson = HttpContext.Session.GetString(InputDataSessionKey);
-            var inputData = string.IsNullOrEmpty(inputJson) 
-                ? null 
+            var inputData = string.IsNullOrEmpty(inputJson)
+                ? null
                 : JsonConvert.DeserializeAnonymousType(inputJson, new
                 {
                     FuelAmount = 0m,
@@ -419,6 +419,8 @@ public class IndexModel : PageModel
             HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(sortedStations));
 
             // Gib die Partial View mit dem IndexModel zurück
+            Console.WriteLine("Sort Mode after Sorting " + model.SortMode);
+            Console.WriteLine("FuelAmount after Sorting " + model.FuelAmount);
             return Partial("_StationListPartial", model);
         }
         catch (Exception ex)

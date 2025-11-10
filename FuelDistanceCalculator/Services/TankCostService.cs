@@ -13,7 +13,7 @@ public static class TankCostService
         SavingsToCheapestStation = cheapestFuelCost.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
         SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
     }
-    public static List<GasStation> GetCheapestStations(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType)
+    public static List<GasStation> GetCheapestStationsAccordTotalCost(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType)
     {
         if (stations == null || !stations.Any())
         {

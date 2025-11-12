@@ -38,11 +38,13 @@ public class GeoLocationService : IGeoLocationService
         if (cachedData.Length > 0)
         {
             Console.WriteLine($"[Redis HIT for place]  {place}!");
+            Console.WriteLine("lat:" + cachedData.FirstOrDefault(x => x.Name == "lat").Value);
+            Console.WriteLine("lon:" + cachedData.FirstOrDefault(x => x.Name == "lon").Value);
 
             return new CoordinatesDTO
             {
-                Latitude = double.Parse(cachedData.FirstOrDefault(x => x.Name == "lat").Value),
-                Longitude = double.Parse(cachedData.FirstOrDefault(x => x.Name == "lon").Value)
+                Latitude = double.Parse(cachedData.First(x => x.Name == "lat").Value, CultureInfo.InvariantCulture),
+                Longitude = double.Parse(cachedData.First(x => x.Name == "lon").Value, CultureInfo.InvariantCulture)
             };
         }
 
@@ -54,8 +56,8 @@ public class GeoLocationService : IGeoLocationService
         // 🚀 Speichern in Redis als Hash (1 Jahr Cache-Zeit)
         await _redisDb.HashSetAsync(cacheKey, new HashEntry[]
         {
-            new HashEntry("lat", coordinates.Latitude),
-            new HashEntry("lon", coordinates.Longitude)
+            new HashEntry("lat", coordinates.Latitude.ToString("F3", CultureInfo.InvariantCulture)),
+            new HashEntry("lon", coordinates.Longitude.ToString("F3", CultureInfo.InvariantCulture))
         });
 
         // Ablaufzeit setzen (optional)

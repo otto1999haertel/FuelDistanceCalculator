@@ -65,7 +65,7 @@ namespace FuelDistanceCalculatorTest
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             // Clean up environment variable
             Environment.SetEnvironmentVariable("MODE_TYPE", null);

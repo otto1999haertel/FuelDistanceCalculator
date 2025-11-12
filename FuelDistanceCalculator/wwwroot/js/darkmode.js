@@ -8,25 +8,33 @@ document.addEventListener("DOMContentLoaded", function () {
     const mapContainer = document.getElementById("map_div");
 
     // Funktion, um Mode zu setzen
-    function setMode(mode) {  // 'dark', 'light', or 'auto'
-        root.classList.remove("dark-mode", "light-mode");  // Änderung: Auf root anwenden
-        table?.classList.remove("table-dark");
-        mapContainer?.classList.remove("dark-map");
+    function setMode(mode) {
+            root.classList.remove("dark-mode", "light-mode");
+            table?.classList.remove("table-dark");
+            mapContainer?.classList.remove("dark-map");
 
-        if (mode === "dark") {
-            root.classList.add("dark-mode");  // Änderung: Auf root
-            table?.classList.add("table-dark");
-            mapContainer?.classList.add("dark-map");
-        } else if (mode === "light") {
-            root.classList.add("light-mode");  // Änderung: Auf root
-        }  // For 'auto', do nothing—let media query handle
+            let effectiveMode = mode;
 
-        // Button-Styles anpassen (basierend auf dem Modus)
-        const isDark = root.classList.contains("dark-mode");  // Änderung: Auf root prüfen
-        toggleButton.classList.toggle("btn-outline-light", isDark);
-        toggleButton.classList.toggle("btn-outline-dark", !isDark);
-        autoButton.classList.toggle("btn-outline-light", isDark);
-        autoButton.classList.toggle("btn-outline-dark", !isDark);
+            // Neu: Auto-Modus → prüfe System-Preference
+            if (mode === "auto" || mode === null) {
+                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                effectiveMode = prefersDark ? "dark" : "light";
+            }
+
+            if (effectiveMode === "dark") {
+                root.classList.add("dark-mode");
+                table?.classList.add("table-dark");
+                mapContainer?.classList.add("dark-map");
+            } else if (effectiveMode === "light") {
+                root.classList.add("light-mode");
+            }
+
+            // Button-Styles
+            const isDark = root.classList.contains("dark-mode");
+            toggleButton.classList.toggle("btn-outline-light", isDark);
+            toggleButton.classList.toggle("btn-outline-dark", !isDark);
+            autoButton.classList.toggle("btn-outline-light", isDark);
+            autoButton.classList.toggle("btn-outline-dark", !isDark);
     }
 
     // Funktion, um den aktiven Modus zu highlighten
@@ -45,14 +53,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Status aus Local Storage abrufen
     const storedMode = localStorage.getItem("darkMode");  // 'dark', 'light', or null for auto
 
-    if (storedMode) {
+    if (storedMode === "dark" || storedMode === "light") {
         setMode(storedMode);
         highlightActiveMode(storedMode);
     } else {
         // Auto: System prüfen
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setMode(prefersDark ? "dark" : "light");  // But since auto, actually set nothing
-        setMode(null);  // Clear classes for auto
+        localStorage.setItem("darkMode", "auto"); // optional: explizit setzen
+        setMode("auto"); // ← Jetzt wird Klasse gesetzt!
         highlightActiveMode("auto");
     }
 
@@ -81,12 +88,19 @@ document.addEventListener("DOMContentLoaded", function () {
         highlightActiveMode("auto");
     });
 
-    // Listener für System-Änderungen (nur in Auto)
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
-        if (localStorage.getItem("darkMode") === "auto") {
-            setMode(null);  // Rely on media
-        }
+    // Auto-Button
+    autoButton.addEventListener("click", function () {
+        localStorage.setItem("darkMode", "auto");
+        setMode("auto"); // ← Klasse wird gesetzt
+        highlightActiveMode("auto");
     });
+
+    // Listener für System-Änderungen (nur in Auto)
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+            if (localStorage.getItem("darkMode") === "auto") {
+                setMode("auto"); // ← Klasse wird neu gesetzt
+            }
+        });
 
     // Contextmenu Reset
     toggleButton.addEventListener("contextmenu", function (e) {

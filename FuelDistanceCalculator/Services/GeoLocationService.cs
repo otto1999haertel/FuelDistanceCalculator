@@ -134,40 +134,45 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
+    
+    public async Task<string> CalculateRouteAndDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
+    {
+        var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("User-Agent", "FuelGo/1.0");
+        string responseString = "";
+        var response = await _httpClient.SendAsync(request);
+        Console.WriteLine("Response from routing service " + response.StatusCode);
+        if (response.IsSuccessStatusCode)
+        {
+            responseString = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("Response String Routing Service: " + responseString);
+        }
+        return responseString;
+    } 
+    
     public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
-        foreach (GasStation station in stations)
+        if (_mode == "Production")
         {
-            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={station.Coords.Lng},{station.Coords.Lat}"; // Example: Munich center
-            Console.WriteLine($"{station.Name} Routing API Request: {url}");
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("User-Agent", "FuelGo/1.0");
-            string responseString = "";
-            bool responseSuccess = false;
-            if (_mode == "Production")
+            foreach (GasStation station in stations)
             {
-                var response = await _httpClient.SendAsync(request);
-                Console.WriteLine("Response from routing service " + response.StatusCode);
-                if (response.IsSuccessStatusCode)
-                {
-                    responseString = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Response String Routing Service: " + responseString);
-                    responseSuccess = true;
-                }
-            }
-            if (responseSuccess)
-            {
-                using JsonDocument doc = JsonDocument.Parse(responseString);
-                JsonElement root = doc.RootElement;
+                string responseString = await CalculateRouteAndDistance(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
 
-                double totalDistance = root
-                    .GetProperty("features")[0]
-                    .GetProperty("properties")
-                    .GetProperty("summary")
-                    .GetProperty("distance")
-                    .GetDouble();
-                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+                if(!string.IsNullOrEmpty(responseString))
+                {
+                    using JsonDocument doc = JsonDocument.Parse(responseString);
+                    JsonElement root = doc.RootElement;
+
+                    double totalDistance = root
+                        .GetProperty("features")[0]
+                        .GetProperty("properties")
+                        .GetProperty("summary")
+                        .GetProperty("distance")
+                        .GetDouble();
+                    station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
+                    Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+                }
             }
         }
         return stations;

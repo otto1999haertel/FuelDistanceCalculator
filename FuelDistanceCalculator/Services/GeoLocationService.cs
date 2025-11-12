@@ -135,7 +135,7 @@ public class GeoLocationService : IGeoLocationService
     }
 
     
-    public async Task<string> CalculateRouteAndDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
+    public async Task<string> GetRouteAndDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
     {
         string responseString = "";
         if (_mode == "Production")
@@ -154,7 +154,7 @@ public class GeoLocationService : IGeoLocationService
         else
         {
             //TODO: create new JSON File for big route Grossgrabe -> Dresden
-            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
+            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
             if (!File.Exists(jsonFilePath))
             {
                 throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
@@ -166,11 +166,9 @@ public class GeoLocationService : IGeoLocationService
     
     public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
-        if (_mode == "Production")
-        {
             foreach (GasStation station in stations)
             {
-                string responseString = await CalculateRouteAndDistance(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
+                string responseString = await GetRouteAndDistance(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
 
                 if(!string.IsNullOrEmpty(responseString))
                 {
@@ -187,7 +185,6 @@ public class GeoLocationService : IGeoLocationService
                     Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
                 }
             }
-        }
         return stations;
     }
 

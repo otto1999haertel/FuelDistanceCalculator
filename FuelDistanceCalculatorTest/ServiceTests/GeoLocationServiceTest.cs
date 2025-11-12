@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Net;
+using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NUnit.Compatibility;
 using StackExchange.Redis;
 using Testcontainers.Redis;
 
@@ -13,7 +15,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
     /// Integrationstests für GeoLocationService mit echtem Redis (Testcontainers)
     /// </summary>
     [TestFixture]
-    public class GeoLocationServiceTest
+    public class GeoLocationServiceTest  : ServiceTestBase
     {
         private RedisContainer _redisContainer = null!;
         private IConnectionMultiplexer _redisConnection = null!;
@@ -192,7 +194,26 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(fullAddress), "API wurde aufgerufen trotz Cache-Hit!");
         }
-        
+
         //TODO: write Test for OpenRouteService API
+
+        [Test]
+        public async Task GetDistanceTest()
+        {
+            double lat = 53.551;
+            double lon = 9.993;
+            // Arrange
+            var service = CreateGeoLocationService();
+            GasStation gasStation = new GasStation();
+            Coordinates coordinates = new Coordinates();
+            coordinates.Lat = lat;
+            coordinates.Lng = lon;
+            gasStation.Coords = coordinates;
+            gasStation.Dist = 3;
+
+            //Act
+            List<GasStation> result = await service.CalculateDistance(lon.ToString(), lat.ToString(), new List<GasStation>() { gasStation });
+            Assert.That(result[0].Dist.Equals(7.68));
+        }
     }
 }

@@ -137,16 +137,29 @@ public class GeoLocationService : IGeoLocationService
     
     public async Task<string> CalculateRouteAndDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd)
     {
-        var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("User-Agent", "FuelGo/1.0");
         string responseString = "";
-        var response = await _httpClient.SendAsync(request);
-        Console.WriteLine("Response from routing service " + response.StatusCode);
-        if (response.IsSuccessStatusCode)
+        if (_mode == "Production")
         {
-            responseString = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("Response String Routing Service: " + responseString);
+            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "FuelGo/1.0");
+            var response = await _httpClient.SendAsync(request);
+            Console.WriteLine("Response from routing service " + response.StatusCode);
+            if (response.IsSuccessStatusCode)
+            {
+                responseString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Response String Routing Service: " + responseString);
+            }
+        }
+        else
+        {
+            //TODO: create new JSON File for big route Grossgrabe -> Dresden
+            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Routing_Service_API_response.json");
+            if (!File.Exists(jsonFilePath))
+            {
+                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+            }
+            responseString = await File.ReadAllTextAsync(jsonFilePath);
         }
         return responseString;
     } 

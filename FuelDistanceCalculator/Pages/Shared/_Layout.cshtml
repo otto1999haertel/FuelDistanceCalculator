@@ -20,54 +20,56 @@
 
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" id="navbar">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">FuelGo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        @if(GlobalState.IsNotPublic){
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/History">Historie</a>
-                        </li>
-                        }
-                       
-                        @* <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li> *@
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Contact">Kontakt</a>
-                    </ul>
-                     <!-- Dark Mode Toggle Button -->
-                    <button id="autoDarkModeToggle" class="btn btn-primary mx-2">🤖 Auto</button>
-                    <button id="darkModeToggle" class="btn btn-primary mx-2">🌙 Mode</button>
+    <div class="site">
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" id="navbar">
+                <div class="container">
+                    <a class="navbar-brand" asp-area="" asp-page="/Index">FuelGo</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
+                            </li>
+                            @if(GlobalState.IsNotPublic){
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/History">Historie</a>
+                            </li>
+                            }
+                        
+                            @* <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Privacy">Privacy</a>
+                            </li> *@
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Contact">Kontakt</a>
+                        </ul>
+                        <!-- Dark Mode Toggle Button -->
+                        <button id="autoDarkModeToggle" class="btn btn-primary mx-2">🤖 Auto</button>
+                        <button id="darkModeToggle" class="btn btn-primary mx-2">🌙 Mode</button>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer">
-        <div class="container" id="Copyright">
-            &copy; 2025 - @DateTime.Now.Year - FuelGo - <a asp-area="" asp-page="/Contact">Impressum</a>
+            </nav>
+        </header>
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
 
-    <script src="~/lib/jquery/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+        <footer class="border-top footer">
+            <div class="container" id="Copyright">
+                &copy; 2025 - @DateTime.Now.Year - FuelGo - <a asp-area="" asp-page="/Contact">Impressum</a>
+            </div>
+        </footer>
 
-    @await RenderSectionAsync("Scripts", required: false)
+        <script src="~/lib/jquery/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+        </div>
 </body>
 </html>

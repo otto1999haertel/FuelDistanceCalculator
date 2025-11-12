@@ -121,7 +121,7 @@ html {
   height: 100%;
 }
 body {
-  min-height: 100vh;        /* Mindesthöhe = voller Bildschirm */
+  min-height: 100dvh;        /* Mindesthöhe = voller Bildschirm */
   margin: 0;                /* margin-bottom entfernen! */
   padding: 0;
   background-color: var(--bg-color);
@@ -533,4 +533,10 @@ a:has(> img) {
 .slider-container {
     height: 38px;
     position: relative;
+}
+
+.site {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0,1fr);
 }

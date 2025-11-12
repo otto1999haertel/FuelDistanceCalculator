@@ -65,7 +65,7 @@
                 <!-- Eingabe für Tankmenge -->
                 <div class="form-group">
                     <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
-                    <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                    <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                         title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
                         ⓘ
                     </span>
@@ -97,7 +97,7 @@
                         <!-- Preis pro Kilometer -->
                         <div class="form-group">
                             <label for="PricePerKm">Kosten pro Kilometer (€)</label>
-                            <span class="input-group-text-icon" data-bs-toggle="tooltip"
+                            <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                                 title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
                                 ⓘ
                             </span>
@@ -325,14 +325,13 @@
                             </select>
                             @if (Model.FuelAmount > 0)
                             {
-                                <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
-                                    style="cursor: pointer;" title="Die Wegkosten werden für Hin- und Rückfahrt angesetzte">
+                                <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                                     title="Die Wegkosten werden für Hin- und Rückfahrt angesetzte">
                                     ⓘ
                                 </span>
                             }
 
-                            <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip"
-                                style="display: none; cursor: pointer;"
+                            <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                                 title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle">
                                 ⓘ
                             </span>

@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Model;
+using Humanizer;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -17,6 +18,7 @@ public class GeoLocationService : IGeoLocationService
     private readonly string _apiKey;
 
     private readonly string _mode;
+    private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
 
     public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
@@ -134,59 +136,133 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    
-    public async Task<string> GetRouteAndDistance(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
-    {
-        string responseString = "";
-        if (_mode == "Production")
-        {
-            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("User-Agent", "FuelGo/1.0");
-            var response = await _httpClient.SendAsync(request);
-            Console.WriteLine("Response from routing service " + response.StatusCode);
-            if (response.IsSuccessStatusCode)
-            {
-                responseString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response String Routing Service: " + responseString);
-            }
-        }
-        else
-        {
-            //TODO: create new JSON File for big route Grossgrabe -> Dresden
-            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
-            if (!File.Exists(jsonFilePath))
-            {
-                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
-            }
-            responseString = await File.ReadAllTextAsync(jsonFilePath);
-        }
-        return responseString;
-    } 
-    
+
     public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
-            foreach (GasStation station in stations)
+        foreach (GasStation station in stations)
+        {
+            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
+
+            if (!string.IsNullOrEmpty(responseString))
             {
-                string responseString = await GetRouteAndDistance(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
+                using JsonDocument doc = JsonDocument.Parse(responseString);
+                JsonElement root = doc.RootElement;
 
-                if(!string.IsNullOrEmpty(responseString))
-                {
-                    using JsonDocument doc = JsonDocument.Parse(responseString);
-                    JsonElement root = doc.RootElement;
-
-                    double totalDistance = root
-                        .GetProperty("features")[0]
-                        .GetProperty("properties")
-                        .GetProperty("summary")
-                        .GetProperty("distance")
-                        .GetDouble();
-                    station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                    Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
-                }
+                double totalDistance = root
+                    .GetProperty("features")[0]
+                    .GetProperty("properties")
+                    .GetProperty("summary")
+                    .GetProperty("distance")
+                    .GetDouble();
+                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
+                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
             }
+        }
         return stations;
     }
+
+    public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(string startLatitude, string startLong, string endLatitude, string endLongitude)
+    {
+        string response = await GetRouteAndDistanceFromAPI(startLatitude, startLong, endLatitude, endLongitude, "Routing_Service_Big_Route_response.json");
+        List<CoordinatesDTO> result = new List<CoordinatesDTO>();
+        CoordinatesDTO coordinatesStart = new CoordinatesDTO();
+        coordinatesStart.Latitude = double.Parse(startLatitude);
+        coordinatesStart.Longitude = double.Parse(startLong);
+        result.Add(coordinatesStart);
+        if (!string.IsNullOrEmpty(response))
+        {
+            using JsonDocument doc = JsonDocument.Parse(response);
+            JsonElement root = doc.RootElement;
+            var coords = root
+            .GetProperty("features")[0]
+            .GetProperty("geometry")
+            .GetProperty("coordinates")
+            .EnumerateArray();
+            foreach (var coord in coords)
+            {
+                CoordinatesDTO coordinatesDTO = new CoordinatesDTO();
+                coordinatesDTO.Longitude = coord[0].GetDouble();
+                coordinatesDTO.Latitude = coord[1].GetDouble();
+                result.Add(coordinatesDTO);
+            }
+        }
+        return result;
+
+    }
+
+    public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm = 15.0,  double intervalKm = 5.0)
+    {
+        List<CoordinatesDTO> searchPoint = new List<CoordinatesDTO>();
+        var searchPoints = new List<CoordinatesDTO>();
+        double accumulatedDistance = 0.0;     // Gesamtdistanz vom Start
+        double segmentDistance = 0.0;         // Distanz seit letztem Suchpunkt
+        double intervalMeters = intervalKm * 1000;
+        double maxDistanceMeters = maxTotalDistanceKm * 1000;
+
+        // Startpunkt hinzufügen
+        searchPoints.Add(route[0]);
+
+        for (int i = 1; i < route.Count; i++)
+        {
+            double segment = CalculateDistance(
+                route[i - 1].Latitude, route[i - 1].Longitude,
+                route[i].Latitude, route[i].Longitude);
+
+            accumulatedDistance += segment;
+            segmentDistance += segment;
+
+            // Prüfen: 15 km Gesamtgrenze
+            if (accumulatedDistance > maxDistanceMeters)
+                break;
+
+            // Prüfen: 5 km Intervall
+            if (segmentDistance >= intervalMeters)
+            {
+                searchPoints.Add(route[i]);
+                segmentDistance = 0.0; // Reset für nächstes Intervall
+            }
+        }
+
+        return searchPoints;
+    }
+    
+        public string NormalizeAddressKey(string place)
+    {
+        if (string.IsNullOrWhiteSpace(place))
+            return "";
+
+        var normalized = place
+            .Trim()
+            .ToLowerInvariant()
+            .Replace("ß", "ss")
+            .Replace("ä", "ae")
+            .Replace("ö", "oe")
+            .Replace("ü", "ue");
+
+        // Mehrfache Leerzeichen durch eines ersetzen
+        normalized = Regex.Replace(normalized, @"\s+", " ");
+
+        // Sonderzeichen rausfiltern (optional)
+        normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
+
+        return normalized;
+    }
+    
+    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        double dLat = ToRadians(lat2 - lat1);
+        double dLon = ToRadians(lon2 - lon1);
+
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return (EarthRadiusMeters * c);
+    }
+
+    private double ToRadians(double degrees) => degrees * Math.PI / 180;
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
@@ -218,25 +294,32 @@ public class GeoLocationService : IGeoLocationService
         return null;
     }
 
-    public string NormalizeAddressKey(string place)
+    private async Task<string> GetRouteAndDistanceFromAPI(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
     {
-        if (string.IsNullOrWhiteSpace(place))
-            return "";
-
-        var normalized = place
-            .Trim()
-            .ToLowerInvariant()
-            .Replace("ß", "ss")
-            .Replace("ä", "ae")
-            .Replace("ö", "oe")
-            .Replace("ü", "ue");
-
-        // Mehrfache Leerzeichen durch eines ersetzen
-        normalized = Regex.Replace(normalized, @"\s+", " ");
-
-        // Sonderzeichen rausfiltern (optional)
-        normalized = Regex.Replace(normalized, @"[^a-z0-9\s,.-]", "");
-
-        return normalized;
+        string responseString = "";
+        if (_mode == "Production")
+        {
+            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "FuelGo/1.0");
+            var response = await _httpClient.SendAsync(request);
+            Console.WriteLine("Response from routing service " + response.StatusCode);
+            if (response.IsSuccessStatusCode)
+            {
+                responseString = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Response String Routing Service: " + responseString);
+            }
+        }
+        else
+        {
+            //TODO: create new JSON File for big route Grossgrabe -> Dresden
+            string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
+            if (!File.Exists(jsonFilePath))
+            {
+                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+            }
+            responseString = await File.ReadAllTextAsync(jsonFilePath);
+        }
+        return responseString;
     }
 }

@@ -215,5 +215,23 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             List<GasStation> result = await service.CalculateDistance(lon.ToString(), lat.ToString(), new List<GasStation>() { gasStation });
             Assert.That(result[0].Dist.Equals(7.68));
         }
+
+        [Test]
+        public async Task CalculateRoutePointsTest()
+        {
+            // Arrange
+            var service = CreateGeoLocationService();
+            CoordinatesDTO startPoint = new CoordinatesDTO();
+            startPoint.Longitude = 14.0129574;
+            startPoint.Latitude = 51.348037;
+            List<CoordinatesDTO> result = await service.GetRouteIncludingStartPoint(startPoint.Latitude.ToString(), startPoint.Longitude.ToString(), "0", "0");
+            Assert.That(result[0].Longitude.Equals(startPoint.Longitude));
+            Assert.That(result[0].Latitude.Equals(startPoint.Latitude));
+            Assert.That(result.Last().Longitude.Equals(13.737048));
+            Assert.That(result.Last().Latitude.Equals(51.049407));
+            //List<CoordinatesDTO> result = service.GetSearchPoints()
+
+            List<CoordinatesDTO> serachPoints = service.GetSearchPoints(result);
+        }
     }
 }

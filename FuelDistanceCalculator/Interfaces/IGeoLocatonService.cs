@@ -10,5 +10,7 @@ namespace FuelDistanceCalculator.Services
         public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm = 15.0,  double intervalKm = 5.0);
 
         public Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(string startLatitude, string startLong, string endLatitude, string endLongitude);
+
+        public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm);
     }
 }

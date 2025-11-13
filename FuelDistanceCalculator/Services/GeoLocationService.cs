@@ -251,7 +251,7 @@ public class GeoLocationService : IGeoLocationService
 
         return normalized;
     }
-    
+
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
         double dLat = ToRadians(lat2 - lat1);
@@ -265,8 +265,24 @@ public class GeoLocationService : IGeoLocationService
 
         return (EarthRadiusMeters * c);
     }
+    
+        private double CalculateBearing(CoordinatesDTO from, CoordinatesDTO to)
+    {
+        double lat1 = ToRadians(from.Latitude);
+        double lat2 = ToRadians(to.Latitude);
+        double dLon = ToRadians(to.Longitude - from.Longitude);
+
+        double y = Math.Sin(dLon) * Math.Cos(lat2);
+        double x = Math.Cos(lat1) * Math.Sin(lat2) -
+                Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dLon);
+
+        double bearing = Math.Atan2(y, x);
+        return NormalizeAngle(ToDegrees(bearing));
+    }
 
     private double ToRadians(double degrees) => degrees * Math.PI / 180;
+    private double ToDegrees(double radians) => radians * 180 / Math.PI;
+    private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
 
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
@@ -325,5 +341,16 @@ public class GeoLocationService : IGeoLocationService
             responseString = await File.ReadAllTextAsync(jsonFilePath);
         }
         return responseString;
+    }
+
+    public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm)
+    {
+        double distanceKm = CalculateDistance(searchPoint.Latitude, searchPoint.Longitude, checkPoint.Latitude, checkPoint.Longitude); ;
+        if (distanceKm > maxRadiusKm) return false;
+        double bearingRoute = CalculateBearing(searchPoint, nextRoutePoint);
+        double bearingToCheck = CalculateBearing(searchPoint, checkPoint);
+        double angleDiff = Math.Abs(NormalizeAngle(bearingToCheck - bearingRoute));
+        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+        return angleDiff <= 90.0;
     }
 }

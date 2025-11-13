@@ -231,7 +231,8 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             Assert.That(result.Last().Latitude.Equals(51.049407));
             //List<CoordinatesDTO> result = service.GetSearchPoints()
 
-            List<CoordinatesDTO> serachPoints = service.GetSearchPoints(result,15,3);
+            List<CoordinatesDTO> serachPoints = service.GetSearchPoints(result, 15, 3);
+            Assert.That(serachPoints.Count.Equals(5));
         }
     }
 }

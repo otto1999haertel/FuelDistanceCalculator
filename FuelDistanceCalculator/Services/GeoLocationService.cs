@@ -211,16 +211,16 @@ public class GeoLocationService : IGeoLocationService
             accumulatedDistance += segment;
             segmentDistance += segment;
 
-            // Prüfen: 15 km Gesamtgrenze
-            if (accumulatedDistance > maxDistanceMeters)
-                break;
-
             // Prüfen: 5 km Intervall
             if (segmentDistance >= intervalMeters)
             {
                 searchPoints.Add(route[i]);
                 segmentDistance = 0.0; // Reset für nächstes Intervall
             }
+
+            // Prüfen: 15 km Gesamtgrenze
+            if (accumulatedDistance > maxDistanceMeters)
+                break;
         }
 
         return searchPoints;

@@ -190,8 +190,12 @@ public class GeoLocationService : IGeoLocationService
 
     }
 
-    public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm = 15.0,  double intervalKm = 5.0)
+    public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm,  double intervalKm)
     {
+        if(maxTotalDistanceKm>15 || maxTotalDistanceKm / intervalKm > 5)
+        {
+            return new List<CoordinatesDTO>();
+        }
         List<CoordinatesDTO> searchPoint = new List<CoordinatesDTO>();
         var searchPoints = new List<CoordinatesDTO>();
         double accumulatedDistance = 0.0;     // Gesamtdistanz vom Start

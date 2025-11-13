@@ -230,7 +230,7 @@ public class GeoLocationService : IGeoLocationService
         return searchPoints;
     }
     
-        public string NormalizeAddressKey(string place)
+    public string NormalizeAddressKey(string place)
     {
         if (string.IsNullOrWhiteSpace(place))
             return "";

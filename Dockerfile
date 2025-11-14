@@ -40,5 +40,4 @@ COPY start.sh /app/start.sh
 COPY create_tables.sql /app/create_tables.sql
 RUN chmod +x /app/start.sh
 ENV REDIS_HOST=redis:6379
-ENV MODE_TYPE=$MODE_TYPE
-ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh && dotnet FuelDistanceCalculator.dll"]
+ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh"]

@@ -1,5 +1,4 @@
 using FuelDistanceCalculator.Model;
-using Humanizer;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -19,6 +18,12 @@ public class GeoLocationService : IGeoLocationService
 
     private readonly string _mode;
     private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
+
+    private double ToRadians(double degrees) => degrees * Math.PI / 180;
+
+    private double ToDegrees(double radians) => radians * 180 / Math.PI;
+
+    private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
 
     public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
@@ -136,7 +141,6 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-
     public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
         foreach (GasStation station in stations)
@@ -251,6 +255,17 @@ public class GeoLocationService : IGeoLocationService
 
         return normalized;
     }
+    
+    public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm)
+    {
+        double distanceKm = CalculateDistance(searchPoint.Latitude, searchPoint.Longitude, checkPoint.Latitude, checkPoint.Longitude); ;
+        if (distanceKm > maxRadiusKm) return false;
+        double bearingRoute = CalculateBearing(searchPoint, nextRoutePoint);
+        double bearingToCheck = CalculateBearing(searchPoint, checkPoint);
+        double angleDiff = Math.Abs(NormalizeAngle(bearingToCheck - bearingRoute));
+        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+        return angleDiff <= 90.0;
+    }
 
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
@@ -266,7 +281,7 @@ public class GeoLocationService : IGeoLocationService
         return (EarthRadiusMeters * c);
     }
     
-        private double CalculateBearing(CoordinatesDTO from, CoordinatesDTO to)
+    private double CalculateBearing(CoordinatesDTO from, CoordinatesDTO to)
     {
         double lat1 = ToRadians(from.Latitude);
         double lat2 = ToRadians(to.Latitude);
@@ -280,10 +295,6 @@ public class GeoLocationService : IGeoLocationService
         return NormalizeAngle(ToDegrees(bearing));
     }
 
-    private double ToRadians(double degrees) => degrees * Math.PI / 180;
-    private double ToDegrees(double radians) => radians * 180 / Math.PI;
-    private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
-
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
         var url = $"https://nominatim.openstreetmap.org/search?q={place}&format=json";
@@ -293,11 +304,7 @@ public class GeoLocationService : IGeoLocationService
         request.Headers.Add("User-Agent", "FuelGo/1.0");
 
         var response = await _httpClient.SendAsync(request);
-        if (!response.IsSuccessStatusCode)
-        {
-            //TODO return status code via out parameter
-            throw new Exception("Error fetching coordinates");
-        }
+        response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();
         var json = JArray.Parse(responseContent);
@@ -341,16 +348,5 @@ public class GeoLocationService : IGeoLocationService
             responseString = await File.ReadAllTextAsync(jsonFilePath);
         }
         return responseString;
-    }
-
-    public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm)
-    {
-        double distanceKm = CalculateDistance(searchPoint.Latitude, searchPoint.Longitude, checkPoint.Latitude, checkPoint.Longitude); ;
-        if (distanceKm > maxRadiusKm) return false;
-        double bearingRoute = CalculateBearing(searchPoint, nextRoutePoint);
-        double bearingToCheck = CalculateBearing(searchPoint, checkPoint);
-        double angleDiff = Math.Abs(NormalizeAngle(bearingToCheck - bearingRoute));
-        if (angleDiff > 180) angleDiff = 360 - angleDiff;
-        return angleDiff <= 90.0;
     }
 }

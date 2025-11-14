@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FuelDistanceCalculator.Data;
 using FuelDistanceCalculator.Services;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
@@ -20,15 +19,19 @@ builder.Services.AddSingleton<FuelPriceService>(provider =>
 // Registriere MarketFuelPriceService mit HttpClientFactory
 builder.Services.AddHttpClient<MarketFuelPriceService>();
 
+var env = builder.Environment;
+string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")}";
+Console.WriteLine("Redis Connection String: " + redisConnectionString); 
+
 // Registriere Redis für Distributed Caching
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "redis:6379";
+    options.Configuration = redisConnectionString;
 });
 
-// 🔧 Testumgebung erkennen
-var env = builder.Environment;
 
+
+// 🔧 Testumgebung erkennen
 // Registriere IConnectionMultiplexer für GeoLocationService
 if (env.IsEnvironment("Testing"))
 {
@@ -45,7 +48,7 @@ else
 {
     // 👉 In allen anderen Umgebungen: echte Verbindung
     builder.Services.AddSingleton<IConnectionMultiplexer>(
-        ConnectionMultiplexer.Connect("redis:6379"));
+        ConnectionMultiplexer.Connect(redisConnectionString));
 }
 
 // Registriere IGeoLocationService mit GeoLocationService

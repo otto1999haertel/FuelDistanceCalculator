@@ -5,6 +5,7 @@ ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG MODE_TYPE=Development
 ENV MODE_TYPE=$MODE_TYPE
+
 WORKDIR /src
 COPY ["FuelDistanceCalculator.sln", "."]
 COPY ["FuelDistanceCalculator/FuelDistanceCalculator.csproj", "FuelDistanceCalculator/"]
@@ -39,5 +40,4 @@ COPY --from=build /app/test-output /app/test-output
 COPY start.sh /app/start.sh
 COPY create_tables.sql /app/create_tables.sql
 RUN chmod +x /app/start.sh
-ENV REDIS_HOST=redis:6379
 ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh"]

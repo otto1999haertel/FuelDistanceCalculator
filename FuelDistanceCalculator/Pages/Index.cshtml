@@ -16,9 +16,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
 <script>
@@ -319,10 +316,16 @@
                 {
                         <div class="mb-3 d-flex align-items-center gap-2">
                             <label for="viewMode" class="form-label mb-0 me-2">Ansicht</label>
-                            <select id="viewMode" class="form-select w-auto" onchange="switchView()">
-                                <option value="list">Liste</option>
-                                <option value="map">Karte</option>
-                            </select>
+                            <div id="viewModeCustom" class="custom-select">
+                                <div class="select-trigger" onclick="toggleDropdown()">
+                                    <span id="selectedValue">Liste</span> <!-- Standardwert -->
+                                    <span class="arrow">▼</span> <!-- Custom Pfeil -->
+                                </div>
+                                <div id="optionsList" class="suggestions-box"> <!-- Wiederverwende deine CSS-Klasse! -->
+                                    <div class="suggestion-item" data-value="list" onclick="selectOption(this)">Liste</div>
+                                    <div class="suggestion-item" data-value="map" onclick="selectOption(this)">Karte</div>
+                                </div>
+                                </div>
                             @if (Model.FuelAmount > 0)
                             {
                                 <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
@@ -337,21 +340,35 @@
                             </span>
 
                             <!-- Neues Dropdown für Sortierung (nur in Listenansicht sichtbar) -->
-                            <label for="sortMode" class="form-label mb-0 me-2" id="sortLabel">Aufsteigend sortieren
-                                nach</label>
-                            <select id="sortMode" class="form-select w-auto" onchange="sortList(this.value)" id="sortModeSelect">
-                                @if (Model.FuelAmount > 0)
-                                {
-                                    <option value="totalCost">Gesamtkosten</option>
-                                    <option value="fuelPrice">Preis pro Liter</option>
-                                    <option value="distance">Entfernung</option>
-                                }
-                                else
-                                {
-                                    <option value="fuelPrice">Preis pro Liter</option>
-                                    <option value="distance">Entfernung</option>
-                                }
-                            </select>
+                            <label for="sortMode" class="form-label mb-0 me-2" id="sortLabel">Aufsteigend sortieren nach</label>
+                                <div id="sortModeCustom" class="custom-select">
+                                    <div class="select-trigger" onclick="toggleDropdownSort()">
+                                        <span id="selectedSortValue">
+                                            @if (Model.FuelAmount > 0)
+                                            {
+                                                <text>Gesamtkosten</text> <!-- Standardwert: Erste Option -->
+                                            }
+                                            else
+                                            {
+                                                <text>Preis pro Liter</text> <!-- Standardwert: Erste Option -->
+                                            }
+                                        </span>
+                                        <span class="arrow">▼</span> <!-- Custom Pfeil, wie zuvor -->
+                                    </div>
+                                    <div id="sortOptionsList" class="suggestions-box"> <!-- Wiederverwende deine CSS-Klasse! -->
+                                        @if (Model.FuelAmount > 0)
+                                        {
+                                            <div class="suggestion-item" data-value="totalCost" onclick="selectOptionSort(this)">Gesamtkosten</div>
+                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
+                                            <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
+                                            <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                        }
+                                    </div>
+                                </div>
                         </div>
                         <div id="stationListContainer">
                             @await Html.PartialAsync("_StationListPartial", Model) @* Oder "~/Pages/Shared/_StationListPartial.cshtml" *@
@@ -557,9 +574,9 @@
             }
         });
 
-        function switchView() {
-            const selected = document.getElementById("viewMode").value;
-            document.getElementById("listView").style.display = selected === "list" ? "block" : "none";
+        function switchView(value) {
+            const selected = value;
+            document.getElementById("stationListContainer").style.display = selected === "list" ? "block" : "none";
             document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
 
             if (selected === "map") {
@@ -569,12 +586,12 @@
                 }
                 document.getElementById("mapTooltip").style.display = "inline-block";
                 document.getElementById("sortLabel").style.display = "none";
-                document.getElementById("sortMode").style.display = "none";
+                document.getElementById("sortModeCustom").style.display = "none";
             }
             else {
                 document.getElementById("mapTooltip").style.display = "none";
                 document.getElementById("sortLabel").style.display = "inline-block";
-                document.getElementById("sortMode").style.display = "inline-block";
+                document.getElementById("sortModeCustom").style.display = "inline-block";
                 document.getElementById("listTooltip").style.display = "inline-block";
             }
         }
@@ -776,6 +793,56 @@
                 container.innerHTML = '<p>Fehler: ' + err.message + '</p>';
             });
         }
+
+                    function toggleDropdown() {
+            const optionsList = document.getElementById('optionsList');
+            optionsList.style.display = optionsList.style.display === 'block' ? 'none' : 'block';
+            }
+
+            function selectOption(element) {
+            const selectedValue = document.getElementById('selectedValue');
+            selectedValue.textContent = element.textContent;
+            const value = element.getAttribute('data-value');
+            
+            // Schließe das Dropdown
+            document.getElementById('optionsList').style.display = 'none';
+            
+            // Rufe deine Original-Funktion auf (z. B. switchView() mit dem Wert)
+            switchView(value); // Passe switchView() an, um den Wert als Parameter zu akzeptieren, falls nötig
+            }
+
+            // Optional: Schließe das Dropdown bei Klick außerhalb
+            document.addEventListener('click', function(event) {
+            const customSelect = document.getElementById('viewModeCustom');
+            if (!customSelect.contains(event.target)) {
+                document.getElementById('optionsList').style.display = 'none';
+            }
+            });
+
+        function toggleDropdownSort() {
+            const optionsList = document.getElementById('sortOptionsList');
+            optionsList.style.display = optionsList.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectOptionSort(element) {
+            const selectedValue = document.getElementById('selectedSortValue');
+            selectedValue.textContent = element.textContent;
+            const value = element.getAttribute('data-value');
+            
+            // Schließe das Dropdown
+            document.getElementById('sortOptionsList').style.display = 'none';
+            
+            // Rufe die Original-Sortierfunktion auf (unverändert)
+            sortList(value);
+        }
+
+        // Optional: Schließe das Dropdown bei Klick außerhalb
+        document.addEventListener('click', function(event) {
+            const customSelect = document.getElementById('sortModeCustom');
+            if (!customSelect.contains(event.target)) {
+                document.getElementById('sortOptionsList').style.display = 'none';
+            }
+        });
 
     </script>
     <!-- Berechnungen oder Ergebnisse - unter dem Berechnen Button -->

@@ -701,3 +701,33 @@ button.btn.locationButton img {
 .location-fade-in {
   animation: fadeInSlide 0.5s ease-out forwards;
 }
+
+.custom-select {
+  position: relative;
+  width: auto; /* Wie in deinem Original */
+}
+
+.select-trigger {
+  border: 1px solid var(--border-color);
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(40px);
+  border-radius: 8px;
+  box-shadow: var(--shadow-neumorphic);
+  padding: var(--spacing-sm);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  margin-left: 10px; /* Dein bestehender Wert */
+  font-size: 0.5em; /* Kleiner machen (z. B. 80% der Eltern-Schriftgröße) */
+  color: var(--text-muted); /* Verwende eine graue/mute-Farbe-Variable, falls vorhanden; alternativ #aaa oder rgba(0,0,0,0.5) */
+  opacity: 0.6; /* Leichte Transparenz für Dezentheit (0.6 = 60% sichtbar) */
+  transition: opacity 0.2s ease; /* Optional: Fade-Effekt beim Hover */
+}
+
+.select-trigger:hover .arrow {
+  opacity: 1; /* Beim Hover voller Opazität für Interaktivität */
+}

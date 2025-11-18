@@ -34,10 +34,19 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
-RUN apt-get update && apt-get install -y postgresql-client && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# dos2unix ZUERST installieren, BEVOR Sie die Dateien kopieren
+RUN apt-get update && \
+    apt-get install -y postgresql-client dos2unix && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/publish .
 COPY --from=build /app/test-output /app/test-output
 COPY start.sh /app/start.sh
 COPY create_tables.sql /app/create_tables.sql
-RUN chmod +x /app/start.sh
+
+# Jetzt dos2unix verwenden
+RUN dos2unix /app/start.sh && chmod +x /app/start.sh
+
 ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh"]

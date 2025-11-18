@@ -23,7 +23,6 @@ services:
       - REDIS_HOST=${REDIS_HOST}
     depends_on:
       - db
-    command: ["./start.sh"]
     networks:
       - fuel-network
     deploy:

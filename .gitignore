@@ -4,6 +4,5 @@ obj/
 FuelDistanceCalculator/appsettings.Development.json
 FuelDistanceCalculator/appsettings.json
 # SSL Zertifikate lokal (nicht committen!)
-nginx/certs/*.crt
-nginx/certs/*.key
+nginx/certs/
 .DS_Store

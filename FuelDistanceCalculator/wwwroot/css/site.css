@@ -584,6 +584,24 @@ a:has(> img) {
   grid-template-columns: minmax(0,1fr);
 }
 
+button.btn.locationButton {
+  width: 40px;          /* Größer für bessere Klickbarkeit */
+  height: 40px;
+  padding: 0;           /* Entfernt Bootstrap padding */
+  background-color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;       /* Verhindert Schrumpfen */
+}
+
+button.btn.locationButton img {
+  width: 20px;          /* Icon-Größe */
+  height: 20px;
+  object-fit: contain;  /* Behält Seitenverhältnis */
+}
+
 @keyframes fadeInSlide {
   from {
     opacity: 0;

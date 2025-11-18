@@ -144,8 +144,8 @@
                                     <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
                                         value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
                                         placeholder="Geben Sie einen Ort ein" />
-                                    <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center" type="button">
-                                        <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
+                                    <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+                                        <img src="location.png" alt="Standort">
                                     </button>
                                 </div>
                         </div>
@@ -281,8 +281,8 @@
                             <div class="input-group">
                                 <input type="text" id="generalLocation" class="form-control"
                                     placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
-                                <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center" type="button">
-                                    <img src="location.png" alt="Standort" style="width: 16px; height: 16px;">
+                                <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+                                    <img src="location.png" alt="Standort">
                                 </button>
                             </div>
                         </div>

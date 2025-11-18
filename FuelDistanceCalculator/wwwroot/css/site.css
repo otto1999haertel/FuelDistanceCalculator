@@ -34,6 +34,7 @@
   font-variation-settings: 'wght' 400; /* Variable Font Support */
   --icon-color: #666;
   --navbar-icon-color: #4b3f2f;
+  --link-color: #8b6914;   
 }
 /* Einheitliche Dark-Mode-Handhabung: Prefers als Basis, .dark-mode als Override */
 /* System Dark Mode Preference */
@@ -63,6 +64,7 @@
     --placeholder-opacity: 0.6; /* Niedrigere Opacity für subtileren Dark-Mode-Effekt */
     --icon-color: #fff; /* Weiß für die Punkte */
     --navbar-icon-color: #eed9c4;
+    --link-color: #f7daa9; 
   }
 }
 
@@ -92,6 +94,7 @@ html.dark-mode {  /* Geändert von body.dark-mode zu html.dark-mode */
   --placeholder-opacity: 0.6; /* Niedrigere Opacity für subtileren Dark-Mode-Effekt */
   --icon-color: #fff;
   --navbar-icon-color: #eed9c4;
+  --link-color: #f7daa9; /* <- Hier hinzufügen */
 }
 
 html.light-mode {  /* Geändert von body.light-mode zu html.light-mode */
@@ -115,6 +118,7 @@ html.light-mode {  /* Geändert von body.light-mode zu html.light-mode */
   --table-hover-bg: #e9ecef;
   --btn-hover-text: #3a3125;
   --navbar-icon-color: #4b3f2f;
+  --link-color: #8b6914; /* <- Hier hinzufügen */
 }
 
 
@@ -516,7 +520,7 @@ html.dark-mode .tooltip-inner {
 }
 /* Links und Borders */
 a {
-  color: var(--primary-color);
+  color: var(--link-color);
   transition: color 0.2s ease;
 }
 a:has(> img) {

@@ -583,3 +583,18 @@ a:has(> img) {
   grid-template-rows: auto 1fr auto;
   grid-template-columns: minmax(0,1fr);
 }
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.location-fade-in {
+  animation: fadeInSlide 0.5s ease-out forwards;
+}

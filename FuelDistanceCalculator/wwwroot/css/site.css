@@ -53,7 +53,7 @@
   --placeholder-opacity: 0.6;
   
   /* Icons & Links - wärmer */
-  --icon-color: #8b7355;           /* Warmes Braun statt #666 */
+  --icon-color: #666;           /* Warmes Braun statt #666 */
   --navbar-icon-color: #3d3328;    /* Wärmeres Ink */
   --link-color: #b5654d;           /* Rust statt #8b6914 */
   
@@ -114,7 +114,7 @@
     --placeholder-opacity: 0.6;
     
     /* Icons & Links - wärmer */
-    --icon-color: #c4b5a0;           /* Warmes Beige statt #fff */
+    --icon-color: #fff;           /* Warmes Beige statt #fff */
     --navbar-icon-color: #e8dcc8;
     --link-color: #d4a574;           /* Ochre statt #f7daa9 */
     --input-text-color: #f5ede0;  /* Fast weiß, aber warm */
@@ -462,6 +462,14 @@ select:focus::placeholder,
     margin-right: 8px;
     font-weight: 900;
     color: var(--icon-color);
+}
+
+html.light-mode .station-summary::before {
+    color: #666;  /* Explizit für Light, falls var(--icon-color) nicht passt */
+}
+
+html.dark-mode .station-summary::before {
+    color: #fff;  /* Dein gewünschter Override für Dark */
 }
 
 @media (prefers-color-scheme: dark) {

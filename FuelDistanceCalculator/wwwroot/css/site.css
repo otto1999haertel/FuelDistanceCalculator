@@ -6,119 +6,188 @@
   padding: 0;
 }
 :root {
-  --primary-color: #d2b48c; /* Earthy beige-orange für Akzente */
-  --accent-color: #a89b7b; /* Olive-tinted neutral für Hover/Gradients */
-  --bg-color: #faf0e6; /* Soft light beige Hintergrund */
-  --text-color: #4b3f2f; /* Dark brown für Text-Kontrast */
-  --navbar-bg: #eed9c4; /* Muted beige für Navbar */
-  --navbar-text: #4b3f2f; /* Dark brown für Navbar-Text */
+  /* ===== LIGHT MODE - Warme Paper-Farben ===== */
+  
+  /* Hauptfarben - wärmer & natürlicher */
+  --primary-color: #c77d58;        /* Terracotta statt #d2b48c */
+  --accent-color: #d4a574;         /* Ochre statt #a89b7b */
+  --bg-color: #f8f5f0;             /* Wärmeres Cream statt #faf0e6 */
+  --text-color: #3d3328;           /* Wärmeres Ink statt #4b3f2f */
+  
+  /* Navbar - wärmer */
+  --navbar-bg: #fdfcf9;            /* Warm off-white statt #eed9c4 */
+  --navbar-text: #3d3328;          /* Wärmeres Ink statt #4b3f2f */
+  
+  /* Borders - natürlicher */
+  --border-color: #e6dfd5;         /* Warmer Tan statt #d2b48c */
+  
+  /* Schatten - weicher & wärmer */
+  --shadow-neumorphic: 
+    0 2px 4px rgba(61, 51, 40, 0.06),
+    0 1px 2px rgba(61, 51, 40, 0.04);
+  
+  /* Glassmorphism - wärmer */
+  --glass-bg: rgba(253, 252, 249, 0.7);  /* Warmer statt rgba(250, 240, 230, 0.2) */
+  
+  /* Hover - wärmer */
+  --hover-bg: rgba(199, 125, 88, 0.06);  /* Terracotta-basiert */
+  
+  /* Focus - wärmer */
+  --focus-shadow: 0 0 0 3px rgba(199, 125, 88, 0.12);
+  
+  /* Tabellen - wärmere Grautöne */
+  --table-bg: #fdfcf9;             /* Warm white statt white */
+  --table-text: #3d3328;           /* Wärmeres Ink statt black */
+  --table-border: #e6dfd5;         /* Warmer statt #e5e5e5 */
+  --table-head-bg: #f0ebe3;        /* Warmes Beige statt #f8f9fa */
+  --table-row-bg: #fdfcf9;         /* Warm white statt white */
+  --table-row-even-bg: #f8f5f0;    /* Warmes Cream statt #f2f2f2 */
+  --table-hover-bg: #f0ebe3;       /* Warmes Beige statt #e9ecef */
+  
+  /* Buttons */
+  --btn-hover-text: #3d3328;       /* Wärmeres Ink */
+  
+  /* Inputs - wärmer */
+  --input-bg: #fdfcf9;             /* Warm white statt #faf0e6 */
+  --placeholder-color: #8b7355;    /* Bleibt */
+  --placeholder-opacity: 0.6;
+  
+  /* Icons & Links - wärmer */
+  --icon-color: #8b7355;           /* Warmes Braun statt #666 */
+  --navbar-icon-color: #3d3328;    /* Wärmeres Ink */
+  --link-color: #b5654d;           /* Rust statt #8b6914 */
+  
+  /* Spacing bleibt unverändert */
   --spacing-sm: 10px;
   --spacing-md: 20px;
-  --border-color: #d2b48c; /* Tan für Borders */
-  --shadow-neumorphic: inset 4px 4px 8px rgba(139, 115, 85, 0.1), inset -4px -4px 8px rgba(255, 240, 230, 0.5); /* Beige-Neumorphism */
-  --glass-bg: rgba(250, 240, 230, 0.2); /* Beige-Glassmorphism */
-  --hover-bg: rgba(var(--accent-color), 0.1); /* Zentrale Hover-Hintergrund */
-  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2); /* Zentrale Focus-Shadow */
-  --table-bg: white; /* Standard für Light Mode Tabellen */
-  --table-text: black; /* Standard für Light Mode Tabellen-Text */
-  --table-border: #e5e5e5; /* Standard für Light Mode Borders */
-  --table-head-bg: #f8f9fa; /* Standard für Light Mode Thead */
-  --table-row-bg: white; /* Standard für Light Mode Rows */
-  --table-row-even-bg: #f2f2f2; /* Leichte Abwechslung für Light Mode */
-  --table-hover-bg: #e9ecef; /* Standard Hover für Light Mode */
-  --btn-hover-text: #3a3125; /* Default hover text for light */
-  --input-bg: #faf0e6; /* Light mode input background */
-  --placeholder-color: #8b7355; /* Gedämpftes Braun für Light-Mode Placeholders */
-  --placeholder-opacity: 0.6; /* Standard-Opacity */
+  
   font-family: 'Inter', system-ui, sans-serif;
-  font-variation-settings: 'wght' 400; /* Variable Font Support */
-  --icon-color: #666;
-  --navbar-icon-color: #4b3f2f;
-  --link-color: #8b6914;   
+  font-variation-settings: 'wght' 400;
+  --input-text-color: var(--text-color);  /* Nutzt normale Textfarbe */
 }
 /* Einheitliche Dark-Mode-Handhabung: Prefers als Basis, .dark-mode als Override */
 /* System Dark Mode Preference */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light-mode) { /* Prevent override if manual light */
-    --primary-color: #b89b7b;
-    --accent-color: #8b7355;
-    --bg-color: #4b3f2f;
-    --text-color: #faf0e6;
-    --navbar-bg: #3a3125;
-    --navbar-text: #eed9c4;
-    --border-color: #8b7355;
-    --shadow-neumorphic: inset 4px 4px 8px rgba(0, 0, 0, 0.2), inset -4px -4px 8px rgba(139, 115, 85, 0.1);
-    --glass-bg: rgba(75, 63, 47, 0.3);
-    --hover-bg: rgba(var(--accent-color), 0.1);
-    --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
-    --table-bg: #222;
-    --table-text: white;
-    --table-border: #444;
-    --table-head-bg: #333;
-    --table-row-bg: #282828;
-    --table-row-even-bg: #1f1f1f;
-    --table-hover-bg: #333;
-    --btn-hover-text: #eed9c4; /* Lighter for dark mode contrast */
-    --input-bg: #5c4b3a; /* Cool darker beige for dark mode inputs */
-    --placeholder-color: #d4c3a8; /* Cooles, gedämpftes Beige für Dark-Mode Placeholders */
-    --placeholder-opacity: 0.6; /* Niedrigere Opacity für subtileren Dark-Mode-Effekt */
-    --icon-color: #fff; /* Weiß für die Punkte */
-    --navbar-icon-color: #eed9c4;
-    --link-color: #f7daa9; 
+  :root:not(.light-mode) {
+    /* Warme dunkle Farben - "Aged Paper" */
+    --primary-color: #d4a574;        /* Ochre statt #b89b7b */
+    --accent-color: #c77d58;         /* Terracotta statt #8b7355 */
+    --bg-color: #2b2520;             /* Wärmeres Dunkelbraun statt #4b3f2f */
+    --text-color: #e8dcc8;           /* Warmes Cream statt #faf0e6 */
+    
+    /* Navbar - wärmer */
+    --navbar-bg: #3d3328;            /* Wärmer statt #3a3125 */
+    --navbar-text: #e8dcc8;          /* Warmes Cream statt #eed9c4 */
+    
+    /* Borders - wärmer */
+    --border-color: #5c4f3f;         /* Bleibt, ist schon warm */
+    
+    /* Schatten - wärmer & weicher */
+    --shadow-neumorphic: 
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+    
+    /* Glassmorphism - wärmer */
+    --glass-bg: rgba(61, 51, 40, 0.7);
+    
+    /* Hover - wärmer */
+    --hover-bg: rgba(212, 165, 116, 0.08);
+    
+    /* Focus - wärmer */
+    --focus-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+    
+    /* Tabellen - wärmere Dunkelfarben */
+    --table-bg: #3d3328;             /* Wärmer statt #222 */
+    --table-text: #e8dcc8;           /* Warmes Cream statt white */
+    --table-border: #5c4f3f;         /* Warmes Braun statt #444 */
+    --table-head-bg: #4a3f34;        /* Wärmer statt #333 */
+    --table-row-bg: #3d3328;         /* Wärmer statt #282828 */
+    --table-row-even-bg: rgba(255, 255, 255, 0.02);
+    --table-hover-bg: #4a3f34;       /* Wärmer statt #333 */
+    
+    /* Buttons */
+    --btn-hover-text: #e8dcc8;
+    
+    /* Inputs - wärmer */
+    --input-bg: #4a3f34;             /* Wärmer statt #5c4b3a */
+    --placeholder-color: #c4b5a0;    /* Warmes Beige statt #d4c3a8 */
+    --placeholder-opacity: 0.6;
+    
+    /* Icons & Links - wärmer */
+    --icon-color: #c4b5a0;           /* Warmes Beige statt #fff */
+    --navbar-icon-color: #e8dcc8;
+    --link-color: #d4a574;           /* Ochre statt #f7daa9 */
+    --input-text-color: #f5ede0;  /* Fast weiß, aber warm */
   }
 }
 
-html.dark-mode {  /* Geändert von body.dark-mode zu html.dark-mode */
-  --primary-color: #b89b7b;
-  --accent-color: #8b7355;
-  --bg-color: #4b3f2f;
-  --text-color: #faf0e6;
-  --navbar-bg: #3a3125;
-  --navbar-text: #eed9c4;
-  --border-color: #8b7355;
-  --shadow-neumorphic: inset 4px 4px 8px rgba(0, 0, 0, 0.2), inset -4px -4px 8px rgba(139, 115, 85, 0.1);
-  --glass-bg: rgba(75, 63, 47, 0.3);
-  --hover-bg: rgba(var(--accent-color), 0.1);
-  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
-  --table-bg: #222;
-  --table-text: white;
-  --table-border: #444;
-  --table-head-bg: #333;
-  --table-row-bg: #282828;
-  --table-row-even-bg: #1f1f1f;
-  --table-hover-bg: #333;
-  --btn-hover-text: #eed9c4; /* Lighter for dark mode contrast */
-  --navbar-brand:hsl(30, 67%, 94%);
-  --input-bg: #5c4b3a; /* Cool darker beige for dark mode inputs */
-  --placeholder-color: #d4c3a8; /* Cooles, gedämpftes Beige für Dark-Mode Placeholders */
-  --placeholder-opacity: 0.6; /* Niedrigere Opacity für subtileren Dark-Mode-Effekt */
-  --icon-color: #fff;
-  --navbar-icon-color: #eed9c4;
-  --link-color: #f7daa9; /* <- Hier hinzufügen */
+html.dark-mode {
+  --primary-color: #d4a574;
+  --accent-color: #c77d58;
+  --bg-color: #2b2520;
+  --text-color: #e8dcc8;
+  --navbar-bg: #3d3328;
+  --navbar-text: #e8dcc8;
+  --border-color: #5c4f3f;
+  
+  --shadow-neumorphic: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  
+  --glass-bg: rgba(61, 51, 40, 0.7);
+  --hover-bg: rgba(212, 165, 116, 0.08);
+  --focus-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+  
+  --table-bg: #3d3328;
+  --table-text: #e8dcc8;
+  --table-border: #5c4f3f;
+  --table-head-bg: #4a3f34;
+  --table-row-bg: #3d3328;
+  --table-row-even-bg: rgba(255, 255, 255, 0.02);
+  --table-hover-bg: #4a3f34;
+  
+  --btn-hover-text: #e8dcc8;
+  --navbar-brand: #e8dcc8;
+  
+  --input-bg: #4a3f34;
+  --placeholder-color: #c4b5a0;
+  --placeholder-opacity: 0.6;
+  
+  --icon-color: #c4b5a0;
+  --navbar-icon-color: #e8dcc8;
+  --link-color: #d4a574;
+  --input-text-color: #f5ede0;
 }
 
-html.light-mode {  /* Geändert von body.light-mode zu html.light-mode */
-  --primary-color: #d2b48c;
-  --accent-color: #a89b7b;
-  --bg-color: #faf0e6;
-  --text-color: #4b3f2f;
-  --navbar-bg: #eed9c4;
-  --navbar-text: #4b3f2f;
-  --border-color: #d2b48c;
-  --shadow-neumorphic: inset 4px 4px 8px rgba(139, 115, 85, 0.1), inset -4px -4px 8px rgba(255, 240, 230, 0.5);
-  --glass-bg: rgba(250, 240, 230, 0.2);
-  --hover-bg: rgba(var(--accent-color), 0.1);
-  --focus-shadow: 0 0 5px rgba(var(--primary-color), 0.2);
-  --table-bg: white;
-  --table-text: black;
-  --table-border: #e5e5e5;
-  --table-head-bg: #f8f9fa;
-  --table-row-bg: white;
-  --table-row-even-bg: #f2f2f2;
-  --table-hover-bg: #e9ecef;
-  --btn-hover-text: #3a3125;
-  --navbar-icon-color: #4b3f2f;
-  --link-color: #8b6914; /* <- Hier hinzufügen */
+
+html.light-mode {
+  --primary-color: #c77d58;
+  --accent-color: #d4a574;
+  --bg-color: #f8f5f0;
+  --text-color: #3d3328;
+  --navbar-bg: #fdfcf9;
+  --navbar-text: #3d3328;
+  --border-color: #e6dfd5;
+  
+  --shadow-neumorphic: 
+    0 2px 4px rgba(61, 51, 40, 0.06),
+    0 1px 2px rgba(61, 51, 40, 0.04);
+  
+  --glass-bg: rgba(253, 252, 249, 0.7);
+  --hover-bg: rgba(199, 125, 88, 0.06);
+  --focus-shadow: 0 0 0 3px rgba(199, 125, 88, 0.12);
+  
+  --table-bg: #fdfcf9;
+  --table-text: #3d3328;
+  --table-border: #e6dfd5;
+  --table-head-bg: #f0ebe3;
+  --table-row-bg: #fdfcf9;
+  --table-row-even-bg: #f8f5f0;
+  --table-hover-bg: #f0ebe3;
+  
+  --btn-hover-text: #3d3328;
+  --navbar-icon-color: #3d3328;
+  --link-color: #b5654d;
 }
 
 
@@ -226,14 +295,21 @@ color: var(--accent-color);
 
 .btn:disabled,
 .btn.disabled {
-  background-color: gray !important;
-  color: #ccc !important;
-  border-color: #999 !important;
+  background-color: #e6dfd5 !important;  /* Warmer Tan statt gray */
+  color: #8b7355 !important;        
+  border-color: #d9cfc0 !important;  
   cursor: not-allowed;
   opacity: 0.7;
   pointer-events: none;
   box-shadow: none !important;
   transform: none !important;
+}
+
+html.dark-mode .btn:disabled,
+html.dark-mode .btn.disabled {
+  background-color: #4a3f34 !important;
+  color: #8b7355 !important;
+  border-color: #5c4f3f !important;
 }
 /* Typography */
 h2 {
@@ -254,14 +330,14 @@ h3 {
 /* Forms und Inputs (gruppiert) */
 input, textarea, select, .form-select, .form-control {
   background-color: var(--input-bg);
-  color: var(--text-color);
+  color: var(--input-text-color);  /* ← GEÄNDERT: Nutzt jetzt separate Variable */
   border: 1px solid var(--border-color);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 input:focus, textarea:focus, select:focus, .form-select:focus, .form-control:focus {
   border-color: var(--primary-color);
-  background-color: #fff9f2; /* sehr helles beige, subtil */
-  box-shadow: 0 0 6px rgba(210, 180, 140, 0.4);
+  background-color: #fffbf7;  /* Sehr warmes Weiß statt #fff9f2 */
+  box-shadow: 0 0 0 3px rgba(199, 125, 88, 0.12);
 }
 
 html.dark-mode input:focus,
@@ -270,14 +346,15 @@ html.dark-mode select:focus,
 html.dark-mode .form-select:focus,
 html.dark-mode .form-control:focus {
   border-color: var(--primary-color);
-  background-color: #a88768; /* etwas heller als dein normales input-bg */
-  box-shadow: 0 0 8px rgba(184, 155, 123, 0.45);
+  background-color: #5c4f3f;  /* Wärmer statt #a88768 */
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+  color: #ffffff;  /* ← GEÄNDERT: Weißer Text beim Fokus */
 }
 
 
 input:hover, textarea:hover, select:hover, 
 .form-select:hover, .form-control:hover {
-  box-shadow: 0 0 5px rgba(0,0,0,0.25); /* leichter Schatten */
+   box-shadow: 0 0 5px rgba(61, 51, 40, 0.15);  /* Warmer statt rgba(0,0,0,0.25) */
 }
 
 .dark-mode input:hover,
@@ -285,7 +362,7 @@ input:hover, textarea:hover, select:hover,
 .dark-mode select:hover,
 .dark-mode .form-select:hover,
 .dark-mode .form-control:hover {
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.25); /* leichter heller Schatten */
+  box-shadow: 0 0 8px rgba(232, 220, 200, 0.15);  /* Warmer */
 }
 
 input::placeholder,
@@ -417,9 +494,9 @@ select:focus::placeholder,
     appearance: none;
     width: 20px;
     height: 20px;
-    border: 2px solid #555;
+    border: 2px solid var(--border-color);  /* Statt #555 */
     border-radius: 50%;
-    background: white;
+    background: var(--input-bg);            /* Statt white */
     cursor: pointer;
     position: relative;
 }
@@ -433,7 +510,7 @@ select:focus::placeholder,
     position: absolute;
     top: 50%; left: 50%;
     width: 10px; height: 10px;
-    background: black;
+    background: var(--primary-color);       /* Statt black */
     border-radius: 50%;
     transform: translate(-50%, -50%);
 }
@@ -468,7 +545,7 @@ select:focus::placeholder,
 }
 
 .tooltip-inner {
-  background-color: rgba(250, 240, 230, 0.85); /* Höhere Deckkraft: 0.85 statt 0.2 */
+  background-color: rgba(253, 252, 249, 0.9);  /* Warmer */
   backdrop-filter: blur(12px) saturate(150%); /* Leichter Blur, aber noch Glas-Effekt */
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   color: var(--text-color);
@@ -476,19 +553,19 @@ select:focus::placeholder,
   padding: 8px 12px;
   border-radius: 6px;
   opacity: 1;
-  box-shadow: 0 8px 32px rgba(139, 115, 85, 0.3);
-  border: 1px solid rgba(210, 180, 140, 0.3); /* Tan-Border für bessere Abgrenzung */
+  box-shadow: 0 4px 16px rgba(61, 51, 40, 0.15);
+  border: 1px solid rgba(230, 223, 213, 0.5);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Leichter Textschatten für Kontrast */
   font-variation-settings: 'wght' 500;
 }
 
 html.dark-mode .tooltip-inner {
-  background-color: rgba(75, 63, 47, 0.9); /* Fast undurchsichtig, aber noch Glas */
+  background-color: rgba(61, 51, 40, 0.95);  /* Wärmer */
   backdrop-filter: blur(12px) saturate(120%);
   -webkit-backdrop-filter: blur(12px) saturate(120%);
-  color: #faf0e6;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(139, 115, 85, 0.3);
+  color: #e8dcc8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(92, 79, 63, 0.5);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Stärkerer Schatten im Dark Mode */
 }
 
@@ -547,7 +624,7 @@ a:has(> img) {
 }
 .form-range {
     height: 6px;
-    background: #ddd;
+    background: #e6dfd5;  /* Warmer Tan statt #ddd */
     border-radius: 3px;
 }
 
@@ -555,21 +632,21 @@ a:has(> img) {
     appearance: none;
     width: 20px;
     height: 20px;
-    background: black;
-    border: 3px solid white;
+    background: var(--primary-color);  /* Terracotta statt black */
+    border: 3px solid var(--input-bg);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 0 0 1px #999;
+    box-shadow: 0 0 0 1px var(--border-color);
 }
 
 .form-range::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: black;
-    border: 3px solid white;
+    background: var(--primary-color);
+    border: 3px solid var(--input-bg);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 0 0 1px #999;
+    box-shadow: 0 0 0 1px var(--border-color);
 }
 
 .slider-container {
@@ -585,10 +662,10 @@ a:has(> img) {
 }
 
 button.btn.locationButton {
+  @extend .btn;          /* Erbt Button-Stile */
   width: 40px;          /* Größer für bessere Klickbarkeit */
   height: 40px;
   padding: 0;           /* Entfernt Bootstrap padding */
-  background-color: var(--primary-color);
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;

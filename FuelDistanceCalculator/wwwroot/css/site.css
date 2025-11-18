@@ -536,7 +536,7 @@ html.dark-mode .station-summary::before {
   display: none;
   position: absolute;
   background-color: var(--glass-bg);
-  backdrop-filter: blur(80px);
+  backdrop-filter: blur(12px) saturate(150%);
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
@@ -544,9 +544,11 @@ html.dark-mode .station-summary::before {
   box-shadow: var(--shadow-neumorphic);
 }
 .suggestion-item {
+  background-color: inherit; /* Erbt semi-transparente Farbe vom Parent */
   padding: var(--spacing-sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
+  white-space: nowrap;
 }
 .suggestion-item:hover {
   background-color: var(--hover-bg);

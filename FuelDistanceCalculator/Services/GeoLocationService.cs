@@ -50,8 +50,8 @@ public class GeoLocationService : IGeoLocationService
 
             return new CoordinatesDTO
             {
-                Latitude = double.Parse(cachedData.First(x => x.Name == "lat").Value, CultureInfo.InvariantCulture),
-                Longitude = double.Parse(cachedData.First(x => x.Name == "lon").Value, CultureInfo.InvariantCulture)
+                Latitude = double.Parse(cachedData.First(x => x.Name == "lat").Value.ToString(), CultureInfo.InvariantCulture),
+                Longitude = double.Parse(cachedData.First(x => x.Name == "lon").Value.ToString(), CultureInfo.InvariantCulture)
             };
         }
 

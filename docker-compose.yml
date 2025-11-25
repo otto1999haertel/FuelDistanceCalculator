@@ -44,8 +44,7 @@ services:
     depends_on:
       - fuelgo-webapp
     networks:
-      fuel-network:
-        ipv4_address: 172.19.0.5
+      - fuel-network
 
   db:
     image: postgres:latest

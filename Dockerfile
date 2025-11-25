@@ -63,4 +63,7 @@ COPY create_tables.sql /app/create_tables.sql
 # dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh
 
+# SICHERHEIT: Anwendung als Non-Root-User ausführen (Neu hinzugefügt!)
+USER app
+
 ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh"]

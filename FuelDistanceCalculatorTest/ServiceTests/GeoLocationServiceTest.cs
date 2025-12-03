@@ -212,7 +212,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             gasStation.Dist = 3;
 
             //Act
-            List<GasStation> result = await service.CalculateDistance(lon.ToString(), lat.ToString(), new List<GasStation>() { gasStation });
+            List<GasStation> result = await service.CalculateDistanceFromAPI(lon.ToString(), lat.ToString(), new List<GasStation>() { gasStation });
             Assert.That(result[0].Dist.Equals(7.68));
         }
 

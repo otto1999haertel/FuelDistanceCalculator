@@ -141,7 +141,7 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    public async Task<List<GasStation>> CalculateDistance(string latitudeStart, string longitudeStart, List<GasStation> stations)
+    public async Task<List<GasStation>> CalculateDistanceFromAPI(string latitudeStart, string longitudeStart, List<GasStation> stations)
     {
         foreach (GasStation station in stations)
         {

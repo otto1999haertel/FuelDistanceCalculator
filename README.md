@@ -28,7 +28,7 @@ For a successfull connection to the gas station price service you have to create
 - test output will be stored in the container: fuelgo-webapp\app\test-output
 
 # Building on the server
--  execute: docker compose --env-file .env.server up --build
+-  execute: sudo docker compose --env-file .env.server up --build -d
 
 # Update certificate with certbot automatically via Cronjob
 - script has to have execution rights for user with sudo rights

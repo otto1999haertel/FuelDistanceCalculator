@@ -96,11 +96,16 @@ public class GasStation
         return TotalCalculatedCoast;
     }
 
-    public void SetPrice(string fuelType)
+    public void SetPrice(string fuelType, string brand = "", decimal discount = 0)
     {
         FuelTypePrice = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
                      .Select(x => (decimal)x.Price)
                      .FirstOrDefault() ?? 0;
+        if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discount > 0)
+        {
+            decimal discountAmount = (FuelTypePrice.Value * discount) / 100m;
+            FuelTypePrice -= discountAmount;
+        }
     }
 
     public void SetUpdateTime(string fuelType)

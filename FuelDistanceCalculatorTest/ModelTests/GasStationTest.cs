@@ -20,7 +20,8 @@ namespace FuelDistanceCalculatorTest.ModelTests
             {
                 Id = "123",
                 Name = "Test Station",
-                Dist = 10.0, // 10 km
+                Dist = 10.0, // 10 km,
+                Brand = "TestBrand",
                 Fuels = new List<Fuel>
                     {
                         new Fuel { Name = "Diesel", Price = 1.50 }
@@ -40,6 +41,32 @@ namespace FuelDistanceCalculatorTest.ModelTests
             decimal expectedTotal = Math.Round(expectedFuelCost + expectedTravelCost, 2, MidpointRounding.AwayFromZero); // 32.00 €
             Assert.That(expectedTotal.Equals(result));
         }
+
+        [TestCase("Aral", "Aral", 5.0, 1.425)]  // Brand stimmt überein - Rabatt wird angewendet
+        [TestCase("Shell", "Aral", 5.0, 1.50)]  // Brand stimmt nicht überein - kein Rabatt
+        [TestCase("aral", "Aral", 10.0, 1.35)]  // Case-insensitive Test
+        [TestCase("Aral", "Aral", 0.0, 1.50)]   // 0% Rabatt
+        public void CalculateDiscountForBrandTest(string stationBrand, string inputBrand, double discountPercent, double expectedPrice)
+        {
+            // Arrange
+            var gasStation = new GasStation
+            {
+                Id = "123",
+                Name = "Test Station",
+                Brand = stationBrand,
+                Dist = 10.0,
+                Fuels = new List<Fuel>
+                {
+                    new Fuel { Name = "Diesel", Price = 1.50 }
+                }
+            };
+
+            // Act
+            gasStation.SetPrice("Diesel", inputBrand, (decimal)discountPercent);
+
+            // Assert
+            Assert.That(gasStation.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001));
+}
 
         [Test]
         [TestCase("Diesel", 1.619)]

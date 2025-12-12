@@ -108,6 +108,12 @@ public class IndexModel : PageModel
     public decimal SavingsToNearestStation { get;  set; }
     [BindProperty]
     public decimal SavingsToCheapestStation { get; set; }
+
+    [BindProperty]
+    public string StationBrand{get; set; }
+
+    [BindProperty]
+    public decimal DiscountPercent{get; set; }
     
     public string SortMode { get; set; }
 
@@ -135,6 +141,8 @@ public class IndexModel : PageModel
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         SearchExecuted = false;
         SortMode = "totalCost";
+        StationBrand = string.Empty;
+        DiscountPercent = 0;
     }
 
     public async Task OnGetAsync()
@@ -189,7 +197,7 @@ public class IndexModel : PageModel
         if (coordinates != null)
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI, StationBrand, DiscountPercent));
             gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
                 () => _geoLocationService.CalculateDistanceFromAPI(coordinates.Latitude.ToString(), coordinates.Longitude.ToString(), gasStations.Stations));
             if (gasStations.IsSuccess)
@@ -445,7 +453,7 @@ public class IndexModel : PageModel
                     RadiusPlaces[i] = radiusPlace;
                 }
                 var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
+                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI, StationBrand, DiscountPercent));
                 if (gasStationsPlace1.IsSuccess)
                 {
                     CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0m;

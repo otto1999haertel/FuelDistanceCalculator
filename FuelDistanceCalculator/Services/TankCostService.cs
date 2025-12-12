@@ -13,7 +13,7 @@ public static class TankCostService
         SavingsToCheapestStation = cheapestFuelCost.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
         SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
     }
-    public static List<GasStation> GetCheapestStationsAccordTotalCost(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType)
+    public static List<GasStation> GetCheapestStationsAccordTotalCost(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType, string stationBrand="", decimal discountPercent=0)
     {
         if (stations == null || !stations.Any())
         {
@@ -30,7 +30,7 @@ public static class TankCostService
                 .Where(station => station.IsOpen && station.Fuels != null)
                 .Select(station =>
                 {
-                    station.SetPrice(fuelType); // Setze FuelTypePrice basierend auf fuelType
+                    station.SetPrice(fuelType, stationBrand, discountPercent); // Setze FuelTypePrice basierend auf fuelType
                     station.SetUpdateTime(fuelType); // Setze LastUpdate
                     return station;
                 })
@@ -46,7 +46,7 @@ public static class TankCostService
             .Select(station =>
             {
                 // Setze FuelTypePrice und LastUpdate
-                station.SetPrice(fuelType);
+                station.SetPrice(fuelType, stationBrand, discountPercent);
                 station.SetUpdateTime(fuelType);
 
                 // Berechne TotalCalculatedCoast

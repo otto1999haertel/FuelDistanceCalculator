@@ -99,13 +99,18 @@ public class GasStation
     public void SetPrice(string fuelType, string brand = "", decimal discount = 0)
     {
         FuelTypePrice = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
-                     .Select(x => (decimal)x.Price)
-                     .FirstOrDefault() ?? 0;
+                    .Select(x => (decimal)x.Price)
+                    .FirstOrDefault() ?? 0;
+        
         if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discount > 0)
         {
+            Console.WriteLine($"Applying discount of {discount}% for brand {brand} on station {Name}");
             decimal discountAmount = (FuelTypePrice.Value * discount) / 100m;
             FuelTypePrice -= discountAmount;
+            FuelTypePrice = Math.Round(FuelTypePrice.Value, 3);
         }
+        
+        Console.WriteLine($"SetPrice called for FuelType: {fuelType}, Brand: {brand}, Discount: {discount}. Resulting FuelTypePrice: {FuelTypePrice}");
     }
 
     public void SetUpdateTime(string fuelType)

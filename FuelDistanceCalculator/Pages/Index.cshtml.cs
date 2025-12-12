@@ -203,7 +203,7 @@ public class IndexModel : PageModel
             if (gasStations.IsSuccess)
             {
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
-                CheapestResultStations = TankCostService.GetCheapestStationsAccordTotalCost(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI);
+                CheapestResultStations = TankCostService.GetCheapestStationsAccordTotalCost(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, DiscountPercent);
                 decimal savingsToNearestTemp = 0;
                 decimal savingsToCheapestTemp = 0;
                 TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);

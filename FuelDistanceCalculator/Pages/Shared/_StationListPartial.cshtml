@@ -1,5 +1,6 @@
 @using System.Globalization
 @using FuelDistanceCalculator.Model
+@using Microsoft.IdentityModel.Tokens
 @model IndexModel
 
 @if (Model.CheapestResultStations == null || !Model.CheapestResultStations.Any())
@@ -29,7 +30,13 @@
         {
             <li class="station-item">
                 <div class="station-summary" onclick="toggleDetails(this)">
-                    <strong>@station.Name</strong> -
+                    @if(!station.Brand.IsNullOrEmpty()){
+                        <strong>@station.Brand</strong> 
+                    }
+                    else{
+                        <strong>@station.Name</strong>
+                    }
+
                     @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
                         <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>

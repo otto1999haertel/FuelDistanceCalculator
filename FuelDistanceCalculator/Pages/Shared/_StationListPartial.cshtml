@@ -54,7 +54,12 @@
                     @if (!string.IsNullOrEmpty(station.LastUpdate))
                     {
                         DateTimeOffset dto = DateTimeOffset.Parse(station.LastUpdate);
-                        <p>Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", new CultureInfo("de-DE"))</p>
+                        <p>
+                            Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", new CultureInfo("de-DE")) um 
+                            <span style="color: @(station.UpdateAmount < 0 ? "#8A9A7B" : "#C85450")">
+                                @Model.ToDisplay(station.UpdateAmount.ToString()) €
+                            </span>
+                        </p>
                     }
                     <p>Entfernung: @Model.ToDisplay(station.Dist.ToString()) km</p>
                     <p>Ort:

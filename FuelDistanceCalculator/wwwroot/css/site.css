@@ -750,15 +750,25 @@ html.light-mode input[type="number"]::-webkit-outer-spin-button {
     opacity: 1 !important;
 }
 
+/* Dark Mode: Input-Hintergrund anpassen für bessere Pfeil-Sichtbarkeit */
+html.dark-mode input[type="number"] {
+    background-color: var(--input-bg);  /* Nutzt deine --input-bg Variable (#4a3f34) */
+}
+
 /* Dark Mode: Helle Pfeile */
 html.dark-mode input[type="number"]::-webkit-inner-spin-button,
 html.dark-mode input[type="number"]::-webkit-outer-spin-button {
     filter: invert(1) brightness(1.5);  /* Invertiert UND heller */
+    background-color: var(--input-bg) !important;
     opacity: 1 !important;
 }
 
 /* System Dark Mode Preference */
 @media (prefers-color-scheme: dark) {
+    :root:not(.light-mode) input[type="number"] {
+         background-color: var(--input-bg) !important;
+    }
+    
     :root:not(.light-mode) input[type="number"]::-webkit-inner-spin-button,
     :root:not(.light-mode) input[type="number"]::-webkit-outer-spin-button {
         filter: invert(1) brightness(1.5);

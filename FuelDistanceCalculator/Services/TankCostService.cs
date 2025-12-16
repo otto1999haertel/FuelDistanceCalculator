@@ -32,6 +32,7 @@ public static class TankCostService
                 {
                     station.SetPrice(fuelType, stationBrand, discountPercent); // Setze FuelTypePrice basierend auf fuelType
                     station.SetUpdateTime(fuelType); // Setze LastUpdate
+                    station.SetUpdateAmount(fuelType); // Setze UpdateAmount
                     return station;
                 })
                 .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue) // Primär: Aufsteigend nach Preis
@@ -48,6 +49,7 @@ public static class TankCostService
                 // Setze FuelTypePrice und LastUpdate
                 station.SetPrice(fuelType, stationBrand, discountPercent);
                 station.SetUpdateTime(fuelType);
+                station.SetUpdateAmount(fuelType);
 
                 // Berechne TotalCalculatedCoast
                 decimal totalCost = 0;

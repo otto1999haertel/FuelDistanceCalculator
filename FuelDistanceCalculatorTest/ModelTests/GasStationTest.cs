@@ -83,9 +83,9 @@ namespace FuelDistanceCalculatorTest.ModelTests
         }
 
         [Test]
-        [TestCase("Diesel", "2025-10-15T09:27:49+02")]
-        [TestCase("Super E5", "2025-10-15T09:27:49+02")]
-        [TestCase("Super E10", "2025-10-15T09:27:49+02")]
+        [TestCase("Diesel", "2025-10-15T09:40:49+02")]
+        [TestCase("Super E5", "2025-10-15T09:30:49+02")]
+        [TestCase("Super E10", "2025-10-15T09:35:49+02")]
         public void SetUpDateTimeTest(string fuelType, string expectedDateTime)
         {
             //Act
@@ -94,6 +94,20 @@ namespace FuelDistanceCalculatorTest.ModelTests
             
             //Assrt
             Assert.That(testObject.LastUpdate.Equals(expectedDateTime));
+        }
+
+        [Test]
+        [TestCase("Diesel", -0.05)]
+        [TestCase("Super E5", 0.10)]
+        [TestCase("Super E10", 0.05)]
+        public void SetUpdateAmountTest(string fuelType, decimal expectedAmount)
+        {
+            //Act
+            GasStation testObject = this._fakeGasStationList.FirstOrDefault();
+            testObject.SetUpdateAmount(fuelType);
+
+            //Assrt
+            Assert.That(testObject.UpdateAmount.Equals(expectedAmount));
         }
     }
 }

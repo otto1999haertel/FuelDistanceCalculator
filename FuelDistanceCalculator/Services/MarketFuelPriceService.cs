@@ -82,6 +82,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
                 gS.SetPrice(fueltype, brand, discount);
                 gS.SetUpdateTime(fueltype);
+                gS.SetUpdateAmount(fueltype);
                 Console.WriteLine("Distance before calculation: " + gS.Dist);
                 Console.WriteLine("Open Gasstations in Service " + gS.ToString());
             }

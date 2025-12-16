@@ -76,6 +76,9 @@ public class GasStation
     [JsonProperty("lastUpdate")]
     public string? LastUpdate { get; set; }
 
+    [JsonProperty("updateAmount")]
+    public decimal? UpdateAmount { get; set; }
+
     public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
     {
         if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
@@ -117,6 +120,13 @@ public class GasStation
     {
         LastUpdate = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
                      .Select(x => x.LastChange?.Timestamp)
+                     .FirstOrDefault();
+    }
+
+    public void SetUpdateAmount (string fuelType)
+    {
+        UpdateAmount = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
+                     .Select(x => (decimal?)x.LastChange?.Amount)
                      .FirstOrDefault();
     }
 

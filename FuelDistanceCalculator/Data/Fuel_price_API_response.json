@@ -60,8 +60,8 @@
           "name": "Super E5",
           "price": 1.759,
           "lastChange": {
-            "amount": 0.05,
-            "timestamp": "2025-10-15T09:27:49+02"
+            "amount": 0.10,
+            "timestamp": "2025-10-15T09:30:49+02"
           }
         },
         {
@@ -70,7 +70,7 @@
           "price": 1.699,
           "lastChange": {
             "amount": 0.05,
-            "timestamp": "2025-10-15T09:27:49+02"
+            "timestamp": "2025-10-15T09:35:49+02"
           }
         },
         {
@@ -78,8 +78,8 @@
           "name": "Diesel",
           "price": 1.619,
           "lastChange": {
-            "amount": 0.05,
-            "timestamp": "2025-10-15T09:27:49+02"
+            "amount": -0.05,
+            "timestamp": "2025-10-15T09:40:49+02"
           }
         }
       ],

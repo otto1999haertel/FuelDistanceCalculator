@@ -733,3 +733,35 @@ button.btn.locationButton img {
 .select-trigger:hover .arrow {
   opacity: 1; /* Beim Hover voller Opazität für Interaktivität */
 }
+
+/* Pfeile immer sichtbar und kleiner machen */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1 !important;  /* !important um Browser-Standard zu überschreiben */
+    height: 25px;
+    width: 20px;
+    margin: 0;
+}
+
+/* Light Mode: Standard (dunkle Pfeile) */
+html.light-mode input[type="number"]::-webkit-inner-spin-button,
+html.light-mode input[type="number"]::-webkit-outer-spin-button {
+    filter: none;
+    opacity: 1 !important;
+}
+
+/* Dark Mode: Helle Pfeile */
+html.dark-mode input[type="number"]::-webkit-inner-spin-button,
+html.dark-mode input[type="number"]::-webkit-outer-spin-button {
+    filter: invert(1) brightness(1.5);  /* Invertiert UND heller */
+    opacity: 1 !important;
+}
+
+/* System Dark Mode Preference */
+@media (prefers-color-scheme: dark) {
+    :root:not(.light-mode) input[type="number"]::-webkit-inner-spin-button,
+    :root:not(.light-mode) input[type="number"]::-webkit-outer-spin-button {
+        filter: invert(1) brightness(1.5);
+        opacity: 1 !important;
+    }
+}

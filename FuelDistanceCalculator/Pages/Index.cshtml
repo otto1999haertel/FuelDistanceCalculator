@@ -365,7 +365,7 @@
                                             }
                                             else
                                             {
-                                                <text>Preis pro Liter (inkl. Rabatt) </text> <!-- Standardwert: Erste Option -->
+                                                <text>Preis pro Liter</text> <!-- Standardwert: Erste Option -->
                                             }
                                         </span>
                                         <span class="arrow">▼</span> <!-- Custom Pfeil, wie zuvor -->
@@ -374,12 +374,12 @@
                                         @if (Model.FuelAmount > 0)
                                         {
                                             <div class="suggestion-item" data-value="totalCost" onclick="selectOptionSort(this)">Gesamtkosten</div>
-                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter (inkl. Rabatt)</div>
+                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
                                             <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
                                         }
                                         else
                                         {
-                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter (inkl. Rabatt)</div>
+                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
                                             <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
                                         }
                                     </div>

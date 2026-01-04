@@ -41,6 +41,8 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ${CERT_CRT_PATH}:/etc/nginx/certs/cert.crt:ro
       - ${CERT_KEY_PATH}:/etc/nginx/certs/cert.key:ro
+      - /var/www/certbot:/var/www/certbot:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - fuelgo-webapp
     networks:

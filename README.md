@@ -30,9 +30,24 @@ For a successfull connection to the gas station price service you have to create
 # Building on the server
 -  execute: sudo docker compose --env-file .env.server up --build -d
 
-# Update certificate with certbot automatically via Cronjob
-- script has to have execution rights for user with sudo rights
-- sudo docker stop fuelgo-nginx => stops nginx docker container 
-- sudo /usr/bin/certbot renew --force-renewal --quiet => renewed certificate and restarts nginx on server
-- sudo nginx -s stop => stops nginx on server for docker nginx to be able to start
-- sudo docker compose --env-file .env.server up --build
+# Update certificate with certbot automatically via deployment hook for certbot
+- edit /usr/local/bin/certbot-deploy.sh
+- use:  
+-- Authentifcator: webroot  
+-- Webrootmap: [[webroot_map]]  
+      fuelgo.de = /var/www/certbot  
+      www.fuelgo.de = /var/www/certbot  
+- create webroot directory: sudo mkdir -p /var/www/certbot  
+- introduce webroot directory in nginx default.conf  
+- adapt docke compose for certbot and lets encrypt config
+- introcude: sudo nano /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh  
+
+```bash
+#!/bin/bash
+
+# Reload nginx im Container (ohne Neustart)
+docker exec fuelgo-nginx nginx -s reload
+
+# Optional: Logging
+echo "$(date): SSL certificates renewed, nginx reloaded" >> /var/log/certbot-nginx-reload.log
+```

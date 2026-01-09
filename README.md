@@ -31,6 +31,10 @@ For a successfull connection to the gas station price service you have to create
 -  execute: sudo docker compose --env-file .env.server up --build -d
 
 # Update certificate with certbot automatically via deployment hook for certbot
+- specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  
+-- delete installer = nginx  
+-- authenticator = webroot  
+-- introdcue webroot-map
 - introcude script under: sudo nano /etc/letsencrypt/renewal-hooks/deploy/
 - certbot will execute every script under /etc/letsencrypt/renewal-hooks/deploy/
 - e.g. : reload-nginx.sh  

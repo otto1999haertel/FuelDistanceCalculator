@@ -21,6 +21,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=${MODE_TYPE:-Development}
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=example;Database=FuelDatabase
       - REDIS_HOST=${REDIS_HOST}
+      - ApiSettings__TankApiKey=${TANK_API_KEY}
+      - ApiSettings__OpenRouteServiceApiKey=${OPENROUTESERVICE_API_KEY}
     depends_on:
       - db
     networks:

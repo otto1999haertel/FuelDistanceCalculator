@@ -22,7 +22,7 @@ For a successfull connection to the gas station price service you have to create
 - test output will be stored in the container: fuelgo-webapp\app\test-output
 
 # Building on the server
--  execute: sudo docker compose --env-file .env.server up --build -d
+-  is triggered by github actions configured in deploy-nighty.yml
 
 # Update certificate with certbot automatically via deployment hook for certbot
 - specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  

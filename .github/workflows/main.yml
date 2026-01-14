@@ -31,28 +31,37 @@ jobs:
         run: dotnet test --configuration Release
 
   deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: needs.test.result == 'success'
+  needs: test
+  runs-on: ubuntu-latest
+  if: ${{ needs.test.result == 'success' }}
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy on remote server
-        run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
+    - name: Sync source to server
+      run: |
+        rsync -avz --delete -e "ssh -p ${{ secrets.SSH_PORT }}" \
+          ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/fuelgo
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
+
+    - name: Deploy on remote server
+      run: |
+        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
           ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd /var/www/fuelgo
+          cd /home/${{ secrets.SSH_USER }}/fuelgo
           sudo docker compose down
           sudo docker compose --env-file .env.server up --build -d
           EOF
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}

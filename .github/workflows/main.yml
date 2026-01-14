@@ -17,8 +17,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
-      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      # Setze die API Keys als Environment Variables für den Test
+      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
+      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
       - uses: actions/checkout@v4
       - run: dotnet test --configuration Release
@@ -52,6 +53,29 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
 
+      - name: Create .env.server with API keys
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENVSSH'
+              cd /home/${{ secrets.SSH_USER }}/fuelgo
+              
+              cat > .env.server << 'EOF'
+          CERT_CRT_PATH=/etc/letsencrypt/live/fuelgo.de/fullchain.pem
+          CERT_KEY_PATH=/etc/letsencrypt/live/fuelgo.de/privkey.pem
+          SERVER_NAME=fuelgo.de www.fuelgo.de
+          MODE_TYPE=Production
+          REDIS_HOST=redis:6379
+          TANK_API_KEY=${{ secrets.TANKAPIKEY }}
+          OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
+          EOF
+              
+              chmod 600 .env.server
+          ENVSSH
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+      
       - name: Deploy on remote server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \

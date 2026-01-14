@@ -1,0 +1,27 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: dotnet build --configuration Release
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
+      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: dotnet test --configuration Release

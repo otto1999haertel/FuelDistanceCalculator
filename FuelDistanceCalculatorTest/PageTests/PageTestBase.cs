@@ -22,7 +22,7 @@ namespace FuelDistanceCalculatorTest.PageTests
                 .WithWebHostBuilder(builder =>
                 {
                     builder.UseEnvironment("Testing");
-
+                    builder.UseSolutionRelativeContentRoot("FuelDistanceCalculator");
                     builder.ConfigureTestServices(services =>
                     {
                         // Mock Services

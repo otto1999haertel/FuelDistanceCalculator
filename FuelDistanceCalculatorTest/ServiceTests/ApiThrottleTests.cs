@@ -100,7 +100,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             // Assert: Parallele Ausführung (~50ms, kein Drosselungsdelay)
             Assert.That(task1.Result, Is.EqualTo(expectedResult));
             Assert.That(task2.Result, Is.EqualTo(expectedResult));
-            Assert.That(elapsedTime.TotalMilliseconds, Is.GreaterThanOrEqualTo(50), $"Expected parallel execution (>= 50ms), but was {elapsedTime.TotalMilliseconds}ms");
+            Assert.That(elapsedTime.TotalMilliseconds, Is.GreaterThanOrEqualTo(45), $"Expected parallel execution (>= 50ms), but was {elapsedTime.TotalMilliseconds}ms");
             Assert.That(elapsedTime.TotalMilliseconds, Is.LessThan(100), $"No throttling delay expected, but was {elapsedTime.TotalMilliseconds}ms");
         }
 

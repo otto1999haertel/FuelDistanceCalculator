@@ -13,14 +13,10 @@ namespace FuelDistanceCalculatorTest.PageTests
         protected WebApplicationFactory<Program> _factory;
 
         [SetUp]
-        public async Task Setup()
+        public void Setup()
         {
-            // Setze ENV‑Var für Tests (lokal & CI)
+            // Set env to Testing
             Environment.SetEnvironmentVariable("MODE_TYPE", "Testing");
-            
-            // Wenn du über GitHub Actions API‑Keys als ENV setzt:
-            // z. B. TANK_API_KEY, OPENROUTESERVICE_API_KEY
-            // dann sind diese jetzt schon gesetzt (CI oder lokal) und werden von IConfiguration gelesen.
 
             _factory = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
@@ -28,26 +24,26 @@ namespace FuelDistanceCalculatorTest.PageTests
                     builder.UseEnvironment("Testing");
                     builder.UseSolutionRelativeContentRoot("FuelDistanceCalculator");
 
-                    // Hier stellen wir sicher, dass EnvironmentVars
-                    // direkt in die App‑Konfiguration einfließen:
+                    // Override configuration BEFORE app build
                     builder.ConfigureAppConfiguration((context, config) =>
                     {
-                        config.AddEnvironmentVariables(); // GitHub Actions ENV übernehmen
+                        var dict = new Dictionary<string, string>
+                        {
+                            // ensure test has values so GeoLocationService doesn’t throw
+                            ["ApiSettings:TankApiKey"] = Environment.GetEnvironmentVariable("TANK_API_KEY") ?? "test",
+                            ["ApiSettings:OpenRouteServiceApiKey"] = Environment.GetEnvironmentVariable("OPENROUTESERVICE_API_KEY") ?? "test",
+                            ["Redis:Configuration"] = "" // avoid actual Redis config
+                        };
+                        config.AddInMemoryCollection(dict);
                     });
 
                     builder.ConfigureTestServices(services =>
                     {
-                        // Mock Redis so that Session / Cache don’t fail
+                        // Mock RedisCache completely
                         services.RemoveAll(typeof(IDistributedCache));
-                        services.AddSingleton<IDistributedCache>(_ =>
-                            new Mock<IDistributedCache>().Object
-                        );
+                        services.AddSingleton<IDistributedCache>(_ => new Mock<IDistributedCache>().Object);
 
-                        // Optional: Wenn dein GeoLocationService nicht null‑safe ist,
-                        // kannst du hier override/mock implementieren.
-                        // Beispiel: services.AddSingleton<IGeoLocationService>(_ => new FakeGeoLocationService());
-
-                        // Andere Mocks deiner Wahl:
+                        // if needed, mock other services too
                         services.AddSingleton<FuelPriceService>(_ => new FuelPriceService());
                         services.AddHttpClient<MarketFuelPriceService>();
                         services.AddScoped<GeoLocationService, GeoLocationService>();

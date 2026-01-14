@@ -10,11 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Restore & Build
-        run: dotnet build --configuration Release
+      - uses: actions/checkout@v4
+      - run: dotnet build --configuration Release
 
   test:
     needs: build
@@ -22,13 +19,9 @@ jobs:
     env:
       TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
       OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Tests
-        run: dotnet test --configuration Release
+      - uses: actions/checkout@v4
+      - run: dotnet test --configuration Release
 
   deploy:
     needs: test
@@ -36,18 +29,23 @@ jobs:
     if: ${{ needs.test.result == 'success' }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Sync source to server
         run: |
-          rsync -avz --delete -e "ssh -p ${{ secrets.SSH_PORT }}" \
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }}" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/fuelgo
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -56,7 +54,7 @@ jobs:
 
       - name: Deploy on remote server
         run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
+          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /home/${{ secrets.SSH_USER }}/fuelgo
             sudo docker compose down

@@ -19,6 +19,9 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
 
     steps:
       - name: Checkout Code

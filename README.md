@@ -5,15 +5,9 @@
 ASP .NET-Core Web-App with razor pages (.cshtml) for calculating the optimal gas station regarding the price, the amount you have to buy and your average cost per kilometer
 To start the app navigate to the root folder, where docker-compose.yml file is located and enter:
 docker compose up --build
-For a successfull connection to the gas station price service you have to create a appsettings.json file and enter your API Key in the following format:  
-``````````json
-{
-  "ApiSettings": {  
-    "TankApiKey": "[your api key for Tankerkönig]",
-    "OpenRouteServiceApiKey": "[your api key for openrouteservice]"
-  }
-}
-``````````
+For a successfull connection to the gas station price service you have to create a env.server file and enter your API Key in the following format:  
+
+
 
 # Design Updates
 - to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine

@@ -2,21 +2,45 @@ name: Nightly Deployment
 
 on:
   schedule:
-    # Cron: Jeden Tag um 2:00 Uhr UTC (3:00 Uhr MEZ / 2:00 Uhr CET im Winter)
-    # Für 2:00 Uhr lokale Zeit Deutschland (CET): 1:00 UTC
     - cron: '0 1 * * *'
-  
-  # Optional: Manueller Trigger für Tests
   workflow_dispatch:
 
 jobs:
-  build:
+  check-changes:
     runs-on: ubuntu-latest
-
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: master  # Immer die neueste Version vom master
+          ref: master
+          fetch-depth: 2  # Letzten 2 Commits holen
+      
+      - name: Check for new commits
+        id: check
+        run: |
+          # Prüfe ob es in den letzten 24h Commits gab
+          LAST_COMMIT=$(git log -1 --format=%ct)
+          CURRENT_TIME=$(date +%s)
+          TIME_DIFF=$((CURRENT_TIME - LAST_COMMIT))
+          
+          # 86400 Sekunden = 24 Stunden
+          if [ $TIME_DIFF -lt 86400 ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "✓ Neue Commits gefunden (vor $((TIME_DIFF / 3600)) Stunden)"
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "✗ Keine neuen Commits in den letzten 24h"
+          fi
+
+  build:
+    needs: check-changes
+    if: needs.check-changes.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
       - run: dotnet build --configuration Release
 
   test:
@@ -95,7 +119,8 @@ jobs:
               fi
 
               cd /home/${{ secrets.SSH_USER }}/fuelgo
-              sudo docker compose down
+              sudo docker compose stop fuelgo-webapp nginx db
+              sudo docker compose rm -f fuelgo-webapp nginx db
               sudo docker compose --env-file .env.server up --build -d
               
               echo "✓ Deployment completed successfully at $(date)"

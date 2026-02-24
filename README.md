@@ -23,6 +23,7 @@ For a successfull connection to the gas station price service you have to create
 
 # Building on the server
 -  is triggered by github actions configured in deploy-nighty.yml
+-  manual execuion: sudo docker compose --env-file .env.server up --build -d
 
 # Update certificate with certbot automatically via deployment hook for certbot
 - specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  

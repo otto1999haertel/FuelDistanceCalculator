@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Model;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -11,6 +12,7 @@ public class GeoLocationService : IGeoLocationService
 {
     private readonly IDatabase _redisDb;
     private readonly HttpClient _httpClient;
+    private readonly ILogger<GeoLocationService> _logger;
 
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
 
@@ -25,10 +27,11 @@ public class GeoLocationService : IGeoLocationService
 
     private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis, ILogger<GeoLocationService> logger)
     {
         _httpClient = httpClientFactory.CreateClient();
         _redisDb = redis.GetDatabase();
+        _logger = logger;
         _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
                   ?? throw new Exception("API Key missing");
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
@@ -44,9 +47,10 @@ public class GeoLocationService : IGeoLocationService
         var cachedData = await _redisDb.HashGetAllAsync(cacheKey);
         if (cachedData.Length > 0)
         {
-            Console.WriteLine($"[Redis HIT for place]  {place}!");
-            Console.WriteLine("lat:" + cachedData.FirstOrDefault(x => x.Name == "lat").Value);
-            Console.WriteLine("lon:" + cachedData.FirstOrDefault(x => x.Name == "lon").Value);
+            _logger.LogInformation("Redis HIT for place: {Place}", place);
+            var lat = cachedData.FirstOrDefault(x => x.Name == "lat").Value;
+            var lon = cachedData.FirstOrDefault(x => x.Name == "lon").Value;
+            _logger.LogDebug("Cached coordinates - lat: {Lat}, lon: {Lon}", lat, lon);
 
             return new CoordinatesDTO
             {
@@ -55,7 +59,7 @@ public class GeoLocationService : IGeoLocationService
             };
         }
 
-        Console.WriteLine($" Cache-Miss für {place}, API wird aufgerufen...");
+        _logger.LogInformation("Cache miss for {Place}, calling API...", place);
         var coordinates = await FetchCoordinatesFromApi(place);
 
         if (coordinates == null) return null;
@@ -90,11 +94,11 @@ public class GeoLocationService : IGeoLocationService
         var cachedAddress = await _redisDb.StringGetAsync(cacheKey);
         if (cachedAddress.HasValue)
         {
-            Console.WriteLine($"[Redis HIT for coordinates] {cacheKey}");
+            _logger.LogInformation("Redis HIT for coordinates: {CacheKey}", cacheKey);
             return cachedAddress;
         }
 
-        Console.WriteLine($"[Redis MISS] {cacheKey}");
+        _logger.LogInformation("Redis MISS for coordinates: {CacheKey}", cacheKey);
         var url = $"https://nominatim.openstreetmap.org/reverse?lat={latKey}&lon={lonKey}&format=json";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
@@ -159,7 +163,7 @@ public class GeoLocationService : IGeoLocationService
                     .GetProperty("distance")
                     .GetDouble();
                 station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+                _logger.LogDebug("Calculated distance: {Distance} km for Gas Station {Name}", station.Dist, station.Name);
             }
         }
         return stations;
@@ -298,7 +302,7 @@ public class GeoLocationService : IGeoLocationService
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
         var url = $"https://nominatim.openstreetmap.org/search?q={place}&format=json";
-        Console.WriteLine($"API Request: {url}");
+        _logger.LogInformation("API Request: {Url}", url);
 
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
@@ -330,11 +334,11 @@ public class GeoLocationService : IGeoLocationService
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("User-Agent", "FuelGo/1.0");
             var response = await _httpClient.SendAsync(request);
-            Console.WriteLine("Response from routing service " + response.StatusCode);
+            _logger.LogInformation("Response from routing service: {StatusCode}", response.StatusCode);
             if (response.IsSuccessStatusCode)
             {
                 responseString = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Response String Routing Service: " + responseString);
+                _logger.LogDebug("Response String Routing Service received, length: {Length}", responseString.Length);
             }
         }
         else

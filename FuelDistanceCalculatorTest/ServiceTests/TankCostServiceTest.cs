@@ -58,7 +58,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             decimal expectedSavingsCheapest = 1.75m;
             decimal calculatedSavingsNearest = 0;
             decimal calculatedSavingsChepast = 0;
-            TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast);
+            TankCostService.CalculateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast);
             Assert.That(execpectSavingsNearest.Equals(calculatedSavingsNearest));
             Assert.That(expectedSavingsCheapest.Equals(calculatedSavingsChepast));
         }
@@ -70,7 +70,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             decimal calculatedSavingsNearest = 0;
             decimal calculatedSavingsChepast = 0;
             Exception exceptionthrown;
-            Assert.DoesNotThrow( () => TankCostService.CaluclateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast));   
+            Assert.DoesNotThrow( () => TankCostService.CalculateSavings(gasStations, ref calculatedSavingsNearest, ref calculatedSavingsChepast));   
         }
 
         private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)

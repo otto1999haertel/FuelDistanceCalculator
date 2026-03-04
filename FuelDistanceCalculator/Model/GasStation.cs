@@ -105,7 +105,10 @@ public class GasStation
                     .Select(x => (decimal)x.Price)
                     .FirstOrDefault() ?? 0;
         
-        if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discount > 0)
+        // only apply discount if we actually have a brand string and it matches the requested brand
+        if (!string.IsNullOrEmpty(Brand) &&
+            Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) &&
+            FuelTypePrice.HasValue && discount > 0)
         {
             Console.WriteLine($"Applying discount of {discount}% for brand {brand} on station {Name}");
             decimal discountAmount = (FuelTypePrice.Value * discount) / 100m;

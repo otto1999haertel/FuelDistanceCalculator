@@ -69,6 +69,26 @@ namespace FuelDistanceCalculatorTest.ModelTests
         }
 
         [Test]
+        public void SetPrice_WithNullBrand_DoesNotThrowAndSetsFuelPrice()
+        {
+            // Arrange: no Brand property set -> null
+            var gasStation = new GasStation
+            {
+                Id = "456",
+                Name = "NoBrand Station",
+                Dist = 5.0,
+                Fuels = new List<Fuel>
+                {
+                    new Fuel { Name = "Diesel", Price = 2.00 }
+                }
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => gasStation.SetPrice("Diesel", "Aral", 10m));
+            Assert.That(gasStation.FuelTypePrice, Is.EqualTo(2.00m));
+        }
+
+        [Test]
         [TestCase("Diesel", 1.619)]
         [TestCase("Super E5", 1.759)]
         [TestCase("Super E10", 1.699)]

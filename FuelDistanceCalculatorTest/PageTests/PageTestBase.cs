@@ -45,7 +45,7 @@ namespace FuelDistanceCalculatorTest.PageTests
 
                         // if needed, mock other services too
                         services.AddSingleton<FuelPriceService>(_ => new FuelPriceService());
-                        services.AddHttpClient<MarketFuelPriceService>();
+                        services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
                         services.AddScoped<GeoLocationService, GeoLocationService>();
                     });
                 });

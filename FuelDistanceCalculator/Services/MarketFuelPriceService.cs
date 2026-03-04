@@ -10,22 +10,25 @@ public class MarketFuelPriceService : IMarketFuelPriceService
     private readonly string _apiKey;
     private readonly string _mode;
     private readonly IGeoLocationService _geoLocationService;
-    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, IGeoLocationService geoLocationService)
+    private readonly ILogger<MarketFuelPriceService> _logger;
+
+    public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, IGeoLocationService geoLocationService, ILogger<MarketFuelPriceService> logger)
     {
         _httpClient = httpClient;
         _apiKey = configuration["ApiSettings:TankApiKey"]
                   ?? throw new Exception("API Key missing");
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
         _geoLocationService = geoLocationService;
+        _logger = logger;
     }
 
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand, decimal discount)
     {
-        Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
-        Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
+        _logger.LogInformation("Called from Fuel API method with Thread {ThreadId}", Thread.CurrentThread.ManagedThreadId);
+        _logger.LogInformation("Lat {Latitude}, Long {Longitude}, Radius {Radius}, Fueltype {FuelType}", latitude, longitude, radius, fueltype);
 
         var requestUrl = $"https://creativecommons.tankerkoenig.de/api/v4/stations/search?apikey={_apiKey}&lat={latitude}&lng={longitude}&rad={radius}";
-        Console.WriteLine("Request URL: " + requestUrl);
+        _logger.LogInformation("Request URL: {RequestUrl}", requestUrl);
         try
         {
             if (DateTime.Now.Second == 0 && DateTime.Now.Minute % 5 == 0)
@@ -33,7 +36,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 await Task.Delay(new Random().Next(400, 750));
             }
             string responseContent;
-            Console.WriteLine("Mode " + _mode);
+            _logger.LogInformation("Mode: {Mode}", _mode);
             if (_mode.Equals("Production"))
             {
                 // Production: Echte HTTP-Anfrage
@@ -51,7 +54,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 }
                 responseContent = await File.ReadAllTextAsync(jsonFilePath);
             }
-            Console.WriteLine("API Response: " + responseContent);
+            _logger.LogInformation("API Response received, length: {Length}", responseContent.Length);
 
             // Versuche, allgemeines Fehlerobjekt zu lesen
             // Versuche, die eigentlichen Tankstellen-Daten zu lesen
@@ -62,29 +65,28 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 {
                     PropertyNameCaseInsensitive = true
                 });
-                Console.WriteLine("Deserialisierung erfolgreich. Stations-Anzahl: " + (gasStationResponse?.Stations?.Count ?? 0));
+                _logger.LogInformation("Deserialization successful. Stations count: {Count}", gasStationResponse?.Stations?.Count ?? 0);
             }
             catch (JsonException ex)
             {
-                Console.WriteLine("Deserialisierungs-Fehler: " + ex.Message);
+                _logger.LogError("Deserialization error: {Message}", ex.Message);
                 // Logge responseContent hier, um das JSON zu inspizieren
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Allgemeiner Fehler: " + ex.Message);
+                _logger.LogError("General error during deserialization: {Message}", ex.Message);
             }
             List<GasStation> openStations = gasStationResponse?.Stations?
                 .Where(station => station.IsOpen && station.Fuels.Any(x => !x.Name.IsNullOrEmpty() && x.Price.HasValue) && station.Dist.HasValue)
                 .ToList() ?? new List<GasStation>();
             foreach (GasStation gS in openStations)
             {
-                Console.WriteLine("Open Gasstations in Service " + gS.ToString());
-                Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
+                _logger.LogDebug("Processing open gas station: {Station}", gS.ToString());
+                _logger.LogDebug("Setting price for fuel type: {FuelType}", fueltype);
                 gS.SetPrice(fueltype, brand, discount);
                 gS.SetUpdateTime(fueltype);
                 gS.SetUpdateAmount(fueltype);
-                Console.WriteLine("Distance before calculation: " + gS.Dist);
-                Console.WriteLine("Open Gasstations in Service " + gS.ToString());
+                _logger.LogDebug("Distance before calculation: {Distance}", gS.Dist);
             }
 
 
@@ -96,7 +98,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         }
         catch (HttpRequestException httpEx)
         {
-            Console.WriteLine("HTTP error: " + httpEx.Message);
+            _logger.LogError("HTTP error: {Message}", httpEx.Message);
             return new GasStationResult
             {
                 IsSuccess = false,
@@ -106,7 +108,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         }
         catch (JsonException jsonEx)
         {
-            Console.WriteLine("Deserialization error: " + jsonEx.Message);
+            _logger.LogError("Deserialization error: {Message}", jsonEx.Message);
             return new GasStationResult
             {
                 IsSuccess = false,
@@ -116,7 +118,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         }
         catch (Exception ex)
         {
-            Console.WriteLine("General error: " + ex.Message);
+            _logger.LogError("General error: {Message}", ex.Message);
             return new GasStationResult
             {
                 IsSuccess = false,

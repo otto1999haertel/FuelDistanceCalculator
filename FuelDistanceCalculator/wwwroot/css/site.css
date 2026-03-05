@@ -62,7 +62,6 @@
   --spacing-md: 20px;
   
   font-family: 'Inter', system-ui, sans-serif;
-  font-variation-settings: 'wght' 400;
   --input-text-color: var(--text-color);  /* Nutzt normale Textfarbe */
 }
 /* Einheitliche Dark-Mode-Handhabung: Prefers als Basis, .dark-mode als Override */
@@ -464,6 +463,10 @@ select:focus::placeholder,
     color: var(--icon-color);
 }
 
+.station-strong-price{
+    font-weight: bold;
+}
+
 html.light-mode .station-summary::before {
     color: #666;  /* Explizit für Light, falls var(--icon-color) nicht passt */
 }
@@ -566,7 +569,6 @@ html.dark-mode .station-summary::before {
   box-shadow: 0 4px 16px rgba(61, 51, 40, 0.15);
   border: 1px solid rgba(230, 223, 213, 0.5);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Leichter Textschatten für Kontrast */
-  font-variation-settings: 'wght' 500;
 }
 
 html.dark-mode .tooltip-inner {

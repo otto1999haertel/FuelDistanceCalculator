@@ -31,19 +31,19 @@
             <li class="station-item">
                 <div class="station-summary" onclick="toggleDetails(this)">
                     @if(!station.Brand.IsNullOrEmpty()){
-                        <strong>@station.Brand</strong> 
+                        <span>@station.Brand</span> 
                     }
                     else{
-                        <strong>@station.Name</strong>
+                        <span>@station.Name</span>
                     }
 
                     @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
-                        <span>Gesamtkosten: @Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span>
+                        <span>Gesamtkosten: <span class="station-strong-price">@Model.ToDisplay(station.TotalCalculatedCoast.ToString()) €</span></span>
                     }
                     else
                     {
-                        <span>Einzelpreis pro Liter (inkl. Rabatt): @Model.ToDisplay(station.FuelTypePrice.ToString()) €</span>
+                        <span>Einzelpreis pro Liter (inkl. Rabatt): <span class="station-strong-price">@Model.ToDisplay(station.FuelTypePrice.ToString()) €</span></span>
                     }
                 </div>
                 <div class="station-details" style="display:none;">

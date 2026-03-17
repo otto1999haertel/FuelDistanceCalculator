@@ -11,7 +11,7 @@ jobs:
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: master
           fetch-depth: 2  # Letzten 2 Commits holen
@@ -38,7 +38,7 @@ jobs:
     if: needs.check-changes.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: master
       - run: dotnet build --configuration Release
@@ -50,7 +50,7 @@ jobs:
       ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
       ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: master
       - run: dotnet test --configuration Release
@@ -61,7 +61,7 @@ jobs:
     if: ${{ needs.test.result == 'success' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: master
 

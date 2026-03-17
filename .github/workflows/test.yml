@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: dotnet build --configuration Release
 
   test:
@@ -23,5 +23,5 @@ jobs:
       ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
       ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: dotnet test --configuration Release

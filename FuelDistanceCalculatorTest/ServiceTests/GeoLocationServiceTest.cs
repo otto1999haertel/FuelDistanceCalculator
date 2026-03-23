@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
+using Humanizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -67,7 +68,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
         // Hilfsmethode: Erstelle Service mit echtem Redis + Mock HTTP
         // ──────────────────────────────────────────────────────────────
         private IGeoLocationService CreateGeoLocationService(
-            Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? httpHandler = null)
+            Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? httpHandler = null, bool requestSucess =true)
         {
             var services = new ServiceCollection();
 
@@ -78,6 +79,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             var config = new Mock<IConfiguration>();
             config.Setup(c => c["ApiSettings:OpenRouteServiceApiKey"]).Returns("fake-ors-key");
             config.Setup(c => c["MODE_TYPE"]).Returns("Development");
+            config.Setup(c => c["RequestSuccess"]).Returns(requestSucess.ToString());
             services.AddSingleton(config.Object);
 
             // Mock HttpClient
@@ -198,12 +200,14 @@ namespace FuelDistanceCalculatorTest.ServiceTests
         //TODO: write Test for OpenRouteService API
 
         [Test]
-        public async Task GetDistanceTest()
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task GetDistanceTest(bool requestSuccess)
         {
             double lat = 53.551;
             double lon = 9.993;
             // Arrange
-            var service = CreateGeoLocationService();
+            var service = CreateGeoLocationService(null,requestSuccess);
             GasStation gasStation = new GasStation();
             Coordinates coordinates = new Coordinates();
             coordinates.Lat = lat;
@@ -213,7 +217,17 @@ namespace FuelDistanceCalculatorTest.ServiceTests
 
             //Act
             GasStationResult result = await service.CalculateDistanceFromAPI(lon, lat, new List<GasStation>() { gasStation });
-            Assert.That(result.Stations[0].Dist.Equals(7.68));
+            if(requestSuccess)
+            {
+                Assert.That(result.Stations[0].Dist.Equals(7.68));
+                Assert.That(result.Stations[0].IsRoutingDistanceCalculated.Equals(true));
+            }
+            else
+            {
+                Assert.That(result.Stations[0].IsRoutingDistanceCalculated.Equals(false));
+                Assert.That(result.Stations[0].Dist.Equals((double)3));
+                GasStationResult.Warning(new List<GasStation>() { gasStation }, "Fehler bei API-Anfrage. Distanz konnte nicht berechnet werden.");
+            }
         }
 
         [Test]

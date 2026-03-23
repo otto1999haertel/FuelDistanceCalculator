@@ -79,6 +79,8 @@ public class GasStation
     [JsonProperty("updateAmount")]
     public decimal? UpdateAmount { get; set; }
 
+    public bool IsRoutingDistanceCalculated {get;set;} = false;
+
     public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
     {
         if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)

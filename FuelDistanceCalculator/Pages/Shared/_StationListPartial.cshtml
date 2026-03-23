@@ -61,7 +61,16 @@
                             </span>
                         </p>
                     }
-                    <p>Entfernung: @Model.ToDisplay(station.Dist.ToString()) km</p>
+                    <p>
+                        Entfernung: @Model.ToDisplay(station.Dist.ToString()) km
+                        @if (station.IsRoutingDistanceCalculated)
+                        {
+                            <small class="text-muted ms-1">via Routing</small>
+                        }
+                        else{
+                            <small class="text-muted ms-1">via Luftlinie</small>
+                        }
+                    </p>
                     <p>Ort:
                         <a href="https://www.google.com/maps?q=@station.Place,@station.Street" target="_blank">
                             @station.Place, @station.Street

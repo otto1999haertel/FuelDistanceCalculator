@@ -17,6 +17,8 @@ public class GeoLocationService : IGeoLocationService
     private readonly string _apiKey;
 
     private readonly string _mode;
+
+    private readonly string _requestSuccess;
     private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
 
     private double ToRadians(double degrees) => degrees * Math.PI / 180;
@@ -32,6 +34,7 @@ public class GeoLocationService : IGeoLocationService
         var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+        _requestSuccess = configuration["RequestSuccess"] ?? "true";
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -168,17 +171,20 @@ public class GeoLocationService : IGeoLocationService
                             .GetDouble();
 
                         station.Dist = Math.Round(totalDistance / 1000.0, 2);
+                        station.IsRoutingDistanceCalculated = true;
                         Console.WriteLine($" {station.Brand} calculated routing distance: {station.Dist} km for {station.Name}");
                     }
                     else
                     {
                         failedCount++;
+                        station.IsRoutingDistanceCalculated = false;
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Fehler bei Distanzberechnung von Station {station.Name}: {ex.Message}");
                     failedCount++;
+                    station.IsRoutingDistanceCalculated = false;
                 }
             }
 
@@ -365,6 +371,11 @@ public class GeoLocationService : IGeoLocationService
         else
         {
             //TODO: create new JSON File for big route Grossgrabe -> Dresden
+            if(_requestSuccess.ToLower() == "false")
+            {
+                Console.WriteLine("Simulating failed API request for routing service.");
+                return responseString;
+            }
             string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
             if (!File.Exists(jsonFilePath))
             {

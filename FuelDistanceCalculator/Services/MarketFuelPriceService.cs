@@ -13,8 +13,8 @@ public class MarketFuelPriceService : IMarketFuelPriceService
     public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, IGeoLocationService geoLocationService)
     {
         _httpClient = httpClient;
-        _apiKey = configuration["ApiSettings:TankApiKey"]
-                  ?? throw new Exception("API Key missing");
+        var apiKeyFromConfig = configuration["ApiSettings:TankApiKey"];
+        _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
         _geoLocationService = geoLocationService;
     }
@@ -51,7 +51,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 }
                 responseContent = await File.ReadAllTextAsync(jsonFilePath);
             }
-            Console.WriteLine("API Response: " + responseContent);
+            Console.WriteLine("Tank API Response: " + responseContent);
 
             // Versuche, allgemeines Fehlerobjekt zu lesen
             // Versuche, die eigentlichen Tankstellen-Daten zu lesen
@@ -100,7 +100,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                ErrorMessage = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message,
+                Message = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message,
                 Stations = new List<GasStation>()
             };
         }
@@ -110,7 +110,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                ErrorMessage = "Fehler beim Verarbeiten der API-Antwort.",
+                Message = "Fehler beim Verarbeiten der API-Antwort.",
                 Stations = new List<GasStation>()
             };
         }
@@ -120,7 +120,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                ErrorMessage = "Ein unerwarteter Fehler ist aufgetreten.",
+                Message = "Ein unerwarteter Fehler ist aufgetreten.",
                 Stations = new List<GasStation>()
             };
         }

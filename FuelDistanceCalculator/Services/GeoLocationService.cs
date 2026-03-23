@@ -29,8 +29,8 @@ public class GeoLocationService : IGeoLocationService
     {
         _httpClient = httpClientFactory.CreateClient();
         _redisDb = redis.GetDatabase();
-        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
-                  ?? throw new Exception("API Key missing");
+        var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
+        _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
     }
 
@@ -141,31 +141,53 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
-    {
-        Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
-        foreach (GasStation station in stations)
+    public async Task<GasStationResult> CalculateDistanceFromAPI(
+        double latitudeStart, double longitudeStart, List<GasStation> stations)
         {
-            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
+            
+            int failedCount = 0;
 
-            if (!string.IsNullOrEmpty(responseString))
+            foreach (GasStation station in stations)
             {
-                using JsonDocument doc = JsonDocument.Parse(responseString);
-                JsonElement root = doc.RootElement;
+                try
+                {
+                    string responseString = await GetRouteAndDistanceFromAPI(
+                        latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
 
-                double totalDistance = root
-                    .GetProperty("features")[0]
-                    .GetProperty("properties")
-                    .GetProperty("summary")
-                    .GetProperty("distance")
-                    .GetDouble();
-                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
+                    if (!string.IsNullOrEmpty(responseString))
+                    {
+                        using JsonDocument doc = JsonDocument.Parse(responseString);
+                        JsonElement root = doc.RootElement;
+
+                        double totalDistance = root
+                            .GetProperty("features")[0]
+                            .GetProperty("properties")
+                            .GetProperty("summary")
+                            .GetProperty("distance")
+                            .GetDouble();
+
+                        station.Dist = Math.Round(totalDistance / 1000.0, 2);
+                        Console.WriteLine($" {station.Brand} calculated routing distance: {station.Dist} km for {station.Name}");
+                    }
+                    else
+                    {
+                        failedCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fehler bei Distanzberechnung von Station {station.Name}: {ex.Message}");
+                    failedCount++;
+                }
             }
-        }
-        return stations;
-    }
 
+            if (failedCount > 0)
+                return GasStationResult.Warning(stations, 
+                    $"Routingdistanz für einige Station(en) konnte nicht berechnet werden");
+
+            return GasStationResult.Success(stations);
+        }
     public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(double startLatitude, double startLong, double endLatitude, double endLongitude)
     {
         string response = await GetRouteAndDistanceFromAPI(startLatitude, startLong, endLatitude, endLongitude, "Routing_Service_Big_Route_response.json");
@@ -325,6 +347,8 @@ public class GeoLocationService : IGeoLocationService
     private async Task<string> GetRouteAndDistanceFromAPI(double latitudeStart, double longitudeStart, double latitudeEnd, double longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
     {
         string responseString = "";
+        Console.WriteLine("Start Coordinates: " + latitudeStart + ", " + longitudeStart);
+        Console.WriteLine("End Coordinates: " + latitudeEnd + ", " + longitudeEnd);
         if (_mode == "Production")
         {
             var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center

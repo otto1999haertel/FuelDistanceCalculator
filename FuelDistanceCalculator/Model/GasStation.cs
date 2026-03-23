@@ -81,6 +81,8 @@ public class GasStation
 
     public bool IsRoutingDistanceCalculated {get;set;} = false;
 
+    public bool DiscountApplied {get; private set; } = false;
+
     public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
     {
         if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
@@ -113,6 +115,7 @@ public class GasStation
             decimal discountAmount = (FuelTypePrice.Value * discount) / 100m;
             FuelTypePrice -= discountAmount;
             FuelTypePrice = Math.Round(FuelTypePrice.Value, 3);
+            DiscountApplied = true;
         }
         
         Console.WriteLine($"SetPrice called for FuelType: {fuelType}, Brand: {brand}, Discount: {discount}. Resulting FuelTypePrice: {FuelTypePrice}");

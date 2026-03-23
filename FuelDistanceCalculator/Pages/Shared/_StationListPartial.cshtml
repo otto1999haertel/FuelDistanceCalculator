@@ -43,13 +43,13 @@
                     }
                     else
                     {
-                        <span>Einzelpreis pro Liter (inkl. Rabatt): <span class="station-strong-price">@Model.ToDisplay(station.FuelTypePrice.ToString()) €</span></span>
+                        <span>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: <span class="station-strong-price">@Model.ToDisplay(station.FuelTypePrice.ToString()) €</span></span>
                     }
                 </div>
                 <div class="station-details" style="display:none;">
                     @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
-                        <p>Einzelpreis pro Liter (inkl. Rabatt): @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
+                        <p>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
                     }
                     @if (!string.IsNullOrEmpty(station.LastUpdate))
                     {

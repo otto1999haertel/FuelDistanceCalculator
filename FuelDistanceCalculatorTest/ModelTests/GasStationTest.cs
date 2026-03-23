@@ -42,11 +42,11 @@ namespace FuelDistanceCalculatorTest.ModelTests
             Assert.That(expectedTotal.Equals(result));
         }
 
-        [TestCase("Aral", "Aral", 5.0, 1.425)]  // ✓ Korrekt: 1.50 - 5% = 1.425
-        [TestCase("Shell", "Aral", 5.0, 1.50)]  // ✓ Korrekt: Kein Rabatt
-        [TestCase("aral", "Aral", 10.0, 1.35)]  // ✓ Korrekt: 1.50 - 10% = 1.35
-        [TestCase("Aral", "Aral", 0.0, 1.50)]   // ✓ Korrekt: 0% Rabatt
-        public void CalculateDiscountForBrandTest(string stationBrand, string inputBrand, double discountPercent, double expectedPrice)
+        [TestCase("Aral", "Aral", 5.0, 1.425, true)]  // ✓ Korrekt: 1.50 - 5% = 1.425
+        [TestCase("Shell", "Aral", 5.0, 1.50, false)]  // ✓ Korrekt: Kein Rabatt
+        [TestCase("aral", "Aral", 10.0, 1.35, true)]  // ✓ Korrekt: 1.50 - 10% = 1.35
+        [TestCase("Aral", "Aral", 0.0, 1.50, false)]   // ✓ Korrekt: 0% Rabatt
+        public void CalculateDiscountForBrandTest(string stationBrand, string inputBrand, double discountPercent, double expectedPrice, bool discountApplied)
         {
             // Arrange
             var gasStation = new GasStation
@@ -66,6 +66,7 @@ namespace FuelDistanceCalculatorTest.ModelTests
 
             // Assert
             Assert.That(gasStation.FuelTypePrice, Is.EqualTo((decimal)expectedPrice).Within(0.001m));
+            Assert.That(gasStation.DiscountApplied, Is.EqualTo(discountApplied));
         }
 
         [Test]

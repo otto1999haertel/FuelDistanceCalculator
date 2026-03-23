@@ -216,17 +216,16 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             gasStation.Dist = 3;
 
             //Act
-            GasStationResult result = await service.CalculateDistanceFromAPI(lon, lat, new List<GasStation>() { gasStation });
+            List<GasStation> result = await service.CalculateDistanceFromAPI(lon, lat, new List<GasStation>() { gasStation });
             if(requestSuccess)
             {
-                Assert.That(result.Stations[0].Dist.Equals(7.68));
-                Assert.That(result.Stations[0].IsRoutingDistanceCalculated.Equals(true));
+                Assert.That(result[0].Dist.Equals(7.68));
+                Assert.That(result[0].IsRoutingDistanceCalculated.Equals(true));
             }
             else
             {
-                Assert.That(result.Stations[0].IsRoutingDistanceCalculated.Equals(false));
-                Assert.That(result.Stations[0].Dist.Equals((double)3));
-                GasStationResult.Warning(new List<GasStation>() { gasStation }, "Fehler bei API-Anfrage. Distanz konnte nicht berechnet werden.");
+                Assert.That(result[0].IsRoutingDistanceCalculated.Equals(false));
+                Assert.That(result[0].Dist.Equals((double)3));
             }
         }
 

@@ -100,7 +100,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                Message = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message,
+                ErrorMessage = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message,
                 Stations = new List<GasStation>()
             };
         }
@@ -110,7 +110,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                Message = "Fehler beim Verarbeiten der API-Antwort.",
+                ErrorMessage = "Fehler beim Verarbeiten der API-Antwort.",
                 Stations = new List<GasStation>()
             };
         }
@@ -120,7 +120,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             return new GasStationResult
             {
                 IsSuccess = false,
-                Message = "Ein unerwarteter Fehler ist aufgetreten.",
+                ErrorMessage = "Ein unerwarteter Fehler ist aufgetreten.",
                 Stations = new List<GasStation>()
             };
         }

@@ -200,14 +200,8 @@ public class IndexModel : PageModel
                 () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI, StationBrand, DiscountPercent));
             if (gasStations.IsSuccess)
             {
-                gasStations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
+                gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
                 () => _geoLocationService.CalculateDistanceFromAPI(coordinates.Latitude, coordinates.Longitude, gasStations.Stations));
-                
-                if (!string.IsNullOrEmpty(gasStations.Message))
-                {
-                    TempData["ToastType"] = gasStations.ToastType;
-                    TempData["ToastMessage"] = gasStations.Message;
-                }
                 
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 CheapestResultStations = TankCostService.GetCheapestStationsAccordTotalCost(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, DiscountPercent);
@@ -231,9 +225,9 @@ public class IndexModel : PageModel
             }
             else
             {
-                Console.WriteLine($"Error in Tanker-API Request: {gasStations.Message}");
-                TempData["ToastType"] = gasStations.ToastType;
-                TempData["ToastMessage"] = gasStations.Message;
+                Console.WriteLine($"Error in Tanker-API Request: {gasStations.ErrorMessage}");
+                TempData["ToastType"] = "error";
+                TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
             }
         }
         else

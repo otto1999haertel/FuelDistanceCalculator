@@ -5,7 +5,7 @@ namespace FuelDistanceCalculator.Services
     {
         Task<CoordinatesDTO> GetCoordinatesAsync(string place);
         Task<string> GetAddressFromCoordinatesAsync(double latitude, double longitude);
-        public Task<GasStationResult> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations);
+        public Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations);
         
         public string NormalizeAddressKey(string place);
         public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm = 15.0,  double intervalKm = 5.0);

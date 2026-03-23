@@ -144,56 +144,35 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    public async Task<GasStationResult> CalculateDistanceFromAPI(
-        double latitudeStart, double longitudeStart, List<GasStation> stations)
+        public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
+    {
+        Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
+        foreach (GasStation station in stations)
         {
-            Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
-            
-            int failedCount = 0;
+            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
 
-            foreach (GasStation station in stations)
+            if (!string.IsNullOrEmpty(responseString))
             {
-                try
-                {
-                    string responseString = await GetRouteAndDistanceFromAPI(
-                        latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+                using JsonDocument doc = JsonDocument.Parse(responseString);
+                JsonElement root = doc.RootElement;
 
-                    if (!string.IsNullOrEmpty(responseString))
-                    {
-                        using JsonDocument doc = JsonDocument.Parse(responseString);
-                        JsonElement root = doc.RootElement;
-
-                        double totalDistance = root
-                            .GetProperty("features")[0]
-                            .GetProperty("properties")
-                            .GetProperty("summary")
-                            .GetProperty("distance")
-                            .GetDouble();
-
-                        station.Dist = Math.Round(totalDistance / 1000.0, 2);
-                        station.IsRoutingDistanceCalculated = true;
-                        Console.WriteLine($" {station.Brand} calculated routing distance: {station.Dist} km for {station.Name}");
-                    }
-                    else
-                    {
-                        failedCount++;
-                        station.IsRoutingDistanceCalculated = false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Fehler bei Distanzberechnung von Station {station.Name}: {ex.Message}");
-                    failedCount++;
-                    station.IsRoutingDistanceCalculated = false;
-                }
+                double totalDistance = root
+                    .GetProperty("features")[0]
+                    .GetProperty("properties")
+                    .GetProperty("summary")
+                    .GetProperty("distance")
+                    .GetDouble();
+                station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
+                 station.IsRoutingDistanceCalculated = true;
+                Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
             }
-
-            if (failedCount > 0)
-                return GasStationResult.Warning(stations, 
-                    $"Routingdistanz für einige Station(en) konnte nicht berechnet werden");
-
-            return GasStationResult.Success(stations);
+            else
+            {
+                station.IsRoutingDistanceCalculated = false;
+            }
         }
+        return stations;
+    }
     public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(double startLatitude, double startLong, double endLatitude, double endLongitude)
     {
         string response = await GetRouteAndDistanceFromAPI(startLatitude, startLong, endLatitude, endLongitude, "Routing_Service_Big_Route_response.json");

@@ -212,7 +212,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             gasStation.Dist = 3;
 
             //Act
-            List<GasStation> result = await service.CalculateDistanceFromAPI(lon.ToString(), lat.ToString(), new List<GasStation>() { gasStation });
+            List<GasStation> result = await service.CalculateDistanceFromAPI(lon, lat, new List<GasStation>() { gasStation });
             Assert.That(result[0].Dist.Equals(7.68));
         }
 
@@ -224,7 +224,7 @@ namespace FuelDistanceCalculatorTest.ServiceTests
             CoordinatesDTO startPoint = new CoordinatesDTO();
             startPoint.Longitude = 14.0129574;
             startPoint.Latitude = 51.348037;
-            List<CoordinatesDTO> result = await service.GetRouteIncludingStartPoint(startPoint.Latitude.ToString(), startPoint.Longitude.ToString(), "0", "0");
+            List<CoordinatesDTO> result = await service.GetRouteIncludingStartPoint(startPoint.Latitude, startPoint.Longitude, 0, 0);
             Assert.That(result[0].Longitude.Equals(startPoint.Longitude));
             Assert.That(result[0].Latitude.Equals(startPoint.Latitude));
             Assert.That(result.Last().Longitude.Equals(13.737048));

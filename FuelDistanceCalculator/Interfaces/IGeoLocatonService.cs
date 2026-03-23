@@ -5,11 +5,11 @@ namespace FuelDistanceCalculator.Services
     {
         Task<CoordinatesDTO> GetCoordinatesAsync(string place);
         Task<string> GetAddressFromCoordinatesAsync(double latitude, double longitude);
-        Task<List<GasStation>> CalculateDistanceFromAPI(string latitudeStart, string longitudeStart, List<GasStation> stations);
+        Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations);
         public string NormalizeAddressKey(string place);
         public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm = 15.0,  double intervalKm = 5.0);
 
-        public Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(string startLatitude, string startLong, string endLatitude, string endLongitude);
+        public Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(double startLatitude, double startLong, double endLatitude, double endLongitude);
 
         public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm);
     }

@@ -141,11 +141,12 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    public async Task<List<GasStation>> CalculateDistanceFromAPI(string latitudeStart, string longitudeStart, List<GasStation> stations)
+    public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
     {
+        Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
         foreach (GasStation station in stations)
         {
-            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
+            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
 
             if (!string.IsNullOrEmpty(responseString))
             {
@@ -159,19 +160,19 @@ public class GeoLocationService : IGeoLocationService
                     .GetProperty("distance")
                     .GetDouble();
                 station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                Console.WriteLine($"Calculated distance: {station.Dist} meters for Gas Station {station.Name}");
+                Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
             }
         }
         return stations;
     }
 
-    public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(string startLatitude, string startLong, string endLatitude, string endLongitude)
+    public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(double startLatitude, double startLong, double endLatitude, double endLongitude)
     {
         string response = await GetRouteAndDistanceFromAPI(startLatitude, startLong, endLatitude, endLongitude, "Routing_Service_Big_Route_response.json");
         List<CoordinatesDTO> result = new List<CoordinatesDTO>();
         CoordinatesDTO coordinatesStart = new CoordinatesDTO();
-        coordinatesStart.Latitude = double.Parse(startLatitude);
-        coordinatesStart.Longitude = double.Parse(startLong);
+        coordinatesStart.Latitude = startLatitude;
+        coordinatesStart.Longitude = startLong;
         result.Add(coordinatesStart);
         if (!string.IsNullOrEmpty(response))
         {
@@ -321,7 +322,7 @@ public class GeoLocationService : IGeoLocationService
         return null;
     }
 
-    private async Task<string> GetRouteAndDistanceFromAPI(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
+    private async Task<string> GetRouteAndDistanceFromAPI(double latitudeStart, double longitudeStart, double latitudeEnd, double longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
     {
         string responseString = "";
         if (_mode == "Production")

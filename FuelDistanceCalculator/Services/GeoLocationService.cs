@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Model;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -18,7 +19,6 @@ public class GeoLocationService : IGeoLocationService
 
     private readonly string _mode;
 
-    private readonly string _requestSuccess;
     private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
 
     private double ToRadians(double degrees) => degrees * Math.PI / 180;
@@ -34,7 +34,6 @@ public class GeoLocationService : IGeoLocationService
         var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
-        _requestSuccess = configuration["RequestSuccess"] ?? "true";
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -147,9 +146,20 @@ public class GeoLocationService : IGeoLocationService
         public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
     {
         Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
+        int alternater =0;
         foreach (GasStation station in stations)
         {
-            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            string responseString = string.Empty;
+            if (_mode == "Development")
+            {
+                responseString = await AlternateResponse(latitudeStart, longitudeStart, alternater, station);
+                alternater++;
+            }
+            else
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            }
+            
 
             if (!string.IsNullOrEmpty(responseString))
             {
@@ -163,7 +173,7 @@ public class GeoLocationService : IGeoLocationService
                     .GetProperty("distance")
                     .GetDouble();
                 station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                 station.IsRoutingDistanceCalculated = true;
+                station.IsRoutingDistanceCalculated = true;
                 Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
             }
             else
@@ -350,18 +360,28 @@ public class GeoLocationService : IGeoLocationService
         else
         {
             //TODO: create new JSON File for big route Grossgrabe -> Dresden
-            if(_requestSuccess.ToLower() == "false")
-            {
-                Console.WriteLine("Simulating failed API request for routing service.");
-                return responseString;
-            }
             string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
             if (!File.Exists(jsonFilePath))
             {
-                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+                return responseString;
             }
             responseString = await File.ReadAllTextAsync(jsonFilePath);
         }
         return responseString;
+    }
+
+    private async Task<string> AlternateResponse(double latitudeStart, double longitudeStart, int alternater, GasStation station)
+    {
+            string responseString = string.Empty;
+            if (alternater % 2 == 0)
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng,"No_Routing");
+            }
+            else
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            }
+
+            return responseString;
     }
 }

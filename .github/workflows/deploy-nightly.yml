@@ -100,8 +100,6 @@ jobs:
           REDIS_HOST=redis:6379
           TANK_API_KEY=${{ secrets.TANKAPIKEY }}
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
-          echo "TANK_API_KEY: ${TANK_API_KEY:0:5}..."
-          echo "OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:0:5}..."
           EOF
               
               chmod 600 .env.server
@@ -110,6 +108,8 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
+           echo "TANK_API_KEY: ${secrets.TANKAPIKEY:0:5}..."
+           echo "OPENROUTESERVICE_API_KEY: ${secrets.OPENROUTESERVICEAPIKEY:0:5}..."
       
       - name: Deploy on remote server
         run: |

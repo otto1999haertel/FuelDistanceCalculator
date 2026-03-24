@@ -100,6 +100,8 @@ jobs:
           REDIS_HOST=redis:6379
           TANK_API_KEY=${{ secrets.TANKAPIKEY }}
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
+          echo "TANK_API_KEY: ${TANK_API_KEY:0:5}..."
+          echo "OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:0:5}..."
           EOF
               
               chmod 600 .env.server

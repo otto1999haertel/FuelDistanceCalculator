@@ -34,6 +34,7 @@ public class GeoLocationService : IGeoLocationService
         var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+        Console.WriteLine("API Key loaded: " + _apiKey);
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)

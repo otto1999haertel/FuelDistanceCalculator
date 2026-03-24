@@ -17,6 +17,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
         _geoLocationService = geoLocationService;
+        Console.WriteLine("API Key loaded: " + _apiKey);
     }
 
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand, decimal discount)

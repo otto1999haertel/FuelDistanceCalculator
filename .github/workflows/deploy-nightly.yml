@@ -104,12 +104,33 @@ jobs:
               
               chmod 600 .env.server
           ENVSSH
+      - name: Verify .env.server on server
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+              echo "=== .env.server key check ==="
+              
+              TANK_KEY=\$(grep "TANK_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
+              ORS_KEY=\$(grep "OPENROUTESERVICE_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
+              
+              if [ -z "$TANK_KEY" ]; then
+                echo "✗ TANK_API_KEY is missing!"
+                exit 1
+              else
+                echo "✓ TANK_API_KEY present | starts with: ${TANK_KEY:0:4}... | length: ${#TANK_KEY}"
+              fi
+              
+              if [ -z "$ORS_KEY" ]; then
+                echo "✗ OPENROUTESERVICE_API_KEY is missing!"
+                exit 1
+              else
+                echo "✓ ORS_KEY present | starts with: ${ORS_KEY:0:4}... | length: ${#ORS_KEY}"
+              fi
+          EOF
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
-           echo "TANK_API_KEY: ${secrets.TANKAPIKEY:0:5}..."
-           echo "OPENROUTESERVICE_API_KEY: ${secrets.OPENROUTESERVICEAPIKEY:0:5}..."
       
       - name: Deploy on remote server
         run: |

@@ -79,6 +79,8 @@ jobs:
       - name: Sync source to server
         run: |
           rsync -avz --delete \
+            --exclude '.env*' \
+            --exclude '.git' \
             -e "ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }}" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/fuelgo
         env:

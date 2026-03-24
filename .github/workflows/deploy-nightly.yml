@@ -107,24 +107,24 @@ jobs:
       - name: Verify .env.server on server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
               echo "=== .env.server key check ==="
               
               TANK_KEY=\$(grep "TANK_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
               ORS_KEY=\$(grep "OPENROUTESERVICE_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
               
-              if [ -z "$TANK_KEY" ]; then
+              if [ -z "\$TANK_KEY" ]; then
                 echo "✗ TANK_API_KEY is missing!"
                 exit 1
               else
-                echo "✓ TANK_API_KEY present | starts with: ${TANK_KEY:0:4}... | length: ${#TANK_KEY}"
+                echo "✓ TANK_API_KEY present | starts with: \${TANK_KEY:0:4}... | length: \${#TANK_KEY}"
               fi
               
-              if [ -z "$ORS_KEY" ]; then
+              if [ -z "\$ORS_KEY" ]; then
                 echo "✗ OPENROUTESERVICE_API_KEY is missing!"
                 exit 1
               else
-                echo "✓ ORS_KEY present | starts with: ${ORS_KEY:0:4}... | length: ${#ORS_KEY}"
+                echo "✓ ORS_KEY present | starts with: \${ORS_KEY:0:4}... | length: \${#ORS_KEY}"
               fi
           EOF
         env:

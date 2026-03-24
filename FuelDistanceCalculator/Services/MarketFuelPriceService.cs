@@ -18,6 +18,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
         _geoLocationService = geoLocationService;
         Console.WriteLine("API Key loaded: " + _apiKey);
+        Console.WriteLine("Mode: " + _mode);
     }
 
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand, decimal discount)

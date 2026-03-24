@@ -89,10 +89,8 @@ jobs:
       - name: Create .env.server with API keys
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENVSSH'
-              cd /home/${{ secrets.SSH_USER }}/fuelgo
-              
-              cat > .env.server << 'EOF'
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd /home/${{ secrets.SSH_USER }}/fuelgo && cat > .env.server << 'EOF'
           CERT_CRT_PATH=/etc/letsencrypt/live/fuelgo.de/fullchain.pem
           CERT_KEY_PATH=/etc/letsencrypt/live/fuelgo.de/privkey.pem
           SERVER_NAME=fuelgo.de www.fuelgo.de
@@ -101,9 +99,7 @@ jobs:
           TANK_API_KEY=${{ secrets.TANKAPIKEY }}
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
           EOF
-              
-              chmod 600 .env.server
-          ENVSSH
+          "
       - name: Verify .env.server on server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
@@ -135,18 +131,18 @@ jobs:
       - name: Deploy on remote server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-              if sudo systemctl is-active --quiet nginx; then
-                echo "Stopping native Nginx service"
-                sudo systemctl stop nginx
-              fi
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          if sudo systemctl is-active --quiet nginx; then
+            echo "Stopping native Nginx service"
+            sudo systemctl stop nginx
+          fi
 
-              cd /home/${{ secrets.SSH_USER }}/fuelgo
-              sudo docker compose stop fuelgo-webapp nginx db
-              sudo docker compose rm -f fuelgo-webapp nginx db
-              sudo docker compose --env-file .env.server up --build -d
-              
-              echo "✓ Deployment completed successfully at $(date)"
+          cd /home/${{ secrets.SSH_USER }}/fuelgo
+          sudo docker compose stop fuelgo-webapp nginx db
+          sudo docker compose rm -f fuelgo-webapp nginx db
+          sudo docker compose --env-file .env.server up --build -d
+          
+          echo "✓ Deployment completed successfully at \$(date)"
           EOF
         env:
           SSH_USER: ${{ secrets.SSH_USER }}

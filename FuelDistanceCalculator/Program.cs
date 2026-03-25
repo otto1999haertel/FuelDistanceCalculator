@@ -12,10 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: true)
-    .AddJsonFile("appsettings.Development.json", optional: true);
 // Registriere FuelPriceService als Singleton
 builder.Services.AddSingleton<FuelPriceService>(provider =>
     new FuelPriceService());

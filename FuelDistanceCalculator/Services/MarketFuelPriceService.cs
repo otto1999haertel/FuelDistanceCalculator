@@ -15,7 +15,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         _httpClient = httpClient;
         var apiKeyFromConfig = configuration["ApiSettings:TankApiKey"];
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
-        _mode = Environment.GetEnvironmentVariable("MODE_TYPE");
+        _mode = configuration["MODE_TYPE"] ?? "Production";
         _geoLocationService = geoLocationService;
         Console.WriteLine("API Key loaded: " + _apiKey);
         Console.WriteLine("Mode: " + _mode);

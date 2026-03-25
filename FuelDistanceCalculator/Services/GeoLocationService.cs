@@ -33,7 +33,7 @@ public class GeoLocationService : IGeoLocationService
         _redisDb = redis.GetDatabase();
         var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
         _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
-        _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+        _mode = configuration["MODE_TYPE"] ?? "Production";
         Console.WriteLine("API Key loaded: " + _apiKey);
         Console.WriteLine("Mode: " + _mode);
     }

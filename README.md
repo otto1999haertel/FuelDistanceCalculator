@@ -13,6 +13,10 @@ For a successfull connection to the gas station price service you have to create
 - to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 
 
+# Build
+- in executable code only use IConfiguration configuration["XAttributeX"] for most flexibility no Environment.Get  
+- then it does not matter whether the configuration is an .env-file or local test context
+
 # Building local
 - copy/ create localhost certificates (*.cert/ *.key) to nginx/certs
 - execute: docker compose --env-file .env.local up --build

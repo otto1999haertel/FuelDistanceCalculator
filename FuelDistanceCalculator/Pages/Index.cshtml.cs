@@ -21,6 +21,7 @@ public class IndexModel : PageModel
     private readonly IGeoLocationService _geoLocationService;
 
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
+    private IConfiguration _configuration;
 
     [BindProperty]
     public decimal FuelAmount { get; set; } // Globale Tankmenge für beide Tankstellen
@@ -121,7 +122,7 @@ public class IndexModel : PageModel
 
     private const string InputDataSessionKey = "InputData";
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
@@ -137,7 +138,8 @@ public class IndexModel : PageModel
         {
             RadiusPlaces = new List<double>();
         }
-        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE").Equals("Production");
+        IsProduction = configuration["MODE_TYPE"]?.Equals("Production") == true;
+        _configuration = configuration;
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         SearchExecuted = false;
         SortMode = "totalCost";
@@ -399,7 +401,7 @@ public class IndexModel : PageModel
                     SavingsToNearestStation = 0m,
                     SortMode = (string)null
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService)
+            var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService,_configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,

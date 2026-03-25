@@ -1,8 +1,7 @@
 using FuelDistanceCalculator.Model;
-namespace FuelDistanceCalculator.Services
+namespace FuelDistanceCalculator.Services;
+
+public interface IMarketFuelPriceService
 {
-    public interface IMarketFuelPriceService
-    {
-        Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand="", decimal discount=0);
-    }
+    Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand = "", decimal discount = 0);
 }

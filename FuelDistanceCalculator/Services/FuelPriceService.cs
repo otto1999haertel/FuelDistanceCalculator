@@ -1,5 +1,6 @@
-namespace FuelDistanceCalculator.Services;
 using FuelDistanceCalculator.Model;
+
+namespace FuelDistanceCalculator.Services;
 
 public class FuelPriceService
 {

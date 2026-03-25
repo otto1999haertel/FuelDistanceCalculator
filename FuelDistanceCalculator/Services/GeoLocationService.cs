@@ -1,5 +1,4 @@
 using FuelDistanceCalculator.Model;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;

@@ -1,6 +1,8 @@
 using FuelDistanceCalculator.Model;
 using Microsoft.IdentityModel.Tokens;
 
+namespace FuelDistanceCalculator.Services;
+
 public static class TankCostService
 {
     public static void CaluclateSavings(List<GasStation> stations, ref decimal SavingsToNearestStation, ref decimal SavingsToCheapestStation)

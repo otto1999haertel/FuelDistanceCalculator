@@ -1,12 +1,13 @@
 using FuelDistanceCalculator.Model;
+using FuelDistanceCalculator.Services;
 
-namespace FuelDistanceCalculatorTest.ServiceTests
+namespace FuelDistanceCalculatorTest.ServiceTests;
+
+public class SortServiceTests : ServiceTestBase
 {
-    public class SortServiceTests : ServiceTestBase
+    public override async Task Setup()
     {
-        public override async Task Setup()
-        {
-            _fakeGasStationList = new List<GasStation>
+        _fakeGasStationList = new List<GasStation>
             {
                 new GasStation
                 {
@@ -75,100 +76,99 @@ namespace FuelDistanceCalculatorTest.ServiceTests
                     Volatility = 220
                 }
             };
-        }
-        [Test]
-        public void SortStations_FuelPrice_ReturnsStationsSortedByFuelPrice()
-        {
-            // Arrange
-            string sortMode = "fuelPrice";
+    }
+    [Test]
+    public void SortStations_FuelPrice_ReturnsStationsSortedByFuelPrice()
+    {
+        // Arrange
+        string sortMode = "fuelPrice";
 
-            // Act
-            var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
 
-            // Assert
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.ByVal(result.Select(s => s.FuelTypePrice), Is.Ordered);
-            Assert.That(result[0].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.40
-            Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
-            Assert.That(result[2].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.60
-        }
+        // Assert
+        Assert.That(result.Count, Is.EqualTo(3));
+        Assert.ByVal(result.Select(s => s.FuelTypePrice), Is.Ordered);
+        Assert.That(result[0].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.40
+        Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
+        Assert.That(result[2].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.60
+    }
 
-        [Test]
-        public void SortStations_TotalCost_ReturnsStationsSortedByTotalCost()
-        {
-            // Arrange
-            string sortMode = "totalCost";
+    [Test]
+    public void SortStations_TotalCost_ReturnsStationsSortedByTotalCost()
+    {
+        // Arrange
+        string sortMode = "totalCost";
 
-            // Act
-            var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
 
-            // Assert
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.ByVal(result.Select(s => s.TotalCalculatedCoast), Is.Ordered);
-            Assert.That(result[0].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.40
-            Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
-            Assert.That(result[2].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.60
-        }
+        // Assert
+        Assert.That(result.Count, Is.EqualTo(3));
+        Assert.ByVal(result.Select(s => s.TotalCalculatedCoast), Is.Ordered);
+        Assert.That(result[0].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.40
+        Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
+        Assert.That(result[2].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.60
+    }
 
-        [Test]
-        public void SortStations_Distance_ReturnsStationsSortedByDistance()
-        {
-            // Arrange
-            string sortMode = "distance";
+    [Test]
+    public void SortStations_Distance_ReturnsStationsSortedByDistance()
+    {
+        // Arrange
+        string sortMode = "distance";
 
-            // Act
-            var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
 
-            // Assert
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.ByVal(result.Select(s => s.Dist), Is.Ordered);
-            Assert.That(result[0].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.40
-            Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
-            Assert.That(result[2].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.60
-        }
+        // Assert
+        Assert.That(result.Count, Is.EqualTo(3));
+        Assert.ByVal(result.Select(s => s.Dist), Is.Ordered);
+        Assert.That(result[0].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.40
+        Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
+        Assert.That(result[2].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.60
+    }
 
-        [Test]
-        public void SortStations_InvalidSortMode_ReturnsUnmodifiedList()
-        {
-            // Arrange
-            string sortMode = "invalid";
-            var originalOrder = _fakeGasStationList.ToList();
+    [Test]
+    public void SortStations_InvalidSortMode_ReturnsUnmodifiedList()
+    {
+        // Arrange
+        string sortMode = "invalid";
+        var originalOrder = _fakeGasStationList.ToList();
 
-            // Act
-            var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
 
-            // Assert
-            Assert.That(result.Count.Equals(3), Is.True);
-            Assert.That(result[0].Name.Equals(originalOrder[0].Name), Is.True);
-        }
+        // Assert
+        Assert.That(result.Count.Equals(3), Is.True);
+        Assert.That(result[0].Name.Equals(originalOrder[0].Name), Is.True);
+    }
 
-        [Test]
-        public void SortStations_EmptyList_ReturnsEmptyList()
-        {
-            // Arrange
-            string sortMode = "fuelPrice";
-            var emptyList = new List<GasStation>();
+    [Test]
+    public void SortStations_EmptyList_ReturnsEmptyList()
+    {
+        // Arrange
+        string sortMode = "fuelPrice";
+        var emptyList = new List<GasStation>();
 
-            // Act
-            var result = SortService.SortStations(emptyList, sortMode);
+        // Act
+        var result = SortService.SortStations(emptyList, sortMode);
 
-            // Assert
-            Assert.That(result.Count.Equals(0), Is.True);
-        }
+        // Assert
+        Assert.That(result.Count.Equals(0), Is.True);
+    }
 
-        [Test]
-        public void SortStations_NullSortMode_ReturnsUnmodifiedList()
-        {
-            // Arrange
-            string sortMode = null;
-            var originalOrder = _fakeGasStationList.ToList();
+    [Test]
+    public void SortStations_NullSortMode_ReturnsUnmodifiedList()
+    {
+        // Arrange
+        string sortMode = null;
+        var originalOrder = _fakeGasStationList.ToList();
 
-            // Act
-            var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
 
-            // Assert
-            Assert.That(result.Count.Equals(3), Is.True);
-            Assert.That(result[0].Id, Is.EqualTo(originalOrder[0].Id));
-        }
-    }    
+        // Assert
+        Assert.That(result.Count.Equals(3), Is.True);
+        Assert.That(result[0].Id, Is.EqualTo(originalOrder[0].Id));
+    }
 }

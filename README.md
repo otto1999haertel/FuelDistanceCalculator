@@ -12,18 +12,17 @@ For a successfull connection to the gas station price service you have to create
 # Design Updates
 - to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 
-# Build
-- appsettings.Development.json (with tankerkoenig API Key) need to be in FuelDistanceCalculator
-- appsettings.json (with tankerkoenig API Key)  need to be in FuelDistanceCalculator
 
 # Building local
 - copy/ create localhost certificates (*.cert/ *.key) to nginx/certs
 - execute: docker compose --env-file .env.local up --build
-- test output will be stored in the container: fuelgo-webapp\app\test-output
+- test output will be stored in the container: fuelgo-webapp\app\test-output  
+- .env.local (with API Keys) need to be in FuelDistanceCalculator
 
 # Building on the server
 -  is triggered by github actions configured in deploy-nighty.yml
--  manual execuion: sudo docker compose --env-file .env.server up --build -d
+-  manual execuion: sudo docker compose --env-file .env.server up --build -d  
+- .env.server (with API Keys) need to be in FuelDistanceCalculator
 
 # Update certificate with certbot automatically via deployment hook for certbot
 - specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  

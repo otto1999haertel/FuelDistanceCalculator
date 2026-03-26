@@ -101,7 +101,7 @@ public class GasStation
         else
         {
             TotalCalculatedCoast = fuelCost + travelCost;
-            DiscountApplied = false;
+            DiscountApplied &= DiscountApplied;
         }
         TotalCalculatedCoast = Math.Round(TotalCalculatedCoast, 2, MidpointRounding.AwayFromZero);
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +

@@ -24,8 +24,9 @@ public static class DiscountParser
             if (isPercentage)
             {
                 discountValuePercent /= 100; // Convert percentage to decimal
+                return true;
             }
-            return true;
+            return false;
         }
         else
         {

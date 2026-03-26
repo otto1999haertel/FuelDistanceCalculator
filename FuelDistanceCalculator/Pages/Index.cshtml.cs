@@ -206,25 +206,7 @@ public class IndexModel : PageModel
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 //Prozentualer Rabatt
                 Console.WriteLine($"Discount input: {DiscountPercentOrAbsolute}, Fuel Amount: {FuelAmount}");
-                if (string.IsNullOrEmpty(DiscountPercentOrAbsolute))
-                {
-                    DiscountPercentOrAbsolute="0";
-                }
-                if(FuelAmount<=0 && DiscountParser.TryParseDiscountPercent(DiscountPercentOrAbsolute,out decimal discouuntValue))
-                {
-                    Console.WriteLine($"Parsed discount value: {discouuntValue}");
-                    CheapestResultStations = TankCostService.GetCheapestStationDiscountPerCent(gasStations.Stations, fuelTypeForAPI, StationBrand, discouuntValue);
-                }
-                //Prozentuale Rabatt oder Absoluter Rabatt
-                else if(FuelAmount>0)
-                {
-                    if(DiscountParser.TryParseDiscountPercent(DiscountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(DiscountPercentOrAbsolute, out discountDecimal))
-                    {
-                        Console.WriteLine($"Parsed discount value: {discountDecimal}");
-                        CheapestResultStations = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, discountDecimal);
-                    }
-                    Console.WriteLine("Could not be parsed no calculation");
-                }  
+                CheapestResultStations = TankCostService.GetCheapestStation(gasStations.Stations, PricePerKm, FuelAmount,fuelTypeForAPI,StationBrand ,DiscountPercentOrAbsolute);
                 
                 decimal savingsToNearestTemp = 0;
                 decimal savingsToCheapestTemp = 0;

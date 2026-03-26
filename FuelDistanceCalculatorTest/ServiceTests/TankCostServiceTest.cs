@@ -14,7 +14,7 @@ public class TankCostServiceTest : ServiceTestBase
         decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
         //Act
-        List<GasStation> result = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
+        List<GasStation> result = TankCostService.GetCheapestStation(_fakeGasStationList, pricePerKilometer, fuelAmount, "diesel");
 
         TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
         Assert.That(CheckOrderAscendingFuelAmountZero(result), Is.True);
@@ -29,7 +29,7 @@ public class TankCostServiceTest : ServiceTestBase
         decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
         //Act
-        List<GasStation> result = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
+        List<GasStation> result = TankCostService.GetCheapestStation(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
         TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
         Assert.That(result.Count > 0);
@@ -47,7 +47,7 @@ public class TankCostServiceTest : ServiceTestBase
         decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
 
         //Act
-        List<GasStation> result = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(emptyStationList, fuelAmount, pricePerKilometer, "diesel");
+        List<GasStation> result = TankCostService.GetCheapestStation(emptyStationList, fuelAmount, pricePerKilometer, "diesel");
 
         //Assert
         Assert.That(result.Count == 0);
@@ -77,82 +77,53 @@ public class TankCostServiceTest : ServiceTestBase
     }
 
     [Test]
-    [TestCase("101%", false)]
-    [TestCase("15%", true)]
-    [TestCase("-10%", false)]
-    [TestCase("0%", false)]
-    public void GetCheapestGasStationPerceantageDiscountTest(string discountPercentOrAbsolute, bool validDiscount)
+    [TestCase(0, "20%", true)]
+    [TestCase(0, "20", false)]
+    [TestCase(40, "15%", true)]
+    [TestCase(40, "20", true)]
+    public void GetCheapestGasStationPerceantageDiscountTest(decimal fuelAmount, string discountPercentOrAbsolute, bool validDiscount)
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
         List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
 
-        string fuelTypeForAPI = "diesel";
-        string StationBrand = "Aral";// Beispiel: 15% Rabatt auf den Dieselpreis der Aral-Station
-        if(DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
-        {
-            CheapestResultStations = TankCostService.GetCheapestStationDiscountPerCent(testData, fuelTypeForAPI, StationBrand, discountDecimal);
-            foreach(var station in CheapestResultStations)
-            {
-                if(station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
-                {
-                    decimal expectedPrice = station.Fuels.Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
-                                            .Select(f => (decimal)f.Price)
-                                            .FirstOrDefault();
-                    expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
-                    Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));
-                    Assert.That(station.DiscountApplied.Equals(validDiscount));
-                }
-                else
-                {
-                    Assert.That(station.DiscountApplied, Is.False);
-                }
-            }
-        }
-        else
-        {
-            Assert.That(validDiscount.Equals(false));
-        }
-    }
-
-
-    [Test]
-    [TestCase("-10")]
-    [TestCase("10")]
-    [TestCase("20")]
-    [TestCase("0")]
-    public void GetCheapestGasStationAmountDiscountTest(string discountPercentOrAbsolute)
-    {
-        List<GasStation> CheapestResultStations = new List<GasStation>();
-        List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
-        decimal FuelAmount = 30;
-        decimal PricePerKm = 0.25m;
         string fuelTypeForAPI = "diesel";
         string StationBrand = "Aral";
-        if(DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
+        decimal pricePerKm = 0.25m;
+        decimal expectedPrice = 0m;
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        foreach (var station in CheapestResultStations)
         {
-            CheapestResultStations = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(testData, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, discountDecimal);
-            foreach(var station in CheapestResultStations)
+            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
             {
-                 var expectedPrice = testData.Where(f => f.Name.Equals(station.Name, StringComparison.OrdinalIgnoreCase))
-                                                                    .Select(f => f.Fuels.Where(fuel => fuel.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase)))
-                                                                    .FirstOrDefault()
-                                                                    .Select(fuel => fuel.Price).FirstOrDefault();
-                if(station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase) && discountDecimal > 0)
+                expectedPrice = testData
+                            .Where(s => s.Name.Equals(station.Name, StringComparison.OrdinalIgnoreCase))
+                            .SelectMany(s => s.Fuels)
+                            .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
+                            .Select(f => (decimal)f.Price)
+                            .FirstOrDefault();
+                if (fuelAmount ==0 && !DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal))
                 {
-                    expectedPrice =   expectedPrice * (double)FuelAmount + (double)station.Dist * (double)PricePerKm * 2 - (double)discountDecimal;         
-                    Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
-                    Assert.That(station.DiscountApplied, Is.True);
+                    Assert.That(station.FuelTypePrice.Equals(expectedPrice));
                 }
-                else
+                else if (decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
                 {
-                    expectedPrice =   expectedPrice * (double)FuelAmount + (double)station.Dist * (double)PricePerKm * 2;         
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m+ expectedPrice*fuelAmount - discountDecimal;
                     Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
-                    Assert.That(station.DiscountApplied,Is.False);
                 }
+                else if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out discountDecimal))
+                {
+                    expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
+                    Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));
+                }                
+                Assert.That(station.DiscountApplied.Equals(validDiscount));
+            }
+            else
+            {
+                Assert.That(station.DiscountApplied, Is.False);
             }
         }
     }
-    
 
     private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
     {
@@ -216,7 +187,7 @@ public class TankCostServiceTest : ServiceTestBase
 
     private static List<GasStation> CheapestGasStationPerceantageDiscountTestCaseSource()
     {
-        return 
+        return
         new List<GasStation>
                     {
                             new GasStation
@@ -228,7 +199,7 @@ public class TankCostServiceTest : ServiceTestBase
                                     new Fuel { Name = "Diesel", Price = 2.00 },
                                     new Fuel { Name = "Super E5", Price = 1.80 },
                                     new Fuel { Name = "Super E10", Price = 1.90 }
-                                    
+
                                 },
                                 IsOpen = true,
                                 //TotalCalculatedCoast = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
@@ -243,7 +214,7 @@ public class TankCostServiceTest : ServiceTestBase
                                     new Fuel { Name = "Diesel", Price = 1.90 },
                                     new Fuel { Name = "Super E5", Price = 1.70 },
                                     new Fuel { Name = "Super E10", Price = 1.80 }
-                                    
+
                                 },
                                 IsOpen = true,
                                 //TotalCalculatedCoast = 78.00m,  // günstigster Literpreis, aber weiter weg
@@ -258,7 +229,7 @@ public class TankCostServiceTest : ServiceTestBase
                                     new Fuel { Name = "Diesel", Price = 1.90 },
                                     new Fuel { Name = "Super E5", Price = 1.70 },
                                     new Fuel { Name = "Super E10", Price = 1.80 }
-                                    
+
                                 },
                                  IsOpen = true,
                                 //TotalCalculatedCoast = 76.25m,  // insgesamt günstigste Gesamtkosten

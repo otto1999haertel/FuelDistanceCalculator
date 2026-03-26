@@ -16,41 +16,72 @@ public static class TankCostService
         SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
     }
 
-    public static List<GasStation> GetCheapestStationDiscountPerCent(List<GasStation> stations, string fuelType, string stationBrand="", decimal dicountPercent=0)
+    public static List<GasStation> GetCheapestStation(List<GasStation> gasStations,decimal pricePerKm, decimal fuelAmount, string fuelTypeForAPI, string stationBrand="", string discountPercentOrAbsolute="")
     {
-        if(stations.IsNullOrEmpty() || dicountPercent<0 || dicountPercent >100)
+        List<GasStation> CheapestResultStations = new List<GasStation>();
+        if (string.IsNullOrEmpty(discountPercentOrAbsolute))
+        {
+            discountPercentOrAbsolute = "0";
+        }
+        if (fuelAmount <= 0 && DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discouuntValue))
+        {
+            Console.WriteLine($"Parsed discount value: {discouuntValue}");
+            CheapestResultStations = GetCheapestStationDiscountPerCent(gasStations, fuelTypeForAPI, stationBrand, discouuntValue);
+        }
+        //Prozentuale Rabatt oder Absoluter Rabatt
+        else if (fuelAmount > 0)
+        {
+            if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
+            {
+                Console.WriteLine($"Parsed discount value: {discountDecimal}");
+                CheapestResultStations = GetCheapestStationsTotalCostDiscountRelAbs(gasStations, fuelAmount, pricePerKm, fuelTypeForAPI, stationBrand, discountDecimal);
+            }
+            Console.WriteLine("Could not be parsed no calculation");
+        }
+        else if (fuelAmount == 0)
+        {
+            CheapestResultStations = GetCheapestStationDiscountPerCent(gasStations, fuelTypeForAPI, stationBrand);
+        }
+
+        return CheapestResultStations;
+
+    }
+
+    private static List<GasStation> GetCheapestStationDiscountPerCent(List<GasStation> stations, string fuelType, string stationBrand = "", decimal dicountPercent = 0)
+    {
+        if (stations.IsNullOrEmpty() || dicountPercent < 0 || dicountPercent > 100)
         {
             Console.WriteLine("Keine Stationen verfügbar.");
             return stations;
         }
-         Console.WriteLine("FuelAmount <= 0, sortiere nach FuelTypePrice und Dist.");
-            var gasStations= stations
-                .AsParallel() // Parallele Verarbeitung
-                .Where(station => station.IsOpen && station.Fuels != null)
-                .Select(station =>
-                {
-                    station.SetPriceWithPercentageDiscount(fuelType,stationBrand,dicountPercent); // Setze FuelTypePrice basierend auf fuelType
-                    station.SetUpdateTime(fuelType); // Setze LastUpdate
-                    station.SetUpdateAmount(fuelType); // Setze UpdateAmount
-                    return station;
-                })
-                .ToList();
-            
-            return gasStations
-                .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue).ToList(); // Primär: Aufsteigend nach Preis // Sekundär: Aufsteigend nach Entfernung
+        Console.WriteLine("FuelAmount <= 0, sortiere nach FuelTypePrice und Dist.");
+        var gasStations = stations
+            .AsParallel() // Parallele Verarbeitung
+            .Where(station => station.IsOpen && station.Fuels != null)
+            .Select(station =>
+            {
+                station.SetPriceWithPercentageDiscount(fuelType, stationBrand, dicountPercent); // Setze FuelTypePrice basierend auf fuelType
+                station.SetUpdateTime(fuelType); // Setze LastUpdate
+                station.SetUpdateAmount(fuelType); // Setze UpdateAmount
+                return station;
+            })
+            .ToList();
+
+        return gasStations
+            .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue).ToList(); // Primär: Aufsteigend nach Preis // Sekundär: Aufsteigend nach Entfernung
     }
 
-    public static List<GasStation> GetCheapestStationsTotalCostDiscountRelAbs(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType, string stationBrand="", decimal discountAmount =0)
+    private static List<GasStation> GetCheapestStationsTotalCostDiscountRelAbs(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType, string stationBrand = "", decimal discountAmount = 0)
     {
         // Wenn fuelAmount <= 0, sortiere nach FuelTypePrice und Dist
-        if(stations.IsNullOrEmpty())
+        if (stations.IsNullOrEmpty())
         {
             Console.WriteLine("Keine Stationen verfügbar.");
             return new List<GasStation>();
         }
         if (fuelAmount <= 0)
         {
-           return GetCheapestStationDiscountPerCent(stations, fuelType, stationBrand, discountAmount);
+            return GetCheapestStationDiscountPerCent(stations, fuelType, stationBrand, discountAmount);
         }
 
         Console.WriteLine($"Parallel working started for {stations.Count} stations with fuelType: {fuelType}");
@@ -70,7 +101,7 @@ public static class TankCostService
                 {
                     try
                     {
-                        totalCost = station.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, costPerKm,stationBrand,discountAmount);
+                        totalCost = station.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, costPerKm, stationBrand, discountAmount);
                     }
                     catch (ArgumentException ex)
                     {

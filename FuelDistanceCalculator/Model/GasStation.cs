@@ -83,7 +83,7 @@ public class GasStation
 
     public bool DiscountApplied {get; private set; } = false;
 
-    public decimal CalculateTotalCostDoubleWay(decimal fuelAmount, decimal pricePerKm)
+    public decimal CalculateTotalCostDoubleWayWithDiscountGreaterOne(decimal fuelAmount, decimal pricePerKm, string brand ="",decimal discountAmount = 0)
     {
         if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
         {
@@ -93,9 +93,17 @@ public class GasStation
         decimal dist = (decimal)Dist.Value;
         decimal fuelCost = (_fuelPrice ?? 0) * fuelAmount;
         decimal travelCost = pricePerKm * dist * 2m;
-        decimal rawTotal = fuelCost + travelCost;
-        TotalCalculatedCoast = Math.Round(rawTotal, 2, MidpointRounding.AwayFromZero);
-
+        if(discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
+        {
+            TotalCalculatedCoast = fuelCost + travelCost - discountAmount;
+            DiscountApplied = true;
+        }
+        else
+        {
+            TotalCalculatedCoast = fuelCost + travelCost;
+            DiscountApplied = false;
+        }
+        TotalCalculatedCoast = Math.Round(TotalCalculatedCoast, 2, MidpointRounding.AwayFromZero);
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
                           $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
@@ -103,22 +111,39 @@ public class GasStation
         return TotalCalculatedCoast;
     }
 
-    public void SetPrice(string fuelType, string brand = "", decimal discount = 0)
+    public void SetPrice(string fuelType)
     {
-        FuelTypePrice = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
+        _fuelPrice = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
                     .Select(x => (decimal)x.Price)
                     .FirstOrDefault() ?? 0;
-        
-        if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discount > 0)
+    }
+
+    public void SetPriceWithPercentageDiscount(string fuelType, string brand, decimal discountPercent)
+    {
+        SetPrice(fuelType);
+        if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discountPercent > 0)
         {
-            Console.WriteLine($"Applying discount of {discount}% for brand {brand} on station {Name}");
-            decimal discountAmount = (FuelTypePrice.Value * discount) / 100m;
-            FuelTypePrice -= discountAmount;
-            FuelTypePrice = Math.Round(FuelTypePrice.Value, 3);
-            DiscountApplied = true;
+            if(discountPercent >0 && discountPercent < 1)
+            {
+                Console.WriteLine($"Applying discount of {discountPercent}% for brand {brand} on station {Name}");
+                decimal discountAmount = FuelTypePrice.Value * discountPercent;
+                _fuelPrice -= discountAmount;
+                _fuelPrice = Math.Round(FuelTypePrice.Value, 3);
+                DiscountApplied = true;
+            }
+            else
+            {
+                DiscountApplied = false;
+            }
         }
-        
-        Console.WriteLine($"SetPrice called for FuelType: {fuelType}, Brand: {brand}, Discount: {discount}. Resulting FuelTypePrice: {FuelTypePrice}");
+        else
+        {
+            DiscountApplied = false;
+        }
+
+
+        Console.WriteLine($"SetPrice called for FuelType: {fuelType}, Brand: {brand}, Discount: {discountPercent}. Resulting FuelTypePrice: {FuelTypePrice}");
+
     }
 
     public void SetUpdateTime(string fuelType)

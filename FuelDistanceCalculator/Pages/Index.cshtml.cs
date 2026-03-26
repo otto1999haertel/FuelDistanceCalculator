@@ -114,7 +114,7 @@ public class IndexModel : PageModel
     public string StationBrand{get; set; }
 
     [BindProperty]
-    public decimal DiscountPercent{get; set; }
+    public string DiscountPercentOrAbsolute{get; set; }
     
     public string SortMode { get; set; }
 
@@ -144,7 +144,6 @@ public class IndexModel : PageModel
         SearchExecuted = false;
         SortMode = "totalCost";
         StationBrand = string.Empty;
-        DiscountPercent = 0;
     }
 
     public async Task OnGetAsync()
@@ -195,18 +194,38 @@ public class IndexModel : PageModel
         LongitudePlace = coordinates?.Longitude ?? 0;
         LatitudePlace = coordinates?.Latitude ?? 0;
         Console.WriteLine($"Coordinates from API: {coordinates}");
-
         if (coordinates != null)
         {
             var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI, StationBrand, DiscountPercent));
+                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
             if (gasStations.IsSuccess)
             {
                 gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
                 () => _geoLocationService.CalculateDistanceFromAPI(coordinates.Latitude, coordinates.Longitude, gasStations.Stations));
                 
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
-                CheapestResultStations = TankCostService.GetCheapestStationsAccordTotalCost(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, DiscountPercent);
+                //Prozentualer Rabatt
+                Console.WriteLine($"Discount input: {DiscountPercentOrAbsolute}, Fuel Amount: {FuelAmount}");
+                if (string.IsNullOrEmpty(DiscountPercentOrAbsolute))
+                {
+                    DiscountPercentOrAbsolute="0";
+                }
+                if(FuelAmount<=0 && DiscountParser.TryParseDiscountPercent(DiscountPercentOrAbsolute,out decimal discouuntValue))
+                {
+                    Console.WriteLine($"Parsed discount value: {discouuntValue}");
+                    CheapestResultStations = TankCostService.GetCheapestStationDiscountPerCent(gasStations.Stations, fuelTypeForAPI, StationBrand, discouuntValue);
+                }
+                //Prozentuale Rabatt oder Absoluter Rabatt
+                else if(FuelAmount>0)
+                {
+                    if(DiscountParser.TryParseDiscountPercent(DiscountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(DiscountPercentOrAbsolute, out discountDecimal))
+                    {
+                        Console.WriteLine($"Parsed discount value: {discountDecimal}");
+                        CheapestResultStations = TankCostService.GetCheapestStationsTotalCostDiscountRelAbs(gasStations.Stations, FuelAmount, PricePerKm, fuelTypeForAPI, StationBrand, discountDecimal);
+                    }
+                    Console.WriteLine("Could not be parsed no calculation");
+                }  
+                
                 decimal savingsToNearestTemp = 0;
                 decimal savingsToCheapestTemp = 0;
                 TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);
@@ -399,7 +418,8 @@ public class IndexModel : PageModel
                     SelectedCarType = "",
                     SavingsToCheapestStation = 0m,
                     SavingsToNearestStation = 0m,
-                    SortMode = (string)null
+                    SortMode = (string)null,
+                    Discount = string.Empty
                 });
             var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService,_configuration)
             {
@@ -411,6 +431,7 @@ public class IndexModel : PageModel
                 SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0,
                 SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0,
                 SortMode = sortMode ?? "",
+                DiscountPercentOrAbsolute = inputData?.Discount ?? ""
             };
 
             var updatedInputData = new
@@ -422,6 +443,7 @@ public class IndexModel : PageModel
                 SavingsToCheapestStation = model.SavingsToCheapestStation,
                 SavingsToNearestStation = model.SavingsToNearestStation,
                 SortMode = sortMode ?? "",
+                DiscountPercentOrAbsolute = model.DiscountPercentOrAbsolute
             };
             HttpContext.Session.SetString(InputDataSessionKey, JsonConvert.SerializeObject(updatedInputData));
             Console.WriteLine($"Amount of stations to sort: {model.CheapestResultStations.Count}");
@@ -456,7 +478,7 @@ public class IndexModel : PageModel
                     RadiusPlaces[i] = radiusPlace;
                 }
                 var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI, StationBrand, DiscountPercent));
+                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
                 if (gasStationsPlace1.IsSuccess)
                 {
                     CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0m;

@@ -21,7 +21,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         Console.WriteLine("Mode: " + _mode);
     }
 
-    public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype, string brand, decimal discount)
+    public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
     {
         Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
         Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
@@ -82,7 +82,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
             {
                 Console.WriteLine("Open Gasstations in Service " + gS.ToString());
                 Console.WriteLine("Setting Price for Fuel Type: " + fueltype);
-                gS.SetPrice(fueltype, brand, discount);
+                gS.SetPrice(fueltype);
                 gS.SetUpdateTime(fueltype);
                 gS.SetUpdateAmount(fueltype);
                 Console.WriteLine("Distance before calculation: " + gS.Dist);

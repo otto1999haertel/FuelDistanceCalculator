@@ -33,7 +33,7 @@ namespace FuelDistanceCalculatorTest.ModelTests
             decimal pricePerKm = 0.25m; // 0.10 € pro km
 
             // Act
-            decimal result = gasStation.CalculateTotalCostDoubleWay(fuelAmount, pricePerKm);
+            decimal result = gasStation.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, pricePerKm);
 
             // Assert
             decimal expectedFuelCost = fuelAmount * (decimal)gasStation.Fuels[0].Price; // 30.00 €
@@ -42,9 +42,9 @@ namespace FuelDistanceCalculatorTest.ModelTests
             Assert.That(expectedTotal.Equals(result));
         }
 
-        [TestCase("Aral", "Aral", 5.0, 1.425, true)]  // ✓ Korrekt: 1.50 - 5% = 1.425
-        [TestCase("Shell", "Aral", 5.0, 1.50, false)]  // ✓ Korrekt: Kein Rabatt
-        [TestCase("aral", "Aral", 10.0, 1.35, true)]  // ✓ Korrekt: 1.50 - 10% = 1.35
+        [TestCase("Aral", "Aral", 0.05, 1.425, true)]  // ✓ Korrekt: 1.50 - 5% = 1.425
+        [TestCase("Shell", "Aral", 0.05, 1.50, false)]  // ✓ Korrekt: Kein Rabatt
+        [TestCase("aral", "Aral", 0.1, 1.35, true)]  // ✓ Korrekt: 1.50 - 10% = 1.35
         [TestCase("Aral", "Aral", 0.0, 1.50, false)]   // ✓ Korrekt: 0% Rabatt
         public void CalculateDiscountForBrandTest(string stationBrand, string inputBrand, double discountPercent, double expectedPrice, bool discountApplied)
         {
@@ -62,7 +62,7 @@ namespace FuelDistanceCalculatorTest.ModelTests
             };
 
             // Act
-            gasStation.SetPrice("Diesel", inputBrand, (decimal)discountPercent);
+            gasStation.SetPriceWithPercentageDiscount("Diesel", inputBrand, (decimal)discountPercent);
 
             // Assert
             Assert.That(gasStation.FuelTypePrice, Is.EqualTo((decimal)expectedPrice).Within(0.001m));

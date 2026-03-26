@@ -15,31 +15,42 @@ public static class TankCostService
         SavingsToCheapestStation = cheapestFuelCost.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
         SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
     }
-    public static List<GasStation> GetCheapestStationsAccordTotalCost(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType, string stationBrand="", decimal discountPercent=0)
-    {
-        if (stations == null || !stations.Any())
-        {
-            Console.WriteLine("Keine Tankstellen vorhanden, leere Liste wird zurückgegeben.");
-            return new List<GasStation>();
-        }
 
-        // Wenn fuelAmount <= 0, sortiere nach FuelTypePrice und Dist
-        if (fuelAmount <= 0)
+    public static List<GasStation> GetCheapestStationDiscountPerCent(List<GasStation> stations, string fuelType, string stationBrand="", decimal dicountPercent=0)
+    {
+        if(stations.IsNullOrEmpty() || dicountPercent<0 || dicountPercent >100)
         {
-            Console.WriteLine("FuelAmount <= 0, sortiere nach FuelTypePrice und Dist.");
-            return stations
+            Console.WriteLine("Keine Stationen verfügbar.");
+            return stations;
+        }
+         Console.WriteLine("FuelAmount <= 0, sortiere nach FuelTypePrice und Dist.");
+            var gasStations= stations
                 .AsParallel() // Parallele Verarbeitung
                 .Where(station => station.IsOpen && station.Fuels != null)
                 .Select(station =>
                 {
-                    station.SetPrice(fuelType, stationBrand, discountPercent); // Setze FuelTypePrice basierend auf fuelType
+                    station.SetPriceWithPercentageDiscount(fuelType,stationBrand,dicountPercent); // Setze FuelTypePrice basierend auf fuelType
                     station.SetUpdateTime(fuelType); // Setze LastUpdate
                     station.SetUpdateAmount(fuelType); // Setze UpdateAmount
                     return station;
                 })
-                .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue) // Primär: Aufsteigend nach Preis
-                .ThenBy(station => station.Dist ?? double.MaxValue) // Sekundär: Aufsteigend nach Entfernung
                 .ToList();
+            
+            return gasStations
+                .OrderBy(station => station.FuelTypePrice ?? decimal.MaxValue).ToList(); // Primär: Aufsteigend nach Preis // Sekundär: Aufsteigend nach Entfernung
+    }
+
+    public static List<GasStation> GetCheapestStationsTotalCostDiscountRelAbs(List<GasStation> stations, decimal fuelAmount, decimal costPerKm, string fuelType, string stationBrand="", decimal discountAmount =0)
+    {
+        // Wenn fuelAmount <= 0, sortiere nach FuelTypePrice und Dist
+        if(stations.IsNullOrEmpty())
+        {
+            Console.WriteLine("Keine Stationen verfügbar.");
+            return new List<GasStation>();
+        }
+        if (fuelAmount <= 0)
+        {
+           return GetCheapestStationDiscountPerCent(stations, fuelType, stationBrand, discountAmount);
         }
 
         Console.WriteLine($"Parallel working started for {stations.Count} stations with fuelType: {fuelType}");
@@ -49,7 +60,7 @@ public static class TankCostService
             .Select(station =>
             {
                 // Setze FuelTypePrice und LastUpdate
-                station.SetPrice(fuelType, stationBrand, discountPercent);
+                station.SetPriceWithPercentageDiscount(fuelType, stationBrand, discountAmount);
                 station.SetUpdateTime(fuelType);
                 station.SetUpdateAmount(fuelType);
 
@@ -59,7 +70,7 @@ public static class TankCostService
                 {
                     try
                     {
-                        totalCost = station.CalculateTotalCostDoubleWay(fuelAmount, costPerKm);
+                        totalCost = station.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, costPerKm,stationBrand,discountAmount);
                     }
                     catch (ArgumentException ex)
                     {

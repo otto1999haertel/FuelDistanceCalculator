@@ -7,24 +7,23 @@ on:
 
 jobs:
   check-changes:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
+
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: master
-          fetch-depth: 2  # Letzten 2 Commits holen
-      
+          fetch-depth: 2
+
       - name: Check for new commits
         id: check
         run: |
-          # Prüfe ob es in den letzten 24h Commits gab
           LAST_COMMIT=$(git log -1 --format=%ct)
           CURRENT_TIME=$(date +%s)
           TIME_DIFF=$((CURRENT_TIME - LAST_COMMIT))
-          
-          # 86400 Sekunden = 24 Stunden
+
           if [ $TIME_DIFF -lt 86400 ]; then
             echo "should_deploy=true" >> $GITHUB_OUTPUT
             echo "✓ Neue Commits gefunden (vor $((TIME_DIFF / 3600)) Stunden)"
@@ -37,10 +36,9 @@ jobs:
     needs: check-changes
     if: needs.check-changes.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: master
       - run: dotnet build --configuration Release
 
   test:
@@ -49,21 +47,18 @@ jobs:
     env:
       ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
       ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: master
       - run: dotnet test --configuration Release
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: ${{ needs.test.result == 'success' }}
+    if: needs.test.result == 'success'
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: master
 
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -102,6 +97,7 @@ jobs:
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
           EOF
           "
+
       - name: Verify .env.server on server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
@@ -129,7 +125,7 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
-      
+
       - name: Deploy on remote server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
@@ -157,6 +153,6 @@ jobs:
           if [ "${{ needs.test.result }}" == "success" ]; then
             echo "✓ Nightly deployment successful"
           else
-            echo "✗ Nightly deployment failed - tests did not pass"
+            echo "✗ Deployment failed"
             exit 1
           fi

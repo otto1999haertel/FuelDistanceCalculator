@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FuelDistanceCalculator.Services;
 
 namespace FuelDistanceCalculatorTest.DataTest;
@@ -33,5 +34,16 @@ public class ADAC_DataTest
         Dictionary<string, string> carsAndRespectivePricePerkm =  await CarDataParser.GetMetaData(filePath);
         Assert.That(carsAndRespectivePricePerkm, Is.Not.Null, "Deserialized object is null.");
         Assert.That(!string.IsNullOrEmpty(carsAndRespectivePricePerkm["generated_at"]));
+    }
+
+    [Test]
+    public async Task DataContent_Test()
+    {
+        Dictionary<string, decimal> carsAndRespectivePricePerkm =  await CarDataParser.ParseCarData(filePath);
+        foreach(KeyValuePair<string,decimal> kvp in carsAndRespectivePricePerkm)
+        {
+            Regex regex = new Regex("([0-9]* (kW))$");
+            Assert.That(regex.Match(kvp.Key).Success,Is.True);
+        }
     }
 }

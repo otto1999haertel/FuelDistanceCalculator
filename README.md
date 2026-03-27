@@ -43,4 +43,18 @@ For a successfull connection to the gas station price service you have to create
 # do you action e.g. stop nginx, start containers ...
 ```
 - test with: sudo certbot renew --dry-run  
-- forcfule re-run (max 5 times a wekk): certbot renew --force-renewal
+- forcfule re-run (max 5 times a wekk): certbot renew --force-renewal  
+
+# Just for my stupid self (git)  
+- deleting all local branches without tracking remote branch:  
+```bash
+git fetch --prune && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d
+```  
+- create new branch from current branch:  
+```bash
+git checkout -b [name]
+```  
+- pushing newly created local brnach upstream:  
+```bash
+git push origin -u [name]
+```  

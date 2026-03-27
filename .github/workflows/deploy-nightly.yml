@@ -132,8 +132,8 @@ jobs:
           fi
 
           cd /home/${{ secrets.SSH_USER }}/fuelgo
-          sudo docker compose --env-file .env.server stop fuelgo-webapp nginx db
-          sudo docker compose --env-file .env.server rm -f fuelgo-webapp nginx db
+          sudo docker compose --env-file .env.server stop fuelgo-webapp nginx
+          sudo docker compose --env-file .env.server rm -f fuelgo-webapp nginx
           sudo docker compose --env-file .env.server up --build -d
           
           echo "✓ Deployment completed successfully at \$(date)"

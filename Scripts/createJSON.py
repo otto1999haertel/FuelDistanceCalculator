@@ -4,6 +4,7 @@ import os
 import re
 import camelot
 from pathlib import Path
+from datetime import datetime
 
 Input_PDF = "autokostenuebersicht.pdf"
 Output_JSON = "ADAC_car_data.json"

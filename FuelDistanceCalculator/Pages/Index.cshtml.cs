@@ -492,8 +492,7 @@ public class IndexModel : PageModel
         }
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
         Console.WriteLine("Combined Path: " + filePath);
-        var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
-        CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(jsonContent);
+        CarsAndRespectivePricePerkm = await CarDataParser.ParseCarData(filePath);
     }
 
     private string GetFuelTypeForAPI()

@@ -9,7 +9,8 @@ For a successfull connection to the gas station price service you have to create
 
 
 # Design Updates
-- to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
+- to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine  
+- to update cost per kilometer: download the current PDF file from ADAC in your download folder and run the script createJSON.py und Scripts
 
 # Build
 - in executable code only use IConfiguration configuration["XAttributeX"] for most flexibility no Environment.Get  

@@ -21,14 +21,13 @@ jobs:
             echo "::warning::ADAC data file not found at $JSON_PATH"
             exit 0
           fi
-
-          echo "JSON preview:"
-          head -10 "$JSON_PATH"
           
-          AGE_DAYS=$(python3 -c "
+          AGE_DAYS=$(python3 - "$JSON_PATH" << 'EOF'
           import json
+          import sys
           from datetime import datetime
-          with open('$JSON_PATH') as f:
+          path = sys.argv[1]
+          with open(path) as f:
               d = json.load(f)
           if 'metadata' not in d:
               print(-1)
@@ -36,9 +35,8 @@ jobs:
               generated = datetime.fromisoformat(d['metadata']['generated_at'])
               age = (datetime.now() - generated).days
               print(age)
-          ")
-          
-          echo "AGE_DAYS value: '$AGE_DAYS'"
+          EOF
+          )
           
           if [ "$AGE_DAYS" -eq -1 ]; then
             echo "::warning::ADAC data has no metadata - regenerate JSON with updated Python script"

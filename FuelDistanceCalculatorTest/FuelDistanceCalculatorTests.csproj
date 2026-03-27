@@ -32,6 +32,10 @@
   <None Update="..\Data\Fuel_price_API_response.json">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
+
+  <None Update="..\Data\ADAC_car_data.json.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
   <None Update="..\libman.json">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>

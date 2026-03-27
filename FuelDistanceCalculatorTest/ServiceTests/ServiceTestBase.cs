@@ -1,7 +1,5 @@
 ﻿using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StackExchange.Redis;
 

@@ -1,3 +1,5 @@
+namespace FuelDistanceCalculator.Constants;
+
 public enum ActionType
 {
     Calculate,

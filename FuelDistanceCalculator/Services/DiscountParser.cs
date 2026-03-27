@@ -1,5 +1,7 @@
 using System.Globalization;
 
+namespace FuelDistanceCalculator.Services;
+
 public static class DiscountParser
 {
     public static bool TryParseDiscountPercent(string input, out decimal discountValuePercent)

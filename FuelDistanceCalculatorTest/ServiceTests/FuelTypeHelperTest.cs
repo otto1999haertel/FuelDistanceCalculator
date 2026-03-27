@@ -1,3 +1,5 @@
+using FuelDistanceCalculator.Constants;
+
 namespace FuelDistanceCalculatorTest.ServiceTests;
 
 public class FuelTypeHelperTest

@@ -4,7 +4,7 @@ using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
-using Moq; // nur nötig, wenn du direkt im Program testweise mockst
+using Moq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +83,7 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 
 if (app.Environment.IsDevelopment())
 {
-    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownIPNetworks.Clear();
     forwardedHeadersOptions.KnownProxies.Clear();
 }
 else

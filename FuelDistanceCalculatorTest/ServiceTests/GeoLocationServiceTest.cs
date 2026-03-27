@@ -191,9 +191,7 @@ public class GeoLocationServiceTest : ServiceTestBase
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(fullAddress), "API wurde aufgerufen trotz Cache-Hit!");
     }
-
-    //TODO: write Test for OpenRouteService API
-
+    
     [Test]
     public async Task GetDistanceTest()
     {

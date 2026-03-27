@@ -23,6 +23,8 @@ jobs:
           fi
           
           AGE_DAYS=$(python3 -c "
+          echo "JSON preview:"
+          head -10 "$JSON_PATH"
           import json
           from datetime import datetime
           with open('$JSON_PATH') as f:

@@ -48,17 +48,6 @@ jobs:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
-      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
-
-    steps:
-      - uses: actions/checkout@v5
-      - run: dotnet test --configuration Release
-
   deploy:
     needs: test
     runs-on: ubuntu-latest

@@ -7,7 +7,6 @@ To start the app navigate to the root folder, where docker-compose.yml file is l
 docker compose up --build
 For a successfull connection to the gas station price service you have to create a env.server file and enter your API Key in the following format, as shown in FuelDistanceCalcultaor/.env.local
 
-
 # Design Updates
 - to update the bootstrap design run 'libman restore' in the FuelDistanceCalculator folder on your machine
 

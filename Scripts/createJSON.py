@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import re
@@ -56,5 +57,20 @@ for table in camelot_tables:
 output_path = os.path.join(output_json_dir, Output_JSON)
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
+
+print(f"\n✓ {len(data)} Einträge gespeichert → {output_path}")
+
+output = {
+    "metadata": {
+        "source": "ADAC Autokosten Herbst/Winter 2025",
+        "generated_at": datetime.now().isoformat(),
+        "entry_count": len(data)
+    },
+    "cars": data
+}
+
+output_path = os.path.join(output_json_dir, Output_JSON)
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(output, f, ensure_ascii=False, indent=2)
 
 print(f"\n✓ {len(data)} Einträge gespeichert → {output_path}")

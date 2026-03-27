@@ -27,10 +27,18 @@ jobs:
           from datetime import datetime
           with open('$JSON_PATH') as f:
               d = json.load(f)
-          generated = datetime.fromisoformat(d['metadata']['generated_at'])
-          age = (datetime.now() - generated).days
-          print(age)
+          if 'metadata' not in d:
+              print(-1)
+          else:
+              generated = datetime.fromisoformat(d['metadata']['generated_at'])
+              age = (datetime.now() - generated).days
+              print(age)
           ")
+          
+          if [ "$AGE_DAYS" -eq -1 ]; then
+            echo "::warning::ADAC data has no metadata - regenerate JSON with updated Python script"
+            exit 0
+          fi
           
           echo "Data age: $AGE_DAYS days"
           

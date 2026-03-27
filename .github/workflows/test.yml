@@ -23,17 +23,22 @@ jobs:
           fi
           
           AGE_DAYS=$(python3 -c "
-          import os
+          import json
           from datetime import datetime
-          mtime = os.path.getmtime('$JSON_PATH')
-          age = (datetime.now() - datetime.fromtimestamp(mtime)).days
+          with open('$JSON_PATH') as f:
+              d = json.load(f)
+          generated = datetime.fromisoformat(d['metadata']['generated_at'])
+          age = (datetime.now() - generated).days
           print(age)
           ")
           
           echo "Data age: $AGE_DAYS days"
           
-          if [ \"\$AGE_DAYS\" -gt 180 ]; then
-            echo \"::warning::ADAC data is \$AGE_DAYS days old - consider updating the PDF\"
+          if [ "$AGE_DAYS" -gt 180 ]; then
+            echo "::warning::ADAC data is $AGE_DAYS days old - consider updating the PDF"
+            if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+              exit 1
+            fi
           fi
 
   build:

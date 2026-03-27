@@ -22,26 +22,14 @@ jobs:
             exit 0
           fi
 
-          AGE_DAYS=$(python3 -c "
-import json, sys
-from datetime import datetime
-with open('$JSON_PATH') as f:
-    d = json.load(f)
-if 'metadata' not in d:
-    print(-1)
-else:
-    generated = datetime.fromisoformat(d['metadata']['generated_at'])
-    print((datetime.now() - generated).days)
-")
+          AGE_DAYS=$(python3 .github/scripts/check_adac.py "$JSON_PATH")
 
-          echo "Raw AGE_DAYS: '${AGE_DAYS}'"
+          echo "Data age: $AGE_DAYS days"
 
           if [ "$AGE_DAYS" -eq -1 ]; then
             echo "::warning::ADAC data has no metadata - regenerate JSON with updated Python script"
             exit 0
           fi
-
-          echo "Data age: $AGE_DAYS days"
 
           if [ "$AGE_DAYS" -gt 180 ]; then
             echo "::warning::ADAC data is $AGE_DAYS days old - consider updating the PDF"
@@ -49,7 +37,7 @@ else:
               exit 1
             fi
           fi
-
+          
   build:
     runs-on: ubuntu-latest
     steps:

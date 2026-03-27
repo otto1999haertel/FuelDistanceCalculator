@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  Check ADAC data freshness
+  check_adac:
     run: |
       JSON_PATH="FuelDistanceCalculator/Data/ADAC_car_data.json"
       
@@ -17,7 +17,7 @@ jobs:
         echo "::warning::ADAC data file not found at $JSON_PATH"
         exit 0
       fi
-      
+
       echo "JSON preview:"
       head -10 "$JSON_PATH"
       

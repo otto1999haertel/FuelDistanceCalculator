@@ -22,21 +22,17 @@ jobs:
             exit 0
           fi
 
-          AGE_DAYS=$(python3 - "$JSON_PATH" <<'EOF'
-import json
-import sys
+          AGE_DAYS=$(python3 -c "
+import json, sys
 from datetime import datetime
-path = sys.argv[1]
-with open(path) as f:
+with open('$JSON_PATH') as f:
     d = json.load(f)
 if 'metadata' not in d:
     print(-1)
 else:
     generated = datetime.fromisoformat(d['metadata']['generated_at'])
-    age = (datetime.now() - generated).days
-    print(age)
-EOF
-)
+    print((datetime.now() - generated).days)
+")
 
           echo "Raw AGE_DAYS: '${AGE_DAYS}'"
 

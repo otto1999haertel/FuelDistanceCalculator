@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using FuelDistanceCalculator.Data;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
@@ -7,10 +5,6 @@ using FuelDistanceCalculator;
 using Moq;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Datenbankverbindung setzen (PostgreSQL)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Registriere FuelPriceService als Singleton
 builder.Services.AddSingleton<FuelPriceService>(provider =>

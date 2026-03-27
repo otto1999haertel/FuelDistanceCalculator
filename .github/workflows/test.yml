@@ -20,8 +20,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
-      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release

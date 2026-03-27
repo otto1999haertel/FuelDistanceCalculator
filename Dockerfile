@@ -58,7 +58,6 @@ COPY --from=build /app/publish .
 
 # Kopiere Skripte und SQL-Dateien
 COPY Scripts/start.sh /app/start.sh
-COPY Scripts/create_tables.sql /app/create_tables.sql
 
 # dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh

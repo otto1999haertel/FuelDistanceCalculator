@@ -9,6 +9,28 @@ on:
       - master
 
 jobs:
+  check-data-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check ADAC data freshness
+        run: |
+          GENERATED=$(cat Data/ADAC_car_data.json | python3 -c "import json,sys; print(json.load(sys.stdin)['metadata']['generated_at'])")
+          echo "Data generated at: $GENERATED"
+          
+          AGE_DAYS=$(python3 -c "
+          from datetime import datetime
+          generated = datetime.fromisoformat('$GENERATED')
+          age = (datetime.now() - generated).days
+          print(age)
+          ")
+          
+          echo "Data age: $AGE_DAYS days"
+          
+          if [ "$AGE_DAYS" -gt 180 ]; then
+            echo "::warning::ADAC data is $AGE_DAYS days old - consider updating the PDF"
+          fi
+
   build:
     runs-on: ubuntu-latest
 

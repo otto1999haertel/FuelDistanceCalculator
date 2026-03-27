@@ -9,9 +9,37 @@ on:
       - master
 
 jobs:
+  check_adac:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check ADAC data freshness
+        run: |
+          JSON_PATH="FuelDistanceCalculator/Data/ADAC_car_data.json"
+
+          if [ ! -f "$JSON_PATH" ]; then
+            echo "::warning::ADAC data file not found at $JSON_PATH"
+            exit 0
+          fi
+
+          AGE_DAYS=$(python3 .github/scripts/check_adac.py "$JSON_PATH")
+
+          echo "Data age: $AGE_DAYS days"
+
+          if [ "$AGE_DAYS" -eq -1 ]; then
+            echo "::warning::ADAC data has no metadata - regenerate JSON with updated Python script"
+            exit 0
+          fi
+
+          if [ "$AGE_DAYS" -gt 180 ]; then
+            echo "::warning::ADAC data is $AGE_DAYS days old - consider updating the PDF"
+            if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+              exit 1
+            fi
+          fi
+
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v5
       - run: dotnet build --configuration Release
@@ -20,8 +48,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
-      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release

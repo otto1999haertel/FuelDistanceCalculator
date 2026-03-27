@@ -8,13 +8,6 @@ public class FuelPriceServiceTest : ServiceTestBase
     [Test]
     public async Task GetGasStationsAsync_ReturnsStationsList_Test()
     {
-        // Arrange
-        double latitude = 52.5200; // Beispiel: Berlin
-        double longitude = 13.4050; // Beispiel: Berlin
-        double radius = 5.0; // 5 km Radius
-        string fueltype = "E5";
-        decimal fuelAmount = 50m; // Beispiel: 50 Liter
-
         // Act
         FuelPriceService fuelPriceService = new FuelPriceService();
         decimal? calculatedAverage = fuelPriceService.CalculateAverageCost(_fakeGasStationList);

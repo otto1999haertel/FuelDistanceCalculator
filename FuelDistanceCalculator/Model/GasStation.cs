@@ -5,40 +5,40 @@ namespace FuelDistanceCalculator.Model;
 public class GasStation
 {
     [JsonProperty("country")]
-    public string Country { get; set; }
+    public string? Country { get; set; }
 
     [JsonProperty("id")]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [JsonProperty("brand")]
-    public string Brand { get; set; }
+    public string? Brand { get; set; }
 
     [JsonProperty("street")]
-    public string Street { get; set; }
+    public string? Street { get; set; }
 
     [JsonProperty("postalCode")]
-    public string PostalCode { get; set; }
+    public string? PostalCode { get; set; }
 
     [JsonProperty("place")]
-    public string Place { get; set; }
+    public string? Place { get; set; }
 
     [JsonProperty("coords")]
-    public Coordinates Coords { get; set; }
+    public Coordinates? Coords { get; set; }
 
     [JsonProperty("isOpen")]
     public bool IsOpen { get; set; }
 
     [JsonProperty("closesAt")]
-    public string ClosesAt { get; set; }
+    public string? ClosesAt { get; set; }
 
     [JsonProperty("dist")]
     public double? Dist { get; set; }
 
     [JsonProperty("fuels")]
-    public List<Fuel> Fuels { get; set; }
+    public List<Fuel>? Fuels { get; set; }
 
     [JsonProperty("volatility")]
     public int Volatility { get; set; }

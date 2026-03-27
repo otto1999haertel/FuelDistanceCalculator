@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using FuelDistanceCalculator.Constants;
-using FuelDistanceCalculator.Data;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,7 +13,6 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
 
-    private readonly AppDbContext _context;
     private FuelPriceService _fuelPriceService;
 
     private readonly IMarketFuelPriceService _MarketfuelPriceService;
@@ -122,11 +120,10 @@ public class IndexModel : PageModel
 
     private const string InputDataSessionKey = "InputData";
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, AppDbContext context, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
-        _context = context;
         _MarketfuelPriceService = marketFuelPriceService;
         _geoLocationService = geoLocationService;
         if (NamePlaces == null || !NamePlaces.Any())
@@ -403,7 +400,7 @@ public class IndexModel : PageModel
                     SortMode = (string)null,
                     Discount = string.Empty
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, _context, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService,_configuration)
+            var model = new IndexModel(_logger, _fuelPriceService, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService,_configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,
@@ -495,8 +492,7 @@ public class IndexModel : PageModel
         }
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
         Console.WriteLine("Combined Path: " + filePath);
-        var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
-        CarsAndRespectivePricePerkm = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(jsonContent);
+        CarsAndRespectivePricePerkm = await CarDataParser.ParseCarData(filePath);
     }
 
     private string GetFuelTypeForAPI()

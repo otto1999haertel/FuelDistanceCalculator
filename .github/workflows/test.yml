@@ -12,7 +12,7 @@ jobs:
   check_adac:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check ADAC data freshness
         run: |
           JSON_PATH="FuelDistanceCalculator/Data/ADAC_car_data.json"
@@ -37,14 +37,11 @@ jobs:
               exit 1
             fi
           fi
-          
+
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+      - uses: actions/checkout@v5
       - run: dotnet build --configuration Release
 
   test:
@@ -54,8 +51,5 @@ jobs:
       TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
       OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+      - uses: actions/checkout@v5
       - run: dotnet test --configuration Release

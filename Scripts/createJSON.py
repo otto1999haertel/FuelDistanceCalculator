@@ -4,7 +4,8 @@ import os
 import re
 import camelot
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 Input_PDF = "autokostenuebersicht.pdf"
 Output_JSON = "ADAC_car_data.json"
@@ -64,7 +65,7 @@ print(f"\n✓ {len(data)} Einträge gespeichert → {output_path}")
 output = {
     "metadata": {
         "source": "ADAC Autokosten Herbst/Winter 2025",
-        "generated_at": datetime.now().isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "entry_count": len(data)
     },
     "cars": data

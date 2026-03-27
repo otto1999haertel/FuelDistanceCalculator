@@ -1,6 +1,4 @@
 using FuelDistanceCalculator.Services;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace FuelDistanceCalculatorTest.DataTest;
 

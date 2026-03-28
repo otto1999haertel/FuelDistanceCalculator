@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,6 +17,34 @@
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+     <!-- SEO -->
+    <meta name="description" content="@(ViewData["Description"] ?? "FuelGo – Finde die günstigste Tankstelle in deiner Nähe oder vergleiche Spritkosten zwischen mehreren Orten. Kostenlos, ohne Anmeldung.")" />
+    <meta name="keywords" content="günstige Tankstelle, Spritpreise vergleichen, Diesel günstig, Benzin Preisvergleich, Tankstelle finden" />
+    <meta name="author" content="FuelGo" />
+    <link rel="canonical" href="https://fuelgo.de@Context.Request.Path" />
+
+    <!-- Open Graph (WhatsApp, Discord, Social Media Vorschau) -->
+    <meta property="og:title" content="@ViewData["Title"] – FuelGo" />
+    <meta property="og:description" content="Finde die optimale Tankstelle oder vergleiche Spritkosten zwischen mehreren Orten." />
+    <meta property="og:url" content="https://fuelgo.de@ViewContext.HttpContext.Request.Path" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+
+    <!-- JSON-LD Structured Data (Google versteht was die App macht) -->
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "WebApplication",
+      "name": "FuelGo",
+      "url": "https://fuelgo.de",
+      "description": "Tankstellen vergleichen und günstigste Spritpreise in Deutschland finden",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Web, Android, iOS",
+      "inLanguage": "de-DE",
+      "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+    </script>
 
 </head>
 <body>

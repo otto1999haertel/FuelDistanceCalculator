@@ -1,0 +1,16 @@
+# FuelGo
+> Kostenlose Webanwendung zum Vergleich von Spritpreisen und Tankstellen in Deutschland
+
+## Funktionen
+- Optimale Tankstellensuche nach Standort mit einstellbarem Radius
+- Spritkosten-Vergleich zwischen mehreren Orten
+- Unterstützt Diesel, Super E10, Super E5
+- Berücksichtigt Fahrtkosten (Kosten/km) und voraussichtliche Tankmenge
+- Rabattberechnung (% oder €)
+- Installierbar als PWA (Android & iOS)
+
+## Technologie
+- ASP.NET Core, Tankerkönig API, OpenStreetMap, openrouteservice
+
+## URL
+https://fuelgo.de

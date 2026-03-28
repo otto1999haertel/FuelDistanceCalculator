@@ -840,13 +840,7 @@
             switchView(value); // Passe switchView() an, um den Wert als Parameter zu akzeptieren, falls nötig
             }
 
-        // Optional: Schließe das Dropdown bei Klick außerhalb
-        document.addEventListener('click', function(event) {
-            const customSelect = document.getElementById('viewModeCustom');
-            if (!customSelect.contains(event.target)) {
-                document.getElementById('optionsList').style.display = 'none';
-            }
-            });
+
 
         function toggleDropdownSort() {
             const optionsList = document.getElementById('sortOptionsList');
@@ -867,8 +861,13 @@
 
         // Optional: Schließe das Dropdown bei Klick außerhalb
         document.addEventListener('click', function(event) {
-            const customSelect = document.getElementById('sortModeCustom');
-            if (!customSelect.contains(event.target)) {
+            const viewSelect = document.getElementById('viewModeCustom');
+            if (viewSelect && !viewSelect.contains(event.target)) {
+                document.getElementById('optionsList').style.display = 'none';
+            }
+
+            const sortSelect = document.getElementById('sortModeCustom');
+            if (sortSelect && !sortSelect.contains(event.target)) {
                 document.getElementById('sortOptionsList').style.display = 'none';
             }
         });

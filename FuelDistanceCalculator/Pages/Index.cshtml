@@ -118,7 +118,7 @@
                                 ⓘ
                             </span>
                             <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required 
-                            asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatPricePerKm(this)"
+                            asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatAndSavePricePerKm(this)"
                                 step="any" min="0.01"/>
                         </div>
                     </div>
@@ -490,9 +490,10 @@
             }
         }
 
-        function formatPricePerKm(input) {
+        function formatAndSavePricePerKm(input) {
             let expression = input.value.replace(",", ".");
             document.getElementById("PricePerKm").value = expression;
+            localStorage.setItem("pricePerKm", expression);
         }
 
         $(function () {
@@ -546,6 +547,7 @@
                     data: { carType: selectedCarType },
                     success: function (data) {
                         $('#PricePerKm').val(data.pricePerKm);
+                        localStorage.setItem("pricePerKm", data.pricePerKm);
                     },
                     error: function () {
                         console.error("Fehler beim Abrufen von PricePerKm");
@@ -579,8 +581,15 @@
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl)
-            })
+            });
+            const savedPricePerKm = localStorage.getItem("pricePerKm");
+            if (savedPricePerKm) {
+                // Nur überschreiben wenn Server keinen Wert geliefert hat
+                const currentValue = $('#PricePerKm').val();
+                $('#PricePerKm').val(savedPricePerKm);
+            }
         });
+
         document.addEventListener('DOMContentLoaded', function () {
             const geoButton = document.getElementById("geoButton");
             if (geoButton) {
@@ -614,6 +623,7 @@
                 document.getElementById("listTooltip").style.display = "inline-block";
             }
         }
+
         function initMap() {
             var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
             var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
@@ -724,7 +734,7 @@
             }
         }
 
-       function addLocation() {
+        function addLocation() {
             const container = document.getElementById("dynamicLocations");
             if (locationIndex < 4) {
                 const html = `
@@ -773,7 +783,7 @@
             }
         }
 
-       function sortList(sortValue) {
+        function sortList(sortValue) {
             console.log('Client: SortValue gesendet:', sortValue);
             const container = document.getElementById('stationListContainer');
             container.innerHTML = '<p>Sortiert...</p>';
@@ -813,12 +823,12 @@
             });
         }
 
-                    function toggleDropdown() {
+        function toggleDropdown() {
             const optionsList = document.getElementById('optionsList');
             optionsList.style.display = optionsList.style.display === 'block' ? 'none' : 'block';
             }
 
-            function selectOption(element) {
+        function selectOption(element) {
             const selectedValue = document.getElementById('selectedValue');
             selectedValue.textContent = element.textContent;
             const value = element.getAttribute('data-value');
@@ -830,8 +840,8 @@
             switchView(value); // Passe switchView() an, um den Wert als Parameter zu akzeptieren, falls nötig
             }
 
-            // Optional: Schließe das Dropdown bei Klick außerhalb
-            document.addEventListener('click', function(event) {
+        // Optional: Schließe das Dropdown bei Klick außerhalb
+        document.addEventListener('click', function(event) {
             const customSelect = document.getElementById('viewModeCustom');
             if (!customSelect.contains(event.target)) {
                 document.getElementById('optionsList').style.display = 'none';

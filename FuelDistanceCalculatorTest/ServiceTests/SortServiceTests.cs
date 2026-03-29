@@ -171,4 +171,18 @@ public class SortServiceTests : ServiceTestBase
         Assert.That(result.Count.Equals(3), Is.True);
         Assert.That(result[0].Id, Is.EqualTo(originalOrder[0].Id));
     }
+
+    [Test]
+    public void SortStations_KeepsOriginalCount_Test()
+    {
+        // Arrange
+        string sortMode = "fuelPrice";
+        int originalCount = _fakeGasStationList.Count;
+
+        // Act
+        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+
+        // Assert
+        Assert.That(result.Count.Equals(originalCount), Is.True);
+    }
 }

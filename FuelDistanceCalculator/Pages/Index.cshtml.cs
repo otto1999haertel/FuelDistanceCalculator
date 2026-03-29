@@ -210,7 +210,6 @@ public class IndexModel : PageModel
                 TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);
                 SavingsToNearestStation = savingsToNearestTemp;
                 SavingsToCheapestStation = savingsToCheapestTemp;
-                CheapestResultStations = CheapestResultStations.Take(10).ToList();
                 if (CheapestResultStations != null && CheapestResultStations.Any())
                 {
                     // Protokolliere die Werte vor der Serialisierung

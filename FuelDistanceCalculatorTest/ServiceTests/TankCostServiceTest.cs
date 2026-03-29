@@ -27,12 +27,12 @@ public class TankCostServiceTest : ServiceTestBase
         // Arrange
         decimal fuelAmount = 50m; // Beispiel: 50 Liter
         decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
-
+         int originalCount = _fakeGasStationList.Count;
         //Act
         List<GasStation> result = TankCostService.GetCheapestStation(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
         TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
-        Assert.That(result.Count > 0);
+        Assert.That(result.Count.Equals(originalCount), Is.True);
         Assert.That(CheckOrderByTotalCost(result), Is.True);
     }
 

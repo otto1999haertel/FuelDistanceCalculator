@@ -786,3 +786,52 @@ html.dark-mode input[type="number"]::-webkit-outer-spin-button {
 html.dark-mode .text-muted.ms-1 {
     opacity: 0.4; /* im Dark-Mode noch dezenter */
 }
+
+.loader {
+    display: none;
+    border: 3px solid rgba(255, 255, 255, 0.3);  /* Ring - weiß transparent */
+    border-top-color: white;                      /* Balken - weiß */
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    animation: spin 0.8s ease-in-out infinite;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* Light + Dark Hover - Braun/Erdton */
+.btn:hover .loader {
+    border-color: rgba(61, 51, 40, 0.2);
+    border-top-color: var(--primary-color);
+}
+
+html.dark-mode .btn:hover .loader {
+    border-color: rgba(232, 220, 200, 0.2);
+    border-top-color: var(--primary-color);
+}
+
+/* Dark Mode Standard - Grau-Weiß */
+html.dark-mode .loader {
+    border-color: rgba(232, 220, 200, 0.3);  /* Warmes Grau-Weiß */
+    border-top-color: #e8dcc8;               /* --text-color dark */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light-mode) .loader {
+        border-color: rgba(232, 220, 200, 0.3);
+        border-top-color: #e8dcc8;
+    }
+    :root:not(.light-mode) .btn:hover .loader {
+        border-color: rgba(232, 220, 200, 0.2);
+        border-top-color: var(--primary-color);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

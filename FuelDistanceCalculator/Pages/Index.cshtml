@@ -280,9 +280,13 @@
             </div>
 
             <!-- Berechnen-Button -->
-            <div class="row justify-content-center mt-3">
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                    asp-page-handler="CalculateAverageCost">Vergleichen
+           <div class="row justify-content-center mt-3">
+                <button type="submit" class="btn btn-primary mx-2" 
+                        style="width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        asp-page-handler="CalculateAverageCost"
+                        onclick="document.getElementById('loader-compare').style.display='inline-block'">
+                    Vergleichen
+                    <div class="loader" id="loader-compare"></div>  <!-- Kein extra > hier! -->
                 </button>
             </div>
         </div>
@@ -325,10 +329,15 @@
                         </div>
                     </div>
                 </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                    asp-page-handler="Search" id="SearchBtn">Suchen</button>
-            </div>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary mx-2"
+                            style="width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                            asp-page-handler="Search" id="SearchBtn"
+                            onclick="document.getElementById('loader-search').style.display='inline-block'">
+                        Suchen
+                        <div class="loader" id="loader-search"></div>
+                    </button>
+                </div>
             <div class="row justify-content-center">
                 <div class="col-md-6" style="padding: 20px;">
                 @if (Model.CheapestResultStations.Any())

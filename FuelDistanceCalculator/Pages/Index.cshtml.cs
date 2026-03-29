@@ -113,6 +113,9 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public string DiscountPercentOrAbsolute{get; set; }
+
+    [BindProperty]
+    public string DataSourceDate{get;private set; }
     
     public string SortMode { get; set; }
 
@@ -492,6 +495,11 @@ public class IndexModel : PageModel
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
         Console.WriteLine("Combined Path: " + filePath);
         CarsAndRespectivePricePerkm = await CarDataParser.ParseCarData(filePath);
+        Dictionary<string, string> carsMetaData =  await CarDataParser.GetMetaData(filePath);
+        if (carsMetaData != null && carsMetaData.ContainsKey("generated_at"))
+        {
+            DataSourceDate = carsMetaData["source"];
+        }
     }
 
     private string GetFuelTypeForAPI()

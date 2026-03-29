@@ -25,6 +25,13 @@ if not os.path.exists(output_json_dir):
 data = {}
 brand = ""
 
+camelot_tables_fp = camelot.read_pdf(file_path , pages="0", flavor="stream")
+header_ = camelot_tables_fp[0].df.loc[0,:].values.tolist()
+non_empty_header = [h for h in header_ if h.strip() != ""]
+adac_table_name = non_empty_header[0]
+adac_table_name = adac_table_name.replace("ADAC Autokostenübersicht Alle Hersteller", "").strip()
+print(f"Extracted table name: {adac_table_name}")
+
 camelot_tables = camelot.read_pdf(file_path, pages="3-end", flavor="stream")
 for table in camelot_tables:
     for row in table.data[4:]:
@@ -55,7 +62,7 @@ for table in camelot_tables:
 
 output = {
     "metadata": {
-        "source": "ADAC Autokosten Herbst/Winter 2025",
+        "source": adac_table_name,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "entry_count": len(data)
     },

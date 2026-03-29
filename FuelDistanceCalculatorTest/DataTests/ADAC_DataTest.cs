@@ -34,6 +34,7 @@ public class ADAC_DataTest
         Dictionary<string, string> carsAndRespectivePricePerkm =  await CarDataParser.GetMetaData(filePath);
         Assert.That(carsAndRespectivePricePerkm, Is.Not.Null, "Deserialized object is null.");
         Assert.That(!string.IsNullOrEmpty(carsAndRespectivePricePerkm["generated_at"]));
+        Assert.That(!string.IsNullOrEmpty(carsAndRespectivePricePerkm["source"]));
     }
 
     [Test]

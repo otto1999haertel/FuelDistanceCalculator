@@ -49,9 +49,9 @@ jobs:
       - run: dotnet test --configuration Release
 
   deploy:
-    needs: test
+    needs: [test, check-changes]
     runs-on: ubuntu-latest
-    if: needs.test.result == 'success'
+    if: needs.test.result == 'success' && needs.check-changes.outputs.should_deploy == 'true'
 
     steps:
       - uses: actions/checkout@v5

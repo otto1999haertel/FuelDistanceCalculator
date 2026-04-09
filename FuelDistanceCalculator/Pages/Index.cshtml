@@ -667,7 +667,7 @@
                 shadowSize: [41, 41]
             });
 
-                    @foreach (var station in Model.CheapestResultStations)
+                    @foreach (var station in Model.CheapestResultStations.Take(10))
                 {
                     var lat = station.Coords.Lat.ToString().Replace(",", ".");
                     var lng = station.Coords.Lng.ToString().Replace(",", ".");

@@ -21,6 +21,8 @@ jobs:
         id: check
         run: |
           LAST_COMMIT=$(git log -1 --format=%ct)
+          LAST_COMMIT_INFO=$(git log -1 --pretty=format:"%h - %s (%an, %ar)")
+          echo "Last commit: $LAST_COMMIT_INFO"
           CURRENT_TIME=$(date +%s)
           TIME_DIFF=$((CURRENT_TIME - LAST_COMMIT))
 

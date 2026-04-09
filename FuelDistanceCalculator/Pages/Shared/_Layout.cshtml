@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,54 +10,160 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script src="~/js/darkmode.js"></script>
+
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
-    <!-- jQuery (falls noch nicht vorhanden) -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-     <!-- SEO -->
-    <meta name="description" content="@(ViewData["Description"] ?? "FuelGo – Finde die günstigste Tankstelle in deiner Nähe oder vergleiche Spritkosten zwischen mehreren Orten. Kostenlos, ohne Anmeldung.")" />
-    <meta name="keywords" content="günstige Tankstelle, Spritpreise vergleichen, Diesel günstig, Benzin Preisvergleich, Tankstelle finden" />
+    <!-- SEO -->
+    <meta name="description"
+          content="@(ViewData["Description"] ?? "FuelGo – Finde die günstigste Tankstelle in deiner Nähe oder vergleiche Spritkosten zwischen mehreren Orten. Kostenlos, ohne Anmeldung.")" />
+    <meta name="keywords"
+          content="günstige Tankstelle, Spritpreise vergleichen, Diesel günstig, Benzin Preisvergleich, Tankstelle finden" />
     <meta name="author" content="FuelGo" />
     <link rel="canonical" href="https://fuelgo.de@Context.Request.Path" />
 
-    <!-- Open Graph (WhatsApp, Discord, Social Media Vorschau) -->
+    <!-- Open Graph -->
     <meta property="og:title" content="@ViewData["Title"] – FuelGo" />
     <meta property="og:description" content="Finde die optimale Tankstelle oder vergleiche Spritkosten zwischen mehreren Orten." />
     <meta property="og:url" content="https://fuelgo.de@ViewContext.HttpContext.Request.Path" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
 
-    <!-- JSON-LD Structured Data (Google versteht was die App macht) -->
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
-      "@@context": "https://schema.org",
-      "@@type": "WebApplication",
-      "name": "FuelGo",
-      "url": "https://fuelgo.de",
-      "description": "Tankstellen vergleichen und günstigste Spritpreise in Deutschland finden",
-      "applicationCategory": "UtilitiesApplication",
-      "operatingSystem": "Web, Android, iOS",
-      "inLanguage": "de-DE",
-      "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+        "@@context": "https://schema.org",
+        "@@type": "WebApplication",
+        "name": "FuelGo",
+        "url": "https://fuelgo.de",
+        "description": "Tankstellen vergleichen und günstigste Spritpreise in Deutschland finden",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Web, Android, iOS",
+        "inLanguage": "de-DE",
+        "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "EUR" }
     }
     </script>
 
+    <!-- Google Analytics - DSGVO-konform: Consent default = denied -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+
+        // Standardmäßig alles ablehnen bis Nutzer zustimmt
+        gtag('consent', 'default', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied',
+            'wait_for_update': 500
+        });
+
+        // GA dynamisch laden - nur nach Zustimmung aufrufen
+        function loadGoogleAnalytics() {
+            gtag('consent', 'update', {
+                'analytics_storage': 'granted'
+            });
+            var script = document.createElement('script');
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH';
+            script.async = true;
+            document.head.appendChild(script);
+            script.onload = function () {
+                gtag('js', new Date());
+                gtag('config', 'G-JEP2Q2QZMH', {
+                    'anonymize_ip': true
+                });
+            };
+        }
+
+        // Cookie-Banner Funktionen
+        function acceptCookies() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            document.getElementById('cookieBanner').style.display = 'none';
+            if (typeof loadGoogleAnalytics === 'function') {
+                loadGoogleAnalytics();
+            }
+        }
+
+        function declineCookies() {
+            localStorage.setItem('cookieConsent', 'declined');
+            document.getElementById('cookieBanner').style.display = 'none';
+        }
+
+        // Nach DOM-Laden: Consent prüfen und Banner ggf. anzeigen
+        document.addEventListener('DOMContentLoaded', function () {
+            const consent = localStorage.getItem('cookieConsent');
+            if (consent === 'accepted') {
+                loadGoogleAnalytics();
+            } else if (!consent) {
+                // Noch keine Entscheidung -> Banner anzeigen
+                document.getElementById('cookieBanner').style.display = 'block';
+            }
+            // Bei 'declined': nichts tun, kein Banner, kein Tracking
+        });
+    </script>
+
 </head>
+
 <body>
     <div class="site">
+
+        <!-- Cookie Banner - FuelGo Style mit CSS-Variablen -->
+        <div id="cookieBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;">
+            <div style="
+                background: var(--glass-bg);
+                backdrop-filter: blur(12px) saturate(150%);
+                -webkit-backdrop-filter: blur(12px) saturate(150%);
+                border-top: 1px solid var(--border-color);
+                box-shadow: var(--shadow-neumorphic);
+                padding: 16px;
+                transition: background-color 0.3s ease, color 0.3s ease;">
+                <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                    <p class="mb-0" style="color: var(--text-color); font-size: 0.9rem;">
+                        🍪 Diese Website verwendet <strong>Google Analytics</strong>,
+                        um die Nutzung anonym zu analysieren. Dabei werden Daten an
+                        Google-Server übertragen.
+                        <a href="/Contact#datenschutz" style="color: var(--link-color);">
+                            Datenschutzerklärung
+                        </a>
+                    </p>
+                    <div class="d-flex gap-2 flex-shrink-0">
+                        <button onclick="declineCookies()"
+                                class="btn btn-sm"
+                                style="
+                                    background: transparent;
+                                    border: 1px solid var(--border-color);
+                                    color: var(--text-color);
+                                    border-radius: 8px;
+                                    padding: 6px 16px;">
+                            Ablehnen
+                        </button>
+                        <button onclick="acceptCookies()"
+                                class="btn btn-primary btn-sm"
+                                style="border-radius: 8px; padding: 6px 16px;">
+                            Akzeptieren
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" id="navbar">
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3"
+                 id="navbar">
                 <div class="container">
                     <a class="navbar-brand" asp-area="" asp-page="/Index">FuelGo</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <svg class="navbar-toggler-icon-svg" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 7h22M4 15h22M4 23h22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10"/>
-                    </svg>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse" aria-controls="navbarNav"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <svg class="navbar-toggler-icon-svg" width="30" height="30" viewBox="0 0 30 30"
+                             fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h22M4 15h22M4 23h22" stroke="currentColor" stroke-width="2"
+                                  stroke-linecap="round" stroke-miterlimit="10" />
+                        </svg>
                     </button>
                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                         <ul class="navbar-nav flex-grow-1">
@@ -65,14 +172,16 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-page="/Contact">Kontakt</a>
+                            </li>
                         </ul>
-                        <!-- Dark Mode Toggle Button -->
+                        <!-- Dark Mode Toggle Buttons -->
                         <button id="autoDarkModeToggle" class="btn btn-primary mx-2">🤖 Auto</button>
                         <button id="darkModeToggle" class="btn btn-primary mx-2">🌙 Mode</button>
                     </div>
                 </div>
             </nav>
         </header>
+
         <div class="container">
             <main role="main" class="pb-3">
                 @RenderBody()
@@ -90,6 +199,8 @@
         <script src="~/js/site.js" asp-append-version="true"></script>
 
         @await RenderSectionAsync("Scripts", required: false)
-        </div>
+
+    </div>
 </body>
+
 </html>

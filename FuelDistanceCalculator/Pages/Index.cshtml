@@ -128,7 +128,7 @@
                     <div class="d-flex gap-4">
                         @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
                         {
-                            var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
+                            var displayText = mode == InputMode.auto ? "Suche" : "Vergleich";
                             var radioId = $"mode_{mode}";
 
                             <div class="form-check">

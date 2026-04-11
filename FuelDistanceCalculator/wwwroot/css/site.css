@@ -222,21 +222,15 @@ body {
     grid-template-columns: repeat(2, 1fr); /* Optional: 2 Spalten auf Desktop */
   }
 }
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
   .col-md-5.custom-col.col-12 {
     justify-content: space-between;
     margin-top: var(--spacing-md);
-  }
-  .row {
-    margin-bottom: 30px;
   }
 }
 @media screen and (min-width: 768px) {
   .col-md-5.custom-col.col-12 {
     justify-content: space-between;
-  }
-  .row {
-    margin-bottom: 30px;
   }
 }
 /* Navbar und Icons */

@@ -282,10 +282,10 @@
             <!-- Berechnen-Button -->
            <div class="row justify-content-center mt-3">
                 <button type="submit" class="btn btn-primary mx-2" 
-                        style="width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        style="width: 200px; display: flex; align-items: center; justify-content: center; gap: 6px;"
                         asp-page-handler="CalculateAverageCost"
                         onclick="document.getElementById('loader-compare').style.display='inline-block'">
-                    Vergleichen
+                    Preise Vergleichen
                     <div class="loader" id="loader-compare"></div>  <!-- Kein extra > hier! -->
                 </button>
             </div>
@@ -412,12 +412,13 @@
                         Keine offene Tankstelle im gewählten Radius gefunden
                     </label>
                 }
-                                 </div>
-                    </div>
+             </div>
+        </div>
     </div>
     </form>
-    </div>
-    <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
+</div>
+
+<!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
     <script>
         let mapInitialized = false;
         let map;

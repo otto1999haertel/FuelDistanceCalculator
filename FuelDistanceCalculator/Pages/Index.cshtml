@@ -441,20 +441,91 @@
         }
 
         function calculateAndStore(input) {
-            try {
-                let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                input.value=0;
-                document.getElementById("FuelAmount").value =0;
-                if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                    let result = eval(expression); // Berechne den Ausdruck
-                    if (!isNaN(result) && result>=0) {
-                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                        document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                    }
+            try 
+            {
+                let expression = input.value.replace(",", ".").trim();
+                input.value = 0;
+                document.getElementById("FuelAmount").value = 0;
+
+                if (!/^[0-9+\-*/().\s]*$/.test(expression)) return;
+
+                const result = parseExpression(expression);
+
+                if (!isNaN(result) && isFinite(result) && result >= 0) 
+            {
+                    input.value = result;
+                    document.getElementById("FuelAmount").value = result;
                 }
-            } catch (e) {
+            } 
+            catch (e) {
                 console.error("Ungültiger Ausdruck:", e);
             }
+        }
+
+        // Rekursiver Descent Parser für +, -, *, /
+        function parseExpression(expr) {
+            const tokens = tokenize(expr);
+            let pos = 0;
+
+            function peek() { return tokens[pos]; }
+            function consume() { return tokens[pos++]; }
+
+            function parseAddSub() {
+                let left = parseMulDiv();
+                while (peek() === '+' || peek() === '-') {
+                    const op = consume();
+                    const right = parseMulDiv();
+                    left = op === '+' ? left + right : left - right;
+                }
+                return left;
+            }
+
+            function parseMulDiv() {
+                let left = parseUnary();
+                while (peek() === '*' || peek() === '/') {
+                    const op = consume();
+                    const right = parseUnary();
+                    if (op === '/' && right === 0) throw new Error("Division durch 0");
+                    left = op === '*' ? left * right : left / right;
+                }
+                return left;
+            }
+
+            function parseUnary() {
+                if (peek() === '-') {
+                    consume();
+                    return -parsePrimary();
+                }
+                return parsePrimary();
+            }
+
+            function parsePrimary() {
+                const token = peek();
+                if (token === '(') {
+                    consume(); // '('
+                    const val = parseAddSub();
+                    if (consume() !== ')') throw new Error("Fehlende schließende Klammer");
+                    return val;
+                }
+                if (token !== undefined && !isNaN(parseFloat(token))) {
+                    consume();
+                    return parseFloat(token);
+                }
+                throw new Error(`Unerwartetes Token: ${token}`);
+            }
+
+            return parseAddSub();
+        }
+
+        function tokenize(expr) {
+            // Zerlegt "30*1.5+10" → ['30', '*', '1.5', '+', '10']
+            const regex = /(\d+\.?\d*)|([+\-*/()])/g;
+            const tokens = [];
+            let match;
+            while ((match = regex.exec(expr)) !== null) {
+                tokens.push(match[0]);
+            }
+            return tokens;
         }
 
         function toggleInputMethod(radio) {

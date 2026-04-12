@@ -46,7 +46,8 @@
                                     type="radio"
                                     asp-for="SelectedFuelType"
                                     value="@kvp.Key"
-                                    id="fuel_@kvp.Key" />
+                                    id="fuel_@kvp.Key" 
+                                    onchange="saveFuelType(this)"/>
                                 <label class="form-check-label" for="fuel_@kvp.Key">
                                     @kvp.Value
                                 </label>
@@ -493,6 +494,22 @@
             document.getElementById("PricePerKm").value = expression;
             localStorage.setItem("pricePerKm", expression);
         }
+
+        function saveFuelType(input){
+            console.log("Selected fuel type:", input.value);
+            localStorage.setItem("selectedFuelType", input.value);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedFuelType = localStorage.getItem("selectedFuelType");
+
+            if (savedFuelType) {
+                const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
+            }
+        });
 
         $(function () {
             let debounceTimer = null;

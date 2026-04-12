@@ -425,36 +425,93 @@
                 output.textContent = slider.value;
             });
 
-        function updateRadius(input) {
-            // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
-            if (!input.value.trim()) {
-                input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
-            }
 
-            // Aktualisiere das Modell im Hintergrund
-            var radiusPlace1 = document.querySelector('input[name="RadiusPlace1"]');
-            var radiusPlace2 = document.querySelector('input[name="RadiusPlace2"]');
-            if (input.value > 0) {
-                radiusPlace1.value = input.value;
-                radiusPlace2.value = input.value;  // Das Modell im Hintergrund aktualisieren
+        function calculateAndStore(input) {
+            try 
+            {
+                let expression = input.value.replace(",", ".").trim();
+                input.value = 0;
+                document.getElementById("FuelAmount").value = 0;
+
+                if (!/^[0-9+\-*/().\s]*$/.test(expression)) return;
+
+                const result = parseExpression(expression);
+
+                if (!isNaN(result) && isFinite(result) && result >= 0) 
+            {
+                    input.value = result;
+                    document.getElementById("FuelAmount").value = result;
+                }
+            } 
+            catch (e) {
+                console.error("Ungültiger Ausdruck:", e);
             }
         }
 
-        function calculateAndStore(input) {
-            try {
-                let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                input.value=0;
-                document.getElementById("FuelAmount").value =0;
-                if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                    let result = eval(expression); // Berechne den Ausdruck
-                    if (!isNaN(result) && result>=0) {
-                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                        document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                    }
+        // Rekursiver Descent Parser für +, -, *, /
+        function parseExpression(expr) {
+            const tokens = tokenize(expr);
+            let pos = 0;
+
+            function peek() { return tokens[pos]; }
+            function consume() { return tokens[pos++]; }
+
+            function parseAddSub() {
+                let left = parseMulDiv();
+                while (peek() === '+' || peek() === '-') {
+                    const op = consume();
+                    const right = parseMulDiv();
+                    left = op === '+' ? left + right : left - right;
                 }
-            } catch (e) {
-                console.error("Ungültiger Ausdruck:", e);
+                return left;
             }
+
+            function parseMulDiv() {
+                let left = parseUnary();
+                while (peek() === '*' || peek() === '/') {
+                    const op = consume();
+                    const right = parseUnary();
+                    if (op === '/' && right === 0) throw new Error("Division durch 0");
+                    left = op === '*' ? left * right : left / right;
+                }
+                return left;
+            }
+
+            function parseUnary() {
+                if (peek() === '-') {
+                    consume();
+                    return -parsePrimary();
+                }
+                return parsePrimary();
+            }
+
+            function parsePrimary() {
+                const token = peek();
+                if (token === '(') {
+                    consume(); // '('
+                    const val = parseAddSub();
+                    if (consume() !== ')') throw new Error("Fehlende schließende Klammer");
+                    return val;
+                }
+                if (token !== undefined && !isNaN(parseFloat(token))) {
+                    consume();
+                    return parseFloat(token);
+                }
+                throw new Error(`Unerwartetes Token: ${token}`);
+            }
+
+            return parseAddSub();
+        }
+
+        function tokenize(expr) {
+            // Zerlegt "30*1.5+10" → ['30', '*', '1.5', '+', '10']
+            const regex = /(\d+\.?\d*)|([+\-*/()])/g;
+            const tokens = [];
+            let match;
+            while ((match = regex.exec(expr)) !== null) {
+                tokens.push(match[0]);
+            }
+            return tokens;
         }
 
         function toggleInputMethod(radio) {
@@ -496,20 +553,8 @@
         }
 
         function saveFuelType(input){
-            console.log("Selected fuel type:", input.value);
             localStorage.setItem("selectedFuelType", input.value);
         }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const savedFuelType = localStorage.getItem("selectedFuelType");
-
-            if (savedFuelType) {
-                const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
-                if (radio) {
-                    radio.checked = true;
-                }
-            }
-        });
 
         $(function () {
             let debounceTimer = null;
@@ -600,21 +645,22 @@
             const savedPricePerKm = localStorage.getItem("pricePerKm");
             if (savedPricePerKm) {
                 // Nur überschreiben wenn Server keinen Wert geliefert hat
-                const currentValue = $('#PricePerKm').val();
                 $('#PricePerKm').val(savedPricePerKm);
             }
-        });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const geoButton = document.getElementById("geoButton");
-            if (geoButton) {
-                geoButton.addEventListener("click", getLocation);
+            const savedFuelType = localStorage.getItem("selectedFuelType");
+            if (savedFuelType) {
+                const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
             }
 
-            const geoButton2 = document.getElementById("geoButton2");
-            if (geoButton2) {
-                geoButton2.addEventListener("click", getLocation);
-            }
+            document.getElementById("geoButton")?.addEventListener("click", getLocation);
+            document.getElementById("geoButton2")?.addEventListener("click", getLocation);
+
+
+
         });
 
         function switchView(value) {
@@ -677,7 +723,6 @@
                 {
                     var lat = station.Coords.Lat.ToString().Replace(",", ".");
                     var lng = station.Coords.Lng.ToString().Replace(",", ".");
-                    var name = Html.Raw(Json.Serialize(station.Name));
                     var price = Model.FuelAmount > 0
                     ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
                     : Model.ToDisplay(station.FuelTypePrice.ToString());
@@ -701,7 +746,7 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendPositionToServer, handleError);
             } else {
-                alert("Geolocation wird nicht unterstützt.");
+                toastr.warning("Geolocation wird nicht unterstützt.");
             }
         }
 
@@ -711,7 +756,9 @@
 
             const response = await fetch("?handler=UpdateLocation", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value },
                 body: JSON.stringify({ latitude: lat, longitude: lon })
             });
 
@@ -729,23 +776,23 @@
                     }
                 }
             } else {
-                alert("Serverfehler bei Standortabfrage.");
+                toastr.error("Serverfehler bei Standortabfrage.");
             }
         }
 
         function handleError(error) {
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    alert("Nutzer hat die Standortfreigabe abgelehnt.");
+                    toastr.warning("Nutzer hat die Standortfreigabe abgelehnt.");
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    alert("Standortinformationen nicht verfügbar.");
+                    toastr.warning("Standortinformationen nicht verfügbar.");
                     break;
                 case error.TIMEOUT:
-                    alert("Standortabfrage hat zu lange gedauert.");
+                    toastr.warning("Standortabfrage hat zu lange gedauert.");
                     break;
                 default:
-                    alert("Unbekannter Fehler.");
+                    toastr.warning("Unbekannter Fehler.");
             }
         }
 
@@ -799,7 +846,6 @@
         }
 
         function sortList(sortValue) {
-            console.log('Client: SortValue gesendet:', sortValue);
             const container = document.getElementById('stationListContainer');
             container.innerHTML = '<p>Sortiert...</p>';
 
@@ -821,14 +867,12 @@
                 body: formData
             })
             .then(response => {
-                console.log('Response:', response);
                 if (!response.ok) {
                     return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
                 }
                 return response.text();
             })
             .then(html => {
-                console.log('HTML empfangen:', html);
                 container.innerHTML = html;
                 document.querySelectorAll('.station-summary').forEach(el => el.onclick = () => toggleDetails(el));
             })

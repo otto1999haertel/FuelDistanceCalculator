@@ -320,6 +320,14 @@ h3 {
   color: var(--text-color);
   border-bottom: 1px solid var(--border-color);
 }
+
+.h3-summary{
+  font-size: 1.4em;
+  font-variation-settings: 'wght' 600;
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+  color: var(--text-color);
+  border-bottom: none;
+}
 /* Forms und Inputs (gruppiert) */
 input, textarea, select, .form-select, .form-control {
   background-color: var(--input-bg);

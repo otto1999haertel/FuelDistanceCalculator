@@ -12,10 +12,10 @@ public class ContactModel : PageModel
     [BindProperty]
     public bool  IsProduction { get; private set; }
 
-    public ContactModel(ILogger<ContactModel> logger)
+    public ContactModel(ILogger<ContactModel> logger, IConfiguration configuration)
     {
         _logger = logger;
-        IsProduction = Environment.GetEnvironmentVariable("MODE_TYPE")?.Equals("Production") == true;
+        IsProduction = configuration["MODE_TYPE"]?.Equals("Production") == true;
     }
 
 

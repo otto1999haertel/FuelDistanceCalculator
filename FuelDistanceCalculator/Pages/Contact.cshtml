@@ -47,7 +47,7 @@
 
 <!-- Datenschutzerklärung -->
 <section id="datenschutzerklaerung">
-    <h2>Datenschutzerklärung</h2>
+    <h2 id="datenschutz">Datenschutzerklärung</h2>
     <p>
         Verantwortlicher für die Datenverarbeitung auf dieser Website ist:
     </p>
@@ -65,6 +65,10 @@
 
     <p>
         Sofern Sie der Standortfreigabe über Ihren Browser zustimmen, werden Ihre aktuellen geografischen Koordinaten (Breiten- und Längengrad) an den Server übertragen, um die nächstgelegenen Tankstellen zu ermitteln. Die übermittelten Koordinaten werden ausschließlich zur Umrechnung in eine Adresse (Reverse Geocoding) verwendet und in anonymisierter Form inkl. des dazugehörigen Ortes für bis zu einem Jahr zwischengespeichert, um die Performance der Anwendung zu verbessern und unnötige API-Anfragen zu vermeiden.
+    </p>
+
+    <p>
+        Zur Verbesserung der Nutzererfahrung wird der zuletzt verwendete Kostensatz pro Kilometer lokal im Browser gespeichert. Es werden keine personenbezogenen Daten übertragen oder gespeichert.
     </p>
     
     <h3>2. Nutzung externer APIs</h3>
@@ -94,23 +98,56 @@
         <li id ="jquery-validation-unobtrusive">jQuery-Validation-Unobtrusive 4.0.0 – <a href="https://github.com/aspnet/jquery-validation-unobtrusive" target="_blank">GitHub</a> – Lizenz: MIT</li>
         </ul>
     </p>
+
+    <h3>3. Google Analytics</h3>
+    <p>
+        Diese Website verwendet Google Analytics, einen Webanalysedienst der Google Ireland Limited, 
+        Gordon House, Barrow Street, Dublin 4, Irland. Google Analytics wird nur nach Ihrer 
+        ausdrücklichen Einwilligung aktiviert (Art. 6 Abs. 1 lit. a DSGVO).
+    </p>
+    <p>
+        Google Analytics verwendet Cookies, um die Nutzung der Website zu analysieren. 
+        Die durch den Cookie erzeugten Informationen werden an einen Server von Google 
+        in den USA übertragen und dort gespeichert. IP-Adressen werden auf dieser Website 
+        anonymisiert (<strong>IP-Anonymisierung</strong>), bevor sie übertragen werden.
+    </p>
+    <p>
+        Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie auf den untenstehenden 
+        Button klicken. Weitere Informationen zur Datenverarbeitung durch Google finden Sie unter: 
+        <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a>
+    </p>
+
+    <!-- Widerruf-Button -->
+    <button onclick="revokeConsent()" 
+        class="btn btn-sm mt-2"
+        style="
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 6px 16px;">
+        🍪 Cookie-Einwilligung widerrufen
+    </button>
+    <span id="consentStatus" class="ms-3" 
+        style="font-size: 0.85rem; color: var(--text-color); opacity: 0.7;">
+    </span>
     
-    <h3>3. Datenweitergabe</h3>
+    <h3>4. Datenweitergabe</h3>
     <p>
         Eine Weitergabe Ihrer Daten an Dritte erfolgt ausschließlich im Rahmen der oben genannten externen API-Dienste. Eine darüberhinausgehende Übermittlung oder dauerhafte Speicherung findet nicht statt.
     </p>
     
-    <h3>4. Sicherheit</h3>
+    <h3>5. Sicherheit</h3>
     <p>
         Wir setzen technische und organisatorische Maßnahmen ein, um Ihre Daten vor unbefugtem Zugriff zu schützen. Da keine dauerhafte Speicherung erfolgt, sind Ihre Daten nur während der aktiven Nutzung der Anwendung temporär vorhanden.
     </p>
     
-    <h3>5. Ihre Rechte</h3>
+    <h3>6. Ihre Rechte</h3>
     <p>
         Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu erhalten. Ebenso können Sie die Berichtigung, Löschung oder Einschränkung der Verarbeitung Ihrer Daten verlangen.
     </p>
     
-    <h3>6. Kontakt</h3>
+    <h3>7. Kontakt</h3>
     <p>
         Bei Fragen zur Verarbeitung Ihrer personenbezogenen Daten oder zu dieser Datenschutzerklärung können Sie uns jederzeit kontaktieren.
     </p>
@@ -161,3 +198,30 @@
         Mit der Nutzung dieser Webanwendung bestätigen Sie, dass Sie diese Nutzungsbedingungen gelesen haben und ihnen zustimmen.
     </p>
 </section>
+
+@section Scripts {
+<script>
+    // Aktuellen Status anzeigen
+    const consent = localStorage.getItem('cookieConsent');
+    const statusEl = document.getElementById('consentStatus');
+
+    if (consent === 'accepted') {
+        statusEl.textContent = '✅ Analytics aktiv';
+        statusEl.style.opacity = '1';
+        statusEl.style.color = 'var(--primary-color)';
+    } else if (consent === 'declined') {
+        statusEl.textContent = '❌ Analytics deaktiviert';
+        statusEl.style.opacity = '0.6';
+    } else {
+        statusEl.textContent = 'ℹ️ Noch keine Entscheidung';
+        statusEl.style.opacity = '0.6';
+    }
+
+    function revokeConsent() {
+        localStorage.removeItem('cookieConsent');
+        statusEl.textContent = '✅ Widerrufen – Banner erscheint beim nächsten Besuch';
+        statusEl.style.color = 'var(--primary-color)';
+        statusEl.style.opacity = '1';
+    }
+</script>
+}

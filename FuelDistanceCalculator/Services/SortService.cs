@@ -1,5 +1,7 @@
 using FuelDistanceCalculator.Model;
 
+namespace FuelDistanceCalculator.Services;
+
 public static class SortService
 {
     public static List<GasStation> SortStations(List<GasStation> stations, string sortMode)

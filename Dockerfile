@@ -57,8 +57,7 @@ RUN apt-get update && \
 COPY --from=build /app/publish .
 
 # Kopiere Skripte und SQL-Dateien
-COPY start.sh /app/start.sh
-COPY create_tables.sql /app/create_tables.sql
+COPY Scripts/start.sh /app/start.sh
 
 # dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh

@@ -1,72 +1,108 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+namespace FuelDistanceCalculatorTest.ServiceTests;
 
-namespace FuelDistanceCalculatorTest.ServiceTests
+[TestFixture]
+public class ApiKeyTest
 {
-    [TestFixture]
-    public class ApiKeyTest
+    private IConfiguration _config;
+
+    [SetUp]
+    public void Setup()
     {
-        private IConfiguration _config;
+        LoadEnvFile(".env.local");
 
-        [SetUp]
-        public void Setup()
+        var envMappings = new Dictionary<string, string?>
         {
-            _config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build();
+            ["ApiSettings:TankApiKey"] = Environment.GetEnvironmentVariable("TANK_API_KEY"),
+            ["ApiSettings:OpenRouteServiceApiKey"] = Environment.GetEnvironmentVariable("OPENROUTESERVICE_API_KEY"),
+        };
+
+        _config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+            .AddEnvironmentVariables()
+            .AddInMemoryCollection(envMappings)
+            .Build();
+    }
+
+    [Test]
+    public void ApiKeysMustBePresentInConfiguration()
+    {
+        // Act: Lese die Keys aus der Config
+        string tankKey = _config["ApiSettings:TankApiKey"];
+        string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
+
+        // Assert: Keys müssen gesetzt sein
+        Assert.That(!string.IsNullOrWhiteSpace(tankKey),
+            $"TankApiKey should not be empty. Current value: '{tankKey}'");
+        Assert.That(!string.IsNullOrWhiteSpace(openrKey),
+            $"OpenRouteServiceApiKey should not be empty. Current value: '{openrKey}'");
+    }
+
+    [Test]
+    [Category("CI")] // Nur in CI ausführen
+    public void ApiKeysInCIMustBeProductionKeys()
+    {
+        // Dieser Test läuft NUR in der CI-Pipeline
+        bool isCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI"))
+                    || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"));
+
+        if (!isCI)
+        {
+            Assert.Ignore("Test only runs in CI environment");
+            return;
         }
 
-        [Test]
-        public void ApiKeysMustBePresentInConfiguration()
+        string tankKey = _config["ApiSettings:TankApiKey"];
+        string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
+
+        // Prüfe, dass es KEINE Fake-Keys sind
+        var fakeKeyPrefixes = new[] { "fake", "test", "local", "dev", "dummy", "sample" };
+
+        Assert.That(!fakeKeyPrefixes.Any(prefix =>
+            tankKey?.ToLower().Contains(prefix) ?? false),
+            $"TankApiKey appears to be a fake/test key in CI: '{tankKey}'");
+
+        Assert.That(!fakeKeyPrefixes.Any(prefix =>
+            openrKey?.ToLower().Contains(prefix) ?? false),
+            $"OpenRouteServiceApiKey appears to be a fake/test key in CI: '{openrKey}'");
+
+        // Keys sollten echte API-Key-Länge haben
+        Assert.That(tankKey?.Length >= 20,
+            $"TankApiKey seems too short for production: {tankKey?.Length} chars");
+        Assert.That(openrKey?.Length >= 20,
+            $"OpenRouteServiceApiKey seems too short for production: {openrKey?.Length} chars");
+
+        Console.WriteLine("✓ Production API keys verified in CI environment");
+    }
+
+    private static void LoadEnvFile(string filePath)
+    {
+        // Suche die .env-Datei vom Test-Verzeichnis aus nach oben
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null)
         {
-            // Act: Lese die Keys aus der Config
-            string tankKey = _config["ApiSettings:TankApiKey"];
-            string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
-
-            // Assert: Keys müssen gesetzt sein
-            Assert.That(!string.IsNullOrWhiteSpace(tankKey),
-                $"TankApiKey should not be empty. Current value: '{tankKey}'");
-            Assert.That(!string.IsNullOrWhiteSpace(openrKey),
-                $"OpenRouteServiceApiKey should not be empty. Current value: '{openrKey}'");
-        }
-
-        [Test]
-        [Category("CI")] // Nur in CI ausführen
-        public void ApiKeysInCIMustBeProductionKeys()
-        {
-            // Dieser Test läuft NUR in der CI-Pipeline
-            bool isCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI"))
-                        || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"));
-
-            if (!isCI)
+            var envFile = Path.Combine(dir.FullName, filePath);
+            if (File.Exists(envFile))
             {
-                Assert.Ignore("Test only runs in CI environment");
+                foreach (var line in File.ReadAllLines(envFile))
+                {
+                    // Kommentare und leere Zeilen überspringen
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                        continue;
+
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2)
+                    {
+                        var key = parts[0].Trim();
+                        var value = parts[1].Trim();
+                        // Nur setzen wenn noch nicht gesetzt (echte Env-Vars haben Vorrang)
+                        if (Environment.GetEnvironmentVariable(key) == null)
+                            Environment.SetEnvironmentVariable(key, value);
+                    }
+                }
                 return;
             }
-
-            string tankKey = _config["ApiSettings:TankApiKey"];
-            string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
-
-            // Prüfe, dass es KEINE Fake-Keys sind
-            var fakeKeyPrefixes = new[] { "fake", "test", "local", "dev", "dummy", "sample" };
-
-            Assert.That(!fakeKeyPrefixes.Any(prefix =>
-                tankKey?.ToLower().Contains(prefix) ?? false),
-                $"TankApiKey appears to be a fake/test key in CI: '{tankKey}'");
-
-            Assert.That(!fakeKeyPrefixes.Any(prefix =>
-                openrKey?.ToLower().Contains(prefix) ?? false),
-                $"OpenRouteServiceApiKey appears to be a fake/test key in CI: '{openrKey}'");
-
-            // Keys sollten echte API-Key-Länge haben
-            Assert.That(tankKey?.Length >= 20,
-                $"TankApiKey seems too short for production: {tankKey?.Length} chars");
-            Assert.That(openrKey?.Length >= 20,
-                $"OpenRouteServiceApiKey seems too short for production: {openrKey?.Length} chars");
-
-            Console.WriteLine("✓ Production API keys verified in CI environment");
+            dir = dir.Parent;
         }
     }
 }

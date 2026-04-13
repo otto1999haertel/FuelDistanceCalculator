@@ -1,5 +1,3 @@
-using System;
-
 namespace FuelDistanceCalculator.Constants;
 
 public enum InputMode

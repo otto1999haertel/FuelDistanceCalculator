@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FuelDistanceCalculator.Services;
+
 public class ApiThrottle
 {
     private readonly TimeSpan _defaultInterval = TimeSpan.FromSeconds(1); // Standardintervall (1 Anfrage pro Sekunde)

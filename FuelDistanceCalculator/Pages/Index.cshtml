@@ -14,18 +14,14 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
     gtag('config', 'G-JEP2Q2QZMH');
 </script>
-
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <div class="text-center">
@@ -37,45 +33,51 @@
     <form method="post">
         @Html.AntiForgeryToken()
         <div class="row justify-content-center">
-            <!-- Eingabefelder für globale Werte - mittig zentriert -->
             <div class="col-md-6">
-                <!-- Radio buttons für Spritart -->
-                <div class="mb-3">
-                <label class="form-label">Spritart</label>
-                <div class="d-flex gap-4">
-                    @foreach (var kvp in FuelTypeHelper.FuelTypeNames)
-                    {
-                        <div class="form-check">
-                            <input class="styled-radio" 
-                                type="radio" 
-                                asp-for="SelectedFuelType" 
-                                value="@kvp.Key" 
-                                id="fuel_@kvp.Key" />
-                            <label class="form-check-label" for="fuel_@kvp.Key">
-                                @kvp.Value
-                            </label>
-                        </div>
-                    }
-                </div>
-            </div>
 
-                <div class="form-group">
-                    <div class="row g-2">
+                <!-- Spritart -->
+                <div class="mb-3">
+                    <label class="form-label">Spritart</label>
+                    <div class="d-flex gap-3">
+                        @foreach (var kvp in FuelTypeHelper.FuelTypeNames)
+                        {
+                            <div class="form-check">
+                                <input class="styled-radio"
+                                    type="radio"
+                                    asp-for="SelectedFuelType"
+                                    value="@kvp.Key"
+                                    id="fuel_@kvp.Key" 
+                                    onchange="saveFuelType(this)"/>
+                                <label class="form-check-label" for="fuel_@kvp.Key">
+                                    @kvp.Value
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Tankstellenmarke & Rabatt -->
+                <div class="mb-3">
+                    <div class="row gx-3">
                         <div class="col-md-6">
                             <label for="stationBrand">Tankstellenmarke</label>
-                            <input type="text" id="stationBrand" name="StationBrand" class="form-control" 
+                            <input type="text" id="stationBrand" name="StationBrand" class="form-control"
                                 placeholder="z.B. Shell, Aral" value="@Model.StationBrand" />
                         </div>
                         <div class="col-md-6">
-                            <label for="discountPercent">Rabatt (%)</label>
-                            <input type="number" id="discountPercent" name="DiscountPercent" class="form-control" 
-                                placeholder="0" step="any" min="0" max="100" value="@Model.DiscountPercent" />
+                            <label for="discountPercent">Rabatt (%/€)</label>
+                            <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                                title="Verwende % für prozentuale Rabatte oder ohne Suffix für Festbeträge.">
+                                ⓘ
+                            </span>
+                            <input type="text" id="discountPercent" name="DiscountPercentOrAbsolute" class="form-control"
+                                    placeholder="z.B. 30% oder 20" min="0" value="@Model.DiscountPercentOrAbsolute" />
                         </div>
                     </div>
                 </div>
 
-                <!-- Eingabe für Tankmenge -->
-                <div class="form-group">
+                <!-- Tankmenge -->
+                <div class="mb-3">
                     <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
                     <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                         title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
@@ -84,16 +86,12 @@
                     <input type="text" id="FuelAmountDisplay" class="form-control" required
                         onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
                     <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
-
-                    <script>
-                    </script>
-
                 </div>
 
-                <!-- Preis pro Kilometer -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
+                <!-- Fahrzeugtyp & Kosten pro KM -->
+                <div class="mb-3">
+                    <div class="row gx-3">
+                        <div class="col-md-6">
                             <label for="SelectedCarType">Fahrzeugtyp </label>
                             <span>
                                 <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
@@ -104,27 +102,26 @@
                                 list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
                             <div id="suggestions" class="suggestions-box"></div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <!-- Preis pro Kilometer -->
-                        <div class="form-group">
+                        <div class="col-md-6">
                             <label for="PricePerKm">Kosten pro Kilometer (€)</label>
                             <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                                 title="Durchschnittliche Kosten pro Kilometer, für Vorschläge nutze die Fahrzeugtypsuche">
                                 ⓘ
                             </span>
-                            <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required 
-                            asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatPricePerKm(this)"
+                            <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required
+                            asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatAndSavePricePerKm(this)"
                                 step="any" min="0.01"/>
                         </div>
                     </div>
                 </div>
-                <div class="mb-3">
+
+                <!-- Modus -->
+                <div class="mb-2">
                     <label class="form-label">Modus</label>
-                    <div class="d-flex gap-4">
+                    <div class="d-flex gap-3">
                         @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
                         {
-                            var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
+                            var displayText = mode == InputMode.auto ? "Suche" : "Vergleich";
                             var radioId = $"mode_{mode}";
 
                             <div class="form-check">
@@ -141,106 +138,105 @@
                         }
                     </div>
                 </div>
+
             </div>
         </div>
-        <!-- Manuelle Eingabe (wird ausgeblendet, wenn Automatische Auswahl gewählt wird) -->
+
+        <!-- Vergleich-Modus -->
         <div id="manualInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
-             <div class="row g-3 align-items-start">
+            <div class="row g-3 align-items-start">
                 @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
                     <!-- Standort 1 -->
                     <div class="col-md-5 offset-md-1">
                         <div class="d-flex flex-column h-100">
-                                <label class="form-label mb-1">Standort 1</label>
-                                <div class="input-group">
-                                    <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
-                                        value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
-                                        placeholder="Geben Sie einen Ort ein" />
-                                    <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
-                                        <img src="location.png" alt="Standort">
-                                    </button>
-                                </div>
+                            <label class="form-label mb-1">Standort 1</label>
+                            <div class="input-group">
+                                <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
+                                    value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
+                                    placeholder="Geben Sie einen Ort ein" />
+                                <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+                                    <img src="location.png" alt="Standort">
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-5">
-                            <div class="d-flex flex-column h-100">
-                                <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
-                                <div class="d-flex align-items-center gap-2 h-100">
-                                    <label class="text-nowrap">1</label>
-                                    <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                        <input type="range"
-                                            name="RadiusPlaces[0]"
-                                            class="form-range"
-                                            min="1"
-                                            max="25"
-                                            step="1"
-                                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                            id="RadiusPlace0"
-                                            oninput="document.getElementById('outputRadius0').textContent = this.value" />
-                                    </div>
-                                    <output id="outputRadius0" class="value-output">
-                                        @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
-                                    </output>
-                                     <label class="text-nowrap">km</label>
+                        <div class="d-flex flex-column h-100">
+                            <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
+                            <div class="d-flex align-items-center gap-3 h-100">
+                                <label class="text-nowrap">1</label>
+                                <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                    <input type="range"
+                                        name="RadiusPlaces[0]"
+                                        class="form-range"
+                                        min="1"
+                                        max="25"
+                                        step="1"
+                                        value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
+                                        id="RadiusPlace0"
+                                        oninput="document.getElementById('outputRadius0').textContent = this.value" />
                                 </div>
+                                <output id="outputRadius0" class="value-output">
+                                    @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
+                                </output>
+                                <label class="text-nowrap">km</label>
                             </div>
+                        </div>
                     </div>
 
-                        <!-- Standort 2 -->
-                        <div class="col-md-5 offset-md-1 mt-3">
-                            <div class="d-flex flex-column h-100">
-                                <label class="form-label mb-1">Standort 2</label>
-                                <input type="text" 
-                                    name="NamePlaces[1]" 
-                                    class="form-control"
-                                    value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
-                                    placeholder="Geben Sie einen Ort ein" />
-                            </div>
+                    <!-- Standort 2 -->
+                    <div class="col-md-5 offset-md-1 mt-3">
+                        <div class="d-flex flex-column h-100">
+                            <label class="form-label mb-1">Standort 2</label>
+                            <input type="text"
+                                name="NamePlaces[1]"
+                                class="form-control"
+                                value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
+                                placeholder="Geben Sie einen Ort ein" />
                         </div>
+                    </div>
 
-                        <!-- Radius für Standort 2 -->
-                        <div class="col-md-5 mt-3">
-                            <div class="d-flex flex-column h-100">
-                                <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
-                                <div class="d-flex align-items-center gap-2 h-100">
-                                    <label class="text-nowrap">1</label>
-                                    
-                                    <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                        <input type="range"
-                                            name="RadiusPlaces[1]"
-                                            class="form-range custom-range"
-                                            min="1"
-                                            max="25"
-                                            step="1"
-                                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
-                                            id="RadiusPlace1"
-                                            oninput="document.getElementById('outputRadius1').textContent = this.value" />
-                                    </div>
-                                    
-                                    <output id="outputRadius1" class="value-output text-center">
-                                        @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)
-                                    </output>
-                                    
-                                    <label class="text-nowrap">km</label>
+                    <!-- Radius Standort 2 -->
+                    <div class="col-md-5 mt-3">
+                        <div class="d-flex flex-column h-100">
+                            <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
+                            <div class="d-flex align-items-center gap-3 h-100">
+                                <label class="text-nowrap">1</label>
+                                <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                    <input type="range"
+                                        name="RadiusPlaces[1]"
+                                        class="form-range custom-range"
+                                        min="1"
+                                        max="25"
+                                        step="1"
+                                        value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
+                                        id="RadiusPlace1"
+                                        oninput="document.getElementById('outputRadius1').textContent = this.value" />
                                 </div>
+                                <output id="outputRadius1" class="value-output text-center">
+                                    @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)
+                                </output>
+                                <label class="text-nowrap">km</label>
                             </div>
                         </div>
+                    </div>
                 }
                 @if (Model.NamePlaces.Count > 2)
                 {
                     @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
                         <div class="col-md-5 offset-md-1 mt-3">
-                                <div class="d-flex flex-column h-100">
-                                    <label class="form-label mb-1">Standort @(i + 1)</label>
-                                    <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
-                                        placeholder="Geben Sie einen Ort ein" />
-                                </div>
+                            <div class="d-flex flex-column h-100">
+                                <label class="form-label mb-1">Standort @(i + 1)</label>
+                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
+                                    placeholder="Geben Sie einen Ort ein" />
+                            </div>
                         </div>
                         <div class="col-md-5 mt-3">
-                            <div class="d-flex flex-column  h-100">
+                            <div class="d-flex flex-column h-100">
                                 <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
-                                <div class="d-flex align-items-center gap-2 h-100">
+                                <div class="d-flex align-items-center gap-3 h-100">
                                     <label class="text-nowrap">1</label>
                                     <div class="slider-container flex-grow-1 d-flex align-items-center">
                                         <input type="range"
@@ -253,94 +249,101 @@
                                             id="RadiusPlace@(i)"
                                             oninput="document.getElementById('outputRadius[@i]').textContent = this.value" />
                                     </div>
-                                    <output  id="outputRadius[@i]" class="value-output text-center">
+                                    <output id="outputRadius[@i]" class="value-output text-center">
                                         @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)
                                     </output>
                                     <label class="text-nowrap">km</label>
                                 </div>
+                            </div>
                         </div>
-                    </div>
                     }
                 }
             </div>
 
-            <!-- Hier kommen zusätzliche Standorte hin -->
-            <div id="dynamicLocations" class="row mt-3">
-            </div>
-            <!-- Plus-Button -->
+            <div id="dynamicLocations" class="row mt-3"></div>
+
             <div class="row justify-content-center mt-3">
-                <button type="button" id="addStandort" class="btn btn-primary mx-2" style="width: 200px"
+                <button type="button" id="addStandort" class="btn btn-primary" style="width: 200px"
                     onclick="addLocation()" @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
                     @(Model.NamePlaces.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
                 </button>
             </div>
 
-            <!-- Berechnen-Button -->
             <div class="row justify-content-center mt-3">
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                    asp-page-handler="CalculateAverageCost">Vergleichen
+                <button type="submit" class="btn btn-primary"
+                        style="width: 200px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        asp-page-handler="CalculateAverageCost"
+                        onclick="document.getElementById('loader-compare').style.display='inline-block'">
+                    Preise Vergleichen
+                    <div class="loader" id="loader-compare"></div>
                 </button>
             </div>
         </div>
 
-        <!-- Automatische Auswahl (wird angezeigt, wenn Automatische Auswahl gewählt wird) -->
-        <div id="autoInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
-            <!-- Automatische Eingabe für Standort und Radius -->
-           <div class="row g-3 align-items-start">
-                    <div class="col-md-5 offset-md-1">
-                        <div class="d-flex flex-column h-100">
-                            <label for="generalLocation" class="form-label mb-1">Standort (PLZ/ Straße, Ort)</label>
-                            <div class="input-group">
-                                <input type="text" id="generalLocation" class="form-control"
-                                    placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
-                                <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
-                                    <img src="location.png" alt="Standort">
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-5">
-                        <div class="d-flex flex-column h-100">
-                            <label for="generalRadius" class="form-label mb-1">Radius</label>
-                            <div class="d-flex align-items-center gap-2 h-100">
-                                <label class="text-nowrap">1</label>
-                                <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                    <input type="range"
-                                        id="generalRadius"
-                                        class="form-range custom-range"
-                                        min="1" max="25" step="1"
-                                        asp-for="Radius" />
-                                </div>
-                                <output id="radiusValue" class="value-output">
-                                    @(Model.Radius)
-                                </output>
-                                <label class="text-nowrap">km</label>
-                            </div>
-                            <input type="number" asp-for="Radius" class="d-none" min="1" max="25" />
+        <!-- Suche-Modus -->
+        <div id="autoInputFields" class="modeStyle mt-2" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+            <div class="row g-3 align-items-start">
+                <div class="col-md-5 offset-md-1">
+                    <div class="d-flex flex-column h-100">
+                        <label for="generalLocation" class="form-label mb-1">Standort (PLZ/ Straße, Ort)</label>
+                        <div class="input-group">
+                            <input type="text" id="generalLocation" class="form-control"
+                                placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
+                            <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+                                <img src="location.png" alt="Standort">
+                            </button>
                         </div>
                     </div>
                 </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary mx-2" style="width: 120px"
-                    asp-page-handler="Search" id="SearchBtn">Suchen</button>
+
+                <div class="col-md-5">
+                    <div class="d-flex flex-column h-100">
+                        <label for="generalRadius" class="form-label mb-1">Radius</label>
+                        <div class="d-flex align-items-center gap-3 h-100">
+                            <label class="text-nowrap">1</label>
+                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                <input type="range"
+                                    id="generalRadius"
+                                    class="form-range custom-range"
+                                    min="1" max="25" step="1"
+                                    asp-for="Radius" />
+                            </div>
+                            <output id="radiusValue" class="value-output">
+                                @(Model.Radius)
+                            </output>
+                            <label class="text-nowrap">km</label>
+                        </div>
+                        <input type="number" asp-for="Radius" class="d-none" min="1" max="25" />
+                    </div>
+                </div>
             </div>
+
+            <div class="d-flex justify-content-center mt-3">
+                <button type="submit" class="btn btn-primary"
+                        style="width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        asp-page-handler="Search" id="SearchBtn"
+                        onclick="document.getElementById('loader-search').style.display='inline-block'">
+                    Suchen
+                    <div class="loader" id="loader-search"></div>
+                </button>
+            </div>
+
             <div class="row justify-content-center">
-                <div class="col-md-6" style="padding: 20px;">
-                @if (Model.CheapestResultStations.Any())
-                {
-                        <div class="mb-3 d-flex align-items-center gap-2">
+                <div class="col-md-6 p-3">
+                    @if (Model.CheapestResultStations.Any())
+                    {
+                        <div class="mb-3 d-flex align-items-center gap-3">
                             <label for="viewMode" class="form-label mb-0 me-2">Ansicht</label>
                             <div id="viewModeCustom" class="custom-select">
                                 <div class="select-trigger" onclick="toggleDropdown()">
-                                    <span id="selectedValue">Liste</span> <!-- Standardwert -->
-                                    <span class="arrow">▼</span> <!-- Custom Pfeil -->
+                                    <span id="selectedValue">Liste</span>
+                                    <span class="arrow">▼</span>
                                 </div>
-                                <div id="optionsList" class="suggestions-box"> <!-- Wiederverwende deine CSS-Klasse! -->
+                                <div id="optionsList" class="suggestions-box">
                                     <div class="suggestion-item" data-value="list" onclick="selectOption(this)">Liste</div>
                                     <div class="suggestion-item" data-value="map" onclick="selectOption(this)">Karte</div>
                                 </div>
-                                </div>
+                            </div>
                             @if (Model.FuelAmount > 0)
                             {
                                 <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
@@ -354,57 +357,57 @@
                                 ⓘ
                             </span>
 
-                            <!-- Neues Dropdown für Sortierung (nur in Listenansicht sichtbar) -->
                             <label for="sortMode" class="form-label mb-0 me-2" id="sortLabel">Aufsteigend sortieren nach</label>
-                                <div id="sortModeCustom" class="custom-select">
-                                    <div class="select-trigger" onclick="toggleDropdownSort()">
-                                        <span id="selectedSortValue">
-                                            @if (Model.FuelAmount > 0)
-                                            {
-                                                <text>Gesamtkosten</text> <!-- Standardwert: Erste Option -->
-                                            }
-                                            else
-                                            {
-                                                <text>Preis pro Liter</text> <!-- Standardwert: Erste Option -->
-                                            }
-                                        </span>
-                                        <span class="arrow">▼</span> <!-- Custom Pfeil, wie zuvor -->
-                                    </div>
-                                    <div id="sortOptionsList" class="suggestions-box"> <!-- Wiederverwende deine CSS-Klasse! -->
+                            <div id="sortModeCustom" class="custom-select">
+                                <div class="select-trigger" onclick="toggleDropdownSort()">
+                                    <span id="selectedSortValue">
                                         @if (Model.FuelAmount > 0)
                                         {
-                                            <div class="suggestion-item" data-value="totalCost" onclick="selectOptionSort(this)">Gesamtkosten</div>
-                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
-                                            <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                            <text>Gesamtkosten</text>
                                         }
                                         else
                                         {
-                                            <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
-                                            <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                            <text>Preis pro Liter</text>
                                         }
-                                    </div>
+                                    </span>
+                                    <span class="arrow">▼</span>
                                 </div>
+                                <div id="sortOptionsList" class="suggestions-box">
+                                    @if (Model.FuelAmount > 0)
+                                    {
+                                        <div class="suggestion-item" data-value="totalCost" onclick="selectOptionSort(this)">Gesamtkosten</div>
+                                        <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
+                                        <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
+                                        <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                    }
+                                </div>
+                            </div>
                         </div>
                         <div id="stationListContainer">
-                            @await Html.PartialAsync("_StationListPartial", Model) @* Oder "~/Pages/Shared/_StationListPartial.cshtml" *@
+                            @await Html.PartialAsync("_StationListPartial", Model)
                             @{ TempData.Keep("StationsJson"); TempData.Keep("FuelAmount"); }
                         </div>
                         <div id="mapView" style="display: none;">
-                                    @* TODO add Tool tip with click option*@
-                                    <div id="map_div" class="map" style="height: 500px;" />
+                            <div id="map_div" class="map" style="height: 500px;" />
                         </div>
-                }
-                else if(@Model.SearchExecuted){
-                    <label id="noOpenStations" style="display: block; text-align: center;">
-                        Keine offene Tankstelle im gewählten Radius gefunden
-                    </label>
-                }
-                                 </div>
-                    </div>
-    </div>
+                    }
+                    else if (@Model.SearchExecuted)
+                    {
+                        <label id="noOpenStations" style="display: block; text-align: center;">
+                            Keine offene Tankstelle im gewählten Radius gefunden
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
     </form>
-    </div>
-    <!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
+</div>
+
+<!-- JavaScript für die Eingabe-Auswahl-Steuerung -->
     <script>
         let mapInitialized = false;
         let map;
@@ -422,36 +425,93 @@
                 output.textContent = slider.value;
             });
 
-        function updateRadius(input) {
-            // Wenn der Benutzer das Feld verlässt und nichts eingegeben hat, verwende den Platzhalter als Standard
-            if (!input.value.trim()) {
-                input.value = input.placeholder;  // Falls leer, setze den Platzhalterwert
-            }
 
-            // Aktualisiere das Modell im Hintergrund
-            var radiusPlace1 = document.querySelector('input[name="RadiusPlace1"]');
-            var radiusPlace2 = document.querySelector('input[name="RadiusPlace2"]');
-            if (input.value > 0) {
-                radiusPlace1.value = input.value;
-                radiusPlace2.value = input.value;  // Das Modell im Hintergrund aktualisieren
+        function calculateAndStore(input) {
+            try 
+            {
+                let expression = input.value.replace(",", ".").trim();
+                input.value = 0;
+                document.getElementById("FuelAmount").value = 0;
+
+                if (!/^[0-9+\-*/().\s]*$/.test(expression)) return;
+
+                const result = parseExpression(expression);
+
+                if (!isNaN(result) && isFinite(result) && result >= 0) 
+            {
+                    input.value = result;
+                    document.getElementById("FuelAmount").value = result;
+                }
+            } 
+            catch (e) {
+                console.error("Ungültiger Ausdruck:", e);
             }
         }
 
-        function calculateAndStore(input) {
-            try {
-                let expression = input.value.replace(",", "."); // Ersetze Komma durch Punkt
-                input.value=0;
-                document.getElementById("FuelAmount").value =0;
-                if (/^[0-9+\-*/().\s]*$/.test(expression)) {
-                    let result = eval(expression); // Berechne den Ausdruck
-                    if (!isNaN(result) && result>=0) {
-                        input.value = result; // Zeige das Ergebnis im Eingabefeld an
-                        document.getElementById("FuelAmount").value = result; // Speichere das Ergebnis im versteckten Feld für das Model
-                    }
+        // Rekursiver Descent Parser für +, -, *, /
+        function parseExpression(expr) {
+            const tokens = tokenize(expr);
+            let pos = 0;
+
+            function peek() { return tokens[pos]; }
+            function consume() { return tokens[pos++]; }
+
+            function parseAddSub() {
+                let left = parseMulDiv();
+                while (peek() === '+' || peek() === '-') {
+                    const op = consume();
+                    const right = parseMulDiv();
+                    left = op === '+' ? left + right : left - right;
                 }
-            } catch (e) {
-                console.error("Ungültiger Ausdruck:", e);
+                return left;
             }
+
+            function parseMulDiv() {
+                let left = parseUnary();
+                while (peek() === '*' || peek() === '/') {
+                    const op = consume();
+                    const right = parseUnary();
+                    if (op === '/' && right === 0) throw new Error("Division durch 0");
+                    left = op === '*' ? left * right : left / right;
+                }
+                return left;
+            }
+
+            function parseUnary() {
+                if (peek() === '-') {
+                    consume();
+                    return -parsePrimary();
+                }
+                return parsePrimary();
+            }
+
+            function parsePrimary() {
+                const token = peek();
+                if (token === '(') {
+                    consume(); // '('
+                    const val = parseAddSub();
+                    if (consume() !== ')') throw new Error("Fehlende schließende Klammer");
+                    return val;
+                }
+                if (token !== undefined && !isNaN(parseFloat(token))) {
+                    consume();
+                    return parseFloat(token);
+                }
+                throw new Error(`Unerwartetes Token: ${token}`);
+            }
+
+            return parseAddSub();
+        }
+
+        function tokenize(expr) {
+            // Zerlegt "30*1.5+10" → ['30', '*', '1.5', '+', '10']
+            const regex = /(\d+\.?\d*)|([+\-*/()])/g;
+            const tokens = [];
+            let match;
+            while ((match = regex.exec(expr)) !== null) {
+                tokens.push(match[0]);
+            }
+            return tokens;
         }
 
         function toggleInputMethod(radio) {
@@ -486,9 +546,14 @@
             }
         }
 
-        function formatPricePerKm(input) {
+        function formatAndSavePricePerKm(input) {
             let expression = input.value.replace(",", ".");
             document.getElementById("PricePerKm").value = expression;
+            localStorage.setItem("pricePerKm", expression);
+        }
+
+        function saveFuelType(input){
+            localStorage.setItem("selectedFuelType", input.value);
         }
 
         $(function () {
@@ -542,6 +607,7 @@
                     data: { carType: selectedCarType },
                     success: function (data) {
                         $('#PricePerKm').val(data.pricePerKm);
+                        localStorage.setItem("pricePerKm", data.pricePerKm);
                     },
                     error: function () {
                         console.error("Fehler beim Abrufen von PricePerKm");
@@ -575,18 +641,26 @@
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl)
-            })
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const geoButton = document.getElementById("geoButton");
-            if (geoButton) {
-                geoButton.addEventListener("click", getLocation);
+            });
+            const savedPricePerKm = localStorage.getItem("pricePerKm");
+            if (savedPricePerKm) {
+                // Nur überschreiben wenn Server keinen Wert geliefert hat
+                $('#PricePerKm').val(savedPricePerKm);
             }
 
-            const geoButton2 = document.getElementById("geoButton2");
-            if (geoButton2) {
-                geoButton2.addEventListener("click", getLocation);
+            const savedFuelType = localStorage.getItem("selectedFuelType");
+            if (savedFuelType) {
+                const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
             }
+
+            document.getElementById("geoButton")?.addEventListener("click", getLocation);
+            document.getElementById("geoButton2")?.addEventListener("click", getLocation);
+
+
+
         });
 
         function switchView(value) {
@@ -610,6 +684,7 @@
                 document.getElementById("listTooltip").style.display = "inline-block";
             }
         }
+
         function initMap() {
             var latitude = @Model.LatitudePlace.ToString().Replace(",", ".");
             var longitude = @Model.LongitudePlace.ToString().Replace(",", ".");
@@ -644,11 +719,10 @@
                 shadowSize: [41, 41]
             });
 
-                    @foreach (var station in Model.CheapestResultStations)
+                    @foreach (var station in Model.CheapestResultStations.Take(10))
                 {
                     var lat = station.Coords.Lat.ToString().Replace(",", ".");
                     var lng = station.Coords.Lng.ToString().Replace(",", ".");
-                    var name = Html.Raw(Json.Serialize(station.Name));
                     var price = Model.FuelAmount > 0
                     ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
                     : Model.ToDisplay(station.FuelTypePrice.ToString());
@@ -672,7 +746,7 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendPositionToServer, handleError);
             } else {
-                alert("Geolocation wird nicht unterstützt.");
+                toastr.warning("Geolocation wird nicht unterstützt.");
             }
         }
 
@@ -682,7 +756,9 @@
 
             const response = await fetch("?handler=UpdateLocation", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value },
                 body: JSON.stringify({ latitude: lat, longitude: lon })
             });
 
@@ -700,27 +776,27 @@
                     }
                 }
             } else {
-                alert("Serverfehler bei Standortabfrage.");
+                toastr.error("Serverfehler bei Standortabfrage.");
             }
         }
 
         function handleError(error) {
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    alert("Nutzer hat die Standortfreigabe abgelehnt.");
+                    toastr.warning("Nutzer hat die Standortfreigabe abgelehnt.");
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    alert("Standortinformationen nicht verfügbar.");
+                    toastr.warning("Standortinformationen nicht verfügbar.");
                     break;
                 case error.TIMEOUT:
-                    alert("Standortabfrage hat zu lange gedauert.");
+                    toastr.warning("Standortabfrage hat zu lange gedauert.");
                     break;
                 default:
-                    alert("Unbekannter Fehler.");
+                    toastr.warning("Unbekannter Fehler.");
             }
         }
 
-       function addLocation() {
+        function addLocation() {
             const container = document.getElementById("dynamicLocations");
             if (locationIndex < 4) {
                 const html = `
@@ -769,8 +845,7 @@
             }
         }
 
-       function sortList(sortValue) {
-            console.log('Client: SortValue gesendet:', sortValue);
+        function sortList(sortValue) {
             const container = document.getElementById('stationListContainer');
             container.innerHTML = '<p>Sortiert...</p>';
 
@@ -792,14 +867,12 @@
                 body: formData
             })
             .then(response => {
-                console.log('Response:', response);
                 if (!response.ok) {
                     return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
                 }
                 return response.text();
             })
             .then(html => {
-                console.log('HTML empfangen:', html);
                 container.innerHTML = html;
                 document.querySelectorAll('.station-summary').forEach(el => el.onclick = () => toggleDetails(el));
             })
@@ -809,12 +882,12 @@
             });
         }
 
-                    function toggleDropdown() {
+        function toggleDropdown() {
             const optionsList = document.getElementById('optionsList');
             optionsList.style.display = optionsList.style.display === 'block' ? 'none' : 'block';
             }
 
-            function selectOption(element) {
+        function selectOption(element) {
             const selectedValue = document.getElementById('selectedValue');
             selectedValue.textContent = element.textContent;
             const value = element.getAttribute('data-value');
@@ -826,13 +899,7 @@
             switchView(value); // Passe switchView() an, um den Wert als Parameter zu akzeptieren, falls nötig
             }
 
-            // Optional: Schließe das Dropdown bei Klick außerhalb
-            document.addEventListener('click', function(event) {
-            const customSelect = document.getElementById('viewModeCustom');
-            if (!customSelect.contains(event.target)) {
-                document.getElementById('optionsList').style.display = 'none';
-            }
-            });
+
 
         function toggleDropdownSort() {
             const optionsList = document.getElementById('sortOptionsList');
@@ -853,8 +920,13 @@
 
         // Optional: Schließe das Dropdown bei Klick außerhalb
         document.addEventListener('click', function(event) {
-            const customSelect = document.getElementById('sortModeCustom');
-            if (!customSelect.contains(event.target)) {
+            const viewSelect = document.getElementById('viewModeCustom');
+            if (viewSelect && !viewSelect.contains(event.target)) {
+                document.getElementById('optionsList').style.display = 'none';
+            }
+
+            const sortSelect = document.getElementById('sortModeCustom');
+            if (sortSelect && !sortSelect.contains(event.target)) {
                 document.getElementById('sortOptionsList').style.display = 'none';
             }
         });
@@ -864,10 +936,10 @@
     @if (Model.SelectInputMode == InputMode.man && (Model.CalculatedAverageCosts.Any()))
     {
         <div id="averageCost" class="mt-4 text-center">
-            <h4>Ergebnisse:</h4>
+            <h3 class="h3-summary">Durchschnittspreise</h3>
             @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
             {
-                <p>@place.Key- @(place.Value > 0 ? $"Durchschnittspreis: {Model.ToDisplay(place.Value.ToString("0.000"))} €" :
+                <p>@place.Key: @(place.Value > 0 ? $"{Model.ToDisplay(place.Value.ToString("0.000"))} €" :
                             "Keine Preise verfügbar")</p>
             }
         </div>
@@ -875,6 +947,6 @@
     <hr>
     <ol>
         <li id="fn1">
-            Frühjahr/ Sommer 2025
+            @Model.DataSourceDate
         </li>
     </ol>

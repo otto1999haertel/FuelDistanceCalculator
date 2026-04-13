@@ -7,24 +7,25 @@ on:
 
 jobs:
   check-changes:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          ref: master
-          fetch-depth: 2  # Letzten 2 Commits holen
-      
+          fetch-depth: 2
+
       - name: Check for new commits
         id: check
         run: |
-          # Prüfe ob es in den letzten 24h Commits gab
           LAST_COMMIT=$(git log -1 --format=%ct)
+          LAST_COMMIT_INFO=$(git log -1 --pretty=format:"%h - %s (%an, %ar)")
+          echo "Last commit: $LAST_COMMIT_INFO"
           CURRENT_TIME=$(date +%s)
           TIME_DIFF=$((CURRENT_TIME - LAST_COMMIT))
-          
-          # 86400 Sekunden = 24 Stunden
+
           if [ $TIME_DIFF -lt 86400 ]; then
             echo "should_deploy=true" >> $GITHUB_OUTPUT
             echo "✓ Neue Commits gefunden (vor $((TIME_DIFF / 3600)) Stunden)"
@@ -34,36 +35,28 @@ jobs:
           fi
 
   build:
-    needs: check-changes
-    if: needs.check-changes.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: master
+      - uses: actions/checkout@v5
       - run: dotnet build --configuration Release
 
   test:
     needs: build
     runs-on: ubuntu-latest
     env:
-      ApiSettings__TankApiKey: ${{ secrets.TANKAPIKEY }}
-      ApiSettings__OpenRouteServiceApiKey: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: master
+      - uses: actions/checkout@v5
       - run: dotnet test --configuration Release
 
   deploy:
-    needs: test
+    needs: [test, check-changes]
     runs-on: ubuntu-latest
-    if: ${{ needs.test.result == 'success' }}
+    if: needs.test.result == 'success' && needs.check-changes.outputs.should_deploy == 'true'
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: master
+      - uses: actions/checkout@v5
 
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
@@ -79,6 +72,8 @@ jobs:
       - name: Sync source to server
         run: |
           rsync -avz --delete \
+            --exclude '.env*' \
+            --exclude '.git' \
             -e "ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }}" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/fuelgo
         env:
@@ -89,10 +84,8 @@ jobs:
       - name: Create .env.server with API keys
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'ENVSSH'
-              cd /home/${{ secrets.SSH_USER }}/fuelgo
-              
-              cat > .env.server << 'EOF'
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd /home/${{ secrets.SSH_USER }}/fuelgo && cat > .env.server << 'EOF'
           CERT_CRT_PATH=/etc/letsencrypt/live/fuelgo.de/fullchain.pem
           CERT_KEY_PATH=/etc/letsencrypt/live/fuelgo.de/privkey.pem
           SERVER_NAME=fuelgo.de www.fuelgo.de
@@ -101,29 +94,51 @@ jobs:
           TANK_API_KEY=${{ secrets.TANKAPIKEY }}
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
           EOF
+          "
+
+      - name: Verify .env.server on server
+        run: |
+          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+              echo "=== .env.server key check ==="
               
-              chmod 600 .env.server
-          ENVSSH
+              TANK_KEY=\$(grep "TANK_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
+              ORS_KEY=\$(grep "OPENROUTESERVICE_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
+              
+              if [ -z "\$TANK_KEY" ]; then
+                echo "✗ TANK_API_KEY is missing!"
+                exit 1
+              else
+                echo "✓ TANK_API_KEY present | starts with: \${TANK_KEY:0:4}... | length: \${#TANK_KEY}"
+              fi
+              
+              if [ -z "\$ORS_KEY" ]; then
+                echo "✗ OPENROUTESERVICE_API_KEY is missing!"
+                exit 1
+              else
+                echo "✓ ORS_KEY present | starts with: \${ORS_KEY:0:4}... | length: \${#ORS_KEY}"
+              fi
+          EOF
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
-      
+
       - name: Deploy on remote server
         run: |
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-              if sudo systemctl is-active --quiet nginx; then
-                echo "Stopping native Nginx service"
-                sudo systemctl stop nginx
-              fi
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          if sudo systemctl is-active --quiet nginx; then
+            echo "Stopping native Nginx service"
+            sudo systemctl stop nginx
+          fi
 
-              cd /home/${{ secrets.SSH_USER }}/fuelgo
-              sudo docker compose stop fuelgo-webapp nginx db
-              sudo docker compose rm -f fuelgo-webapp nginx db
-              sudo docker compose --env-file .env.server up --build -d
-              
-              echo "✓ Deployment completed successfully at $(date)"
+          cd /home/${{ secrets.SSH_USER }}/fuelgo
+          sudo docker compose --env-file .env.server stop fuelgo-webapp nginx
+          sudo docker compose --env-file .env.server rm -f fuelgo-webapp nginx
+          sudo docker compose --env-file .env.server up --build -d
+          
+          echo "✓ Deployment completed successfully at \$(date)"
           EOF
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -136,6 +151,6 @@ jobs:
           if [ "${{ needs.test.result }}" == "success" ]; then
             echo "✓ Nightly deployment successful"
           else
-            echo "✗ Nightly deployment failed - tests did not pass"
+            echo "✗ Deployment failed"
             exit 1
           fi

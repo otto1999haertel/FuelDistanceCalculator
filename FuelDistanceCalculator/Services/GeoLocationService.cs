@@ -1,5 +1,4 @@
 using FuelDistanceCalculator.Model;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -12,13 +11,13 @@ public class GeoLocationService : IGeoLocationService
 {
     private readonly IDatabase _redisDb;
     private readonly HttpClient _httpClient;
-    private readonly ILogger<GeoLocationService> _logger;
 
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
 
     private readonly string _apiKey;
 
     private readonly string _mode;
+
     private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
 
     private double ToRadians(double degrees) => degrees * Math.PI / 180;
@@ -27,14 +26,15 @@ public class GeoLocationService : IGeoLocationService
 
     private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
 
-    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis, ILogger<GeoLocationService> logger)
+    public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
         _httpClient = httpClientFactory.CreateClient();
         _redisDb = redis.GetDatabase();
-        _logger = logger;
-        _apiKey = configuration["ApiSettings:OpenRouteServiceApiKey"]
-                  ?? throw new Exception("API Key missing");
-        _mode = Environment.GetEnvironmentVariable("MODE_TYPE") ?? "Production";
+        var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
+        _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
+        _mode = configuration["MODE_TYPE"] ?? "Production";
+        Console.WriteLine("API Key loaded: " + _apiKey);
+        Console.WriteLine("Mode: " + _mode);
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
@@ -47,10 +47,9 @@ public class GeoLocationService : IGeoLocationService
         var cachedData = await _redisDb.HashGetAllAsync(cacheKey);
         if (cachedData.Length > 0)
         {
-            _logger.LogInformation("Redis HIT for place: {Place}", place);
-            var lat = cachedData.FirstOrDefault(x => x.Name == "lat").Value;
-            var lon = cachedData.FirstOrDefault(x => x.Name == "lon").Value;
-            _logger.LogDebug("Cached coordinates - lat: {Lat}, lon: {Lon}", lat, lon);
+            Console.WriteLine($"[Redis HIT for place]  {place}!");
+            Console.WriteLine("lat:" + cachedData.FirstOrDefault(x => x.Name == "lat").Value);
+            Console.WriteLine("lon:" + cachedData.FirstOrDefault(x => x.Name == "lon").Value);
 
             return new CoordinatesDTO
             {
@@ -59,7 +58,7 @@ public class GeoLocationService : IGeoLocationService
             };
         }
 
-        _logger.LogInformation("Cache miss for {Place}, calling API...", place);
+        Console.WriteLine($" Cache-Miss für {place}, API wird aufgerufen...");
         var coordinates = await FetchCoordinatesFromApi(place);
 
         if (coordinates == null) return null;
@@ -94,11 +93,11 @@ public class GeoLocationService : IGeoLocationService
         var cachedAddress = await _redisDb.StringGetAsync(cacheKey);
         if (cachedAddress.HasValue)
         {
-            _logger.LogInformation("Redis HIT for coordinates: {CacheKey}", cacheKey);
+            Console.WriteLine($"[Redis HIT for coordinates] {cacheKey}");
             return cachedAddress;
         }
 
-        _logger.LogInformation("Redis MISS for coordinates: {CacheKey}", cacheKey);
+        Console.WriteLine($"[Redis MISS] {cacheKey}");
         var url = $"https://nominatim.openstreetmap.org/reverse?lat={latKey}&lon={lonKey}&format=json";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
@@ -145,11 +144,23 @@ public class GeoLocationService : IGeoLocationService
         return fullAddress;
     }
 
-    public async Task<List<GasStation>> CalculateDistanceFromAPI(string latitudeStart, string longitudeStart, List<GasStation> stations)
+        public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
     {
+        Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
+        int alternater =0;
         foreach (GasStation station in stations)
         {
-            string responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat.ToString(), station.Coords.Lng.ToString());
+            string responseString = string.Empty;
+            if (_mode == "Development")
+            {
+                responseString = await AlternateResponse(latitudeStart, longitudeStart, alternater, station);
+                alternater++;
+            }
+            else
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            }
+            
 
             if (!string.IsNullOrEmpty(responseString))
             {
@@ -163,19 +174,23 @@ public class GeoLocationService : IGeoLocationService
                     .GetProperty("distance")
                     .GetDouble();
                 station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
-                _logger.LogDebug("Calculated distance: {Distance} km for Gas Station {Name}", station.Dist, station.Name);
+                station.IsRoutingDistanceCalculated = true;
+                Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
+            }
+            else
+            {
+                station.IsRoutingDistanceCalculated = false;
             }
         }
         return stations;
     }
-
-    public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(string startLatitude, string startLong, string endLatitude, string endLongitude)
+    public async Task<List<CoordinatesDTO>> GetRouteIncludingStartPoint(double startLatitude, double startLong, double endLatitude, double endLongitude)
     {
         string response = await GetRouteAndDistanceFromAPI(startLatitude, startLong, endLatitude, endLongitude, "Routing_Service_Big_Route_response.json");
         List<CoordinatesDTO> result = new List<CoordinatesDTO>();
         CoordinatesDTO coordinatesStart = new CoordinatesDTO();
-        coordinatesStart.Latitude = double.Parse(startLatitude);
-        coordinatesStart.Longitude = double.Parse(startLong);
+        coordinatesStart.Latitude = startLatitude;
+        coordinatesStart.Longitude = startLong;
         result.Add(coordinatesStart);
         if (!string.IsNullOrEmpty(response))
         {
@@ -302,7 +317,7 @@ public class GeoLocationService : IGeoLocationService
     private async Task<CoordinatesDTO> FetchCoordinatesFromApi(string place)
     {
         var url = $"https://nominatim.openstreetmap.org/search?q={place}&format=json";
-        _logger.LogInformation("API Request: {Url}", url);
+        Console.WriteLine($"API Request: {url}");
 
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
@@ -325,20 +340,22 @@ public class GeoLocationService : IGeoLocationService
         return null;
     }
 
-    private async Task<string> GetRouteAndDistanceFromAPI(string latitudeStart, string longitudeStart, string latitudeEnd, string longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
+    private async Task<string> GetRouteAndDistanceFromAPI(double latitudeStart, double longitudeStart, double latitudeEnd, double longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
     {
         string responseString = "";
+        Console.WriteLine("Start Coordinates: " + latitudeStart + ", " + longitudeStart);
+        Console.WriteLine("End Coordinates: " + latitudeEnd + ", " + longitudeEnd);
         if (_mode == "Production")
         {
             var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("User-Agent", "FuelGo/1.0");
             var response = await _httpClient.SendAsync(request);
-            _logger.LogInformation("Response from routing service: {StatusCode}", response.StatusCode);
+            Console.WriteLine("Response from routing service " + response.StatusCode);
             if (response.IsSuccessStatusCode)
             {
                 responseString = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug("Response String Routing Service received, length: {Length}", responseString.Length);
+                Console.WriteLine("Response String Routing Service: " + responseString);
             }
         }
         else
@@ -347,10 +364,25 @@ public class GeoLocationService : IGeoLocationService
             string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", jsonFile);
             if (!File.Exists(jsonFilePath))
             {
-                throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
+                return responseString;
             }
             responseString = await File.ReadAllTextAsync(jsonFilePath);
         }
         return responseString;
+    }
+
+    private async Task<string> AlternateResponse(double latitudeStart, double longitudeStart, int alternater, GasStation station)
+    {
+            string responseString = string.Empty;
+            if (alternater % 2 == 0)
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng,"No_Routing");
+            }
+            else
+            {
+                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            }
+
+            return responseString;
     }
 }

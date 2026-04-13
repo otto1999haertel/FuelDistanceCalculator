@@ -1,4 +1,7 @@
+using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Model;
+
+namespace FuelDistanceCalculator.Services;
 
 public class RouteOptimizationService : IRouteOptimizationService
 {

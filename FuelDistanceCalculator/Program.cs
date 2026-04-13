@@ -1,17 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using FuelDistanceCalculator.Data;
 using FuelDistanceCalculator.Services;
 using FuelDistanceCalculator.Interfaces;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
-using Moq; // nur nötig, wenn du direkt im Program testweise mockst
+using Moq;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Datenbankverbindung setzen (PostgreSQL)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Registriere FuelPriceService als Singleton
 builder.Services.AddSingleton<FuelPriceService>(provider =>
@@ -22,9 +16,6 @@ builder.Services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>(
 
 // API-first: Controller support
 builder.Services.AddControllers();
-
-// Register search service used by both pages and API
-builder.Services.AddScoped<ISearchService, SearchService>();
 
 var env = builder.Environment;
 string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")}";
@@ -90,7 +81,7 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 
 if (app.Environment.IsDevelopment())
 {
-    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownIPNetworks.Clear();
     forwardedHeadersOptions.KnownProxies.Clear();
 }
 else

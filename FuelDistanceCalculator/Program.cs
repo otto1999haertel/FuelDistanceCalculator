@@ -1,5 +1,4 @@
 using FuelDistanceCalculator.Services;
-using FuelDistanceCalculator.Interfaces;
 using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
@@ -13,9 +12,6 @@ builder.Services.AddSingleton<FuelPriceService>(provider =>
 
 // Registriere MarketFuelPriceService mit HttpClientFactory über Interface
 builder.Services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
-
-// API-first: Controller support
-builder.Services.AddControllers();
 
 var env = builder.Environment;
 string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")}";
@@ -104,8 +100,6 @@ app.UseAuthorization();
 
 app.UseStaticFiles();
 
-// Map API controllers and Razor pages
-app.MapControllers();
 app.MapRazorPages();
 
 // ✅ Kein Portbinding in Tests

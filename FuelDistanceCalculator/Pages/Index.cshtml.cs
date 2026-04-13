@@ -123,7 +123,7 @@ public class IndexModel : PageModel
 
     private const string InputDataSessionKey = "InputData";
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, MarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, IMarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
@@ -402,7 +402,7 @@ public class IndexModel : PageModel
                     SortMode = (string)null,
                     Discount = string.Empty
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, (MarketFuelPriceService)_MarketfuelPriceService, _geoLocationService,_configuration)
+            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService,_configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,

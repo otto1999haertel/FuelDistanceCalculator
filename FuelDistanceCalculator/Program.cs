@@ -10,8 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<FuelPriceService>(provider =>
     new FuelPriceService());
 
-// Registriere MarketFuelPriceService mit HttpClientFactory
-builder.Services.AddHttpClient<MarketFuelPriceService>();
+// Registriere MarketFuelPriceService mit HttpClientFactory über Interface
+builder.Services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
 
 var env = builder.Environment;
 string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")}";
@@ -99,6 +99,7 @@ app.UseMiddleware<RequestProtectionMiddleware>();
 app.UseAuthorization();
 
 app.UseStaticFiles();
+
 app.MapRazorPages();
 
 // ✅ Kein Portbinding in Tests

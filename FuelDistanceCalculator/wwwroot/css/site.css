@@ -532,6 +532,7 @@ html.dark-mode .station-summary::before {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding-left: 0; 
 }
 
 

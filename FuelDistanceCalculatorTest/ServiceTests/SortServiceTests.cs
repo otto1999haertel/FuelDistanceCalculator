@@ -80,11 +80,8 @@ public class SortServiceTests : ServiceTestBase
     [Test]
     public void SortStations_FuelPrice_ReturnsStationsSortedByFuelPrice()
     {
-        // Arrange
-        string sortMode = "fuelPrice";
-
         // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        var result = SortService.SortStations(_fakeGasStationList, SortModeEnum.fuelPrice);
 
         // Assert
         Assert.That(result.Count, Is.EqualTo(3));
@@ -97,11 +94,8 @@ public class SortServiceTests : ServiceTestBase
     [Test]
     public void SortStations_TotalCost_ReturnsStationsSortedByTotalCost()
     {
-        // Arrange
-        string sortMode = "totalCost";
-
         // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        var result = SortService.SortStations(_fakeGasStationList, SortModeEnum.totalCost);
 
         // Assert
         Assert.That(result.Count, Is.EqualTo(3));
@@ -114,11 +108,8 @@ public class SortServiceTests : ServiceTestBase
     [Test]
     public void SortStations_Distance_ReturnsStationsSortedByDistance()
     {
-        // Arrange
-        string sortMode = "distance";
-
         // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        var result = SortService.SortStations(_fakeGasStationList, SortModeEnum.distance);
 
         // Assert
         Assert.That(result.Count, Is.EqualTo(3));
@@ -132,11 +123,10 @@ public class SortServiceTests : ServiceTestBase
     public void SortStations_InvalidSortMode_ReturnsUnmodifiedList()
     {
         // Arrange
-        string sortMode = "invalid";
         var originalOrder = _fakeGasStationList.ToList();
 
         // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        var result = SortService.SortStations(_fakeGasStationList, SortModeEnum.invalid);
 
         // Assert
         Assert.That(result.Count.Equals(3), Is.True);
@@ -151,25 +141,10 @@ public class SortServiceTests : ServiceTestBase
         var emptyList = new List<GasStation>();
 
         // Act
-        var result = SortService.SortStations(emptyList, sortMode);
+        var result = SortService.SortStations(emptyList, SortModeEnum.fuelPrice);
 
         // Assert
         Assert.That(result.Count.Equals(0), Is.True);
-    }
-
-    [Test]
-    public void SortStations_NullSortMode_ReturnsUnmodifiedList()
-    {
-        // Arrange
-        string sortMode = null;
-        var originalOrder = _fakeGasStationList.ToList();
-
-        // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
-
-        // Assert
-        Assert.That(result.Count.Equals(3), Is.True);
-        Assert.That(result[0].Id, Is.EqualTo(originalOrder[0].Id));
     }
 
     [Test]
@@ -180,7 +155,7 @@ public class SortServiceTests : ServiceTestBase
         int originalCount = _fakeGasStationList.Count;
 
         // Act
-        var result = SortService.SortStations(_fakeGasStationList, sortMode);
+        var result = SortService.SortStations(_fakeGasStationList, SortModeEnum.fuelPrice);
 
         // Assert
         Assert.That(result.Count.Equals(originalCount), Is.True);

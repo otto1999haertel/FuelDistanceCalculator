@@ -117,11 +117,10 @@
 
                 <!-- Modus -->
                 <div class="mb-2">
-                    <label class="form-label">Modus</label>
                     <div class="d-flex gap-3">
                         @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
                         {
-                            var displayText = mode == InputMode.auto ? "Suche" : "Vergleich";
+                            var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
                             var radioId = $"mode_{mode}";
 
                             <div class="form-check">

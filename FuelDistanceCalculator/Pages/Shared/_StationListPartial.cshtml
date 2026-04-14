@@ -9,7 +9,7 @@
     return;
 }
 <div id="listView">
-    @if(Model.FuelAmount> 0 && Model.SortMode.Equals("totalCost")){
+    @if(Model.FuelAmount> 0 && Model.SortMode.Equals(SortModeEnum.totalCost)){
         <div class="d-flex flex-column gap-2 align-items-start fw-medium mb-3" style="color: #8A9A7B;">
         @if (Model.SavingsToCheapestStation > 0)
             {

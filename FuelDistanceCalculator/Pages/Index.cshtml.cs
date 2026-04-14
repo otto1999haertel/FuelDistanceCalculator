@@ -117,7 +117,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public string DataSourceDate{get;private set; }
     
-    public string SortMode { get; set; }
+    public SortModeEnum SortMode { get; set; }
 
     private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
 
@@ -142,7 +142,7 @@ public class IndexModel : PageModel
         _configuration = configuration;
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         SearchExecuted = false;
-        SortMode = "totalCost";
+        SortMode = SortModeEnum.totalCost;
         StationBrand = string.Empty;
     }
 
@@ -301,7 +301,7 @@ public class IndexModel : PageModel
 
     public string ToDisplay(string obj)
     {
-        return obj.ToString().Replace(".", ",");
+        return obj.Replace(".", ",");
     }
 
     public async Task<JsonResult> OnGetFilterCarTypes(string query)
@@ -352,15 +352,11 @@ public class IndexModel : PageModel
         Console.WriteLine("Calculated Average Costs: " + CalculatedAverageCosts.Count);
     }
 
-    public async Task<IActionResult> OnPostSort(string sortMode)
+    public async Task<IActionResult> OnPostSort(SortModeEnum sortMode)
     {
         try
         {
             Console.WriteLine($"sortMode: {sortMode}");
-            if (string.IsNullOrEmpty(sortMode))
-            {
-                return BadRequest("sortMode ist erforderlich");
-            }
             SortMode = sortMode;
 
             // Lade die gespeicherten GasStation-Objekte aus der Session
@@ -411,7 +407,7 @@ public class IndexModel : PageModel
                 SelectedCarType = inputData?.SelectedCarType ?? "",
                 SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0,
                 SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0,
-                SortMode = sortMode ?? "",
+                SortMode = sortMode,
                 DiscountPercentOrAbsolute = inputData?.Discount ?? ""
             };
 
@@ -423,7 +419,7 @@ public class IndexModel : PageModel
                 SelectedCarType = model.SelectedCarType,
                 SavingsToCheapestStation = model.SavingsToCheapestStation,
                 SavingsToNearestStation = model.SavingsToNearestStation,
-                SortMode = sortMode ?? "",
+                SortMode = sortMode,
                 DiscountPercentOrAbsolute = model.DiscountPercentOrAbsolute
             };
             HttpContext.Session.SetString(InputDataSessionKey, JsonConvert.SerializeObject(updatedInputData));

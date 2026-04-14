@@ -147,9 +147,14 @@
                 @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
                     <!-- Standort 1 -->
-                    <div class="col-md-5 offset-md-1">
-                        <div class="d-flex flex-column h-100">
-                            <label class="form-label mb-1">Standort 1</label>
+                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
+                        <!-- Zeile 1: Label -->
+                        <label for="generalLocation" class="form-label mb-0">Standort 1</label>
+                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
+                        <div style="visibility: hidden;">
+                            <label class="form-label mb-0">x</label>
+                        </div>
+                        <!-- Zeile 3: Input -->
                             <div class="input-group">
                                 <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
                                     value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
@@ -158,9 +163,8 @@
                                     <img src="location.png" alt="Standort">
                                 </button>
                             </div>
-                        </div>
                     </div>
-                   <div class="col-md-5">
+                   <div class="col-md-5 radius-col">
                         <div class="d-flex flex-column h-100">
                             <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
                             <div class="text-center mb-1">
@@ -185,19 +189,23 @@
                     </div>
 
                     <!-- Standort 2 -->
-                    <div class="col-md-5 offset-md-1 mt-3">
-                        <div class="d-flex flex-column h-100">
-                            <label class="form-label mb-1">Standort 2</label>
+                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
+                        <!-- Zeile 1: Label -->
+                        <label for="generalLocation" class="form-label mb-0">Standort 2</label>
+                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
+                        <div style="visibility: hidden;">
+                            <label class="form-label mb-0">x</label>
+                        </div>
+                        <!-- Zeile 3: Input -->
                             <input type="text"
                                 name="NamePlaces[1]"
                                 class="form-control"
                                 value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
                                 placeholder="Geben Sie einen Ort ein" />
-                        </div>
                     </div>
 
                     <!-- Radius Standort 2 -->
-                    <div class="col-md-5 mt-3">
+                    <div class="col-md-5 mt-3 radius-col">
                         <div class="d-flex flex-column h-100">
                             <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
                             <div class="text-center mb-1">
@@ -225,36 +233,42 @@
                 {
                     @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
-                        <div class="col-md-5 offset-md-1 mt-3">
-                            <div class="d-flex flex-column h-100">
-                                <label class="form-label mb-1">Standort @(i + 1)</label>
-                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
-                                    placeholder="Geben Sie einen Ort ein" />
-                            </div>
+                        <div class="col-md-5 offset-md-1">
+                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
+                        <!-- Zeile 1: Label -->
+                        <label for="generalLocation" class="form-label mb-0">Standort  @(i + 1)</label>
+                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
+                        <div style="visibility: hidden;">
+                            <label class="form-label mb-0">x</label>
                         </div>
+                        <!-- Zeile 3: Input -->
+                        <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
+                                    placeholder="Geben Sie einen Ort ein" />
+                    </div>
+                </div>
                         <div class="col-md-5 mt-3">
                             <div class="d-flex flex-column h-100">
                                 <label class="form-label mb-1">Radius</label>
                                 <div class="text-center mb-1">
-                                    <output id="outputRadius@(i)" class="value-output text-center">
+                            <output id="outputRadius@(i)" class="value-output text-center">
                                         @(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10) km
-                                    </output>
-                                </div>
-                                <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                    <input type="range"
-                                        name="RadiusPlaces[@i]"
-                                        class="form-range custom-range"
-                                        min="1" max="25" step="1"
-                                        value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
+                            </output>
+                        </div>
+                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                <input type="range"
+                                    name="RadiusPlaces[@i]"
+                                    class="form-range custom-range"
+                                    min="1" max="25" step="1"
+                                    value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
                                         id="RadiusPlace@(i)"
                                         oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'" />
-                                </div>
+                            </div>
                                 <div class="d-flex justify-content-between">
                                     <small class="text-muted">1 km</small>
                                     <small class="text-muted">25 km</small>
                                 </div>
-                            </div>
                         </div>
+                    </div>
                     }
                 }
             </div>
@@ -281,26 +295,31 @@
 
         <!-- Suche-Modus -->
         <div id="autoInputFields" class="modeStyle mt-2" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
-            <div class="row g-3 align-items-start">
+          <div class="row g-3" style="align-items: start;">
                 <div class="col-md-5 offset-md-1">
-                    <div class="d-flex flex-column h-100">
-                        <label for="generalLocation" class="form-label mb-1">Standort (PLZ/ Straße, Ort)</label>
-                        <div class="input-group">
-                            <input type="text" id="generalLocation" class="form-control"
-                                placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
-                            <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
-                                <img src="location.png" alt="Standort">
-                            </button>
-                        </div>
+                    <!-- Standort Label -->
+                    <label for="generalLocation" class="form-label mb-1">Standort (PLZ/ Straße, Ort)</label>
+                    <!-- Input -->
+                    <div class="input-group">
+                        <input type="text" id="generalLocation" class="form-control"
+                            placeholder="Geben Sie einen Ort ein" asp-for="Place" value="@Model.Place">
+                        <button id="geoButton" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+                            <img src="location.png" alt="Standort">
+                        </button>
                     </div>
                 </div>
 
                 <div class="col-md-5">
-                    <div class="d-flex flex-column h-100">
-                        <label class="form-label mb-1">Radius</label>
-                        <div class="text-center mb-1">
-                            <output id="radiusValue" class="value-output">@(Model.Radius) km</output>
+                    <!-- Zeile 1: Label -->
+                    <div class="d-flex align-items-center mb-1">
+                        <label class="form-label mb-0">Radius</label>
+                        <div class="flex-grow-1 text-center">
+                            <output id="radiusValue" class="value-output">10 km</output>
                         </div>
+                    </div>
+                    <!-- Zeile 3: Slider -->
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <small class="text-muted.ms-1">1 km</small>
                         <div class="slider-container flex-grow-1 d-flex align-items-center">
                             <input type="range"
                                 id="generalRadius"
@@ -308,15 +327,10 @@
                                 min="1" max="25" step="1"
                                 asp-for="Radius" />
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <small class="text-muted">1 km</small>
-                            <small class="text-muted">25 km</small>
-                        </div>
-                        <input type="number" asp-for="Radius" class="d-none" min="1" max="25" />
-                </div>
+                        <small class="text-muted.ms-1">25 km</small>
+                    </div>
                 </div>
             </div>
-
             <div class="d-flex justify-content-center mt-3">
                 <button type="submit" class="btn btn-primary"
                         style="width: 120px; display: flex; align-items: center; justify-content: center; gap: 6px;"
@@ -796,7 +810,7 @@
             const container = document.getElementById("dynamicLocations");
             if (locationIndex < 4) {
                 const html = `
-                    <div class="col-md-5 offset-md-1 mt-3 location-fade-in">
+                    <div class="col-md-5 offset-md-1 mt-3 location-fade-in standort-col">
                         <div class="d-flex flex-column h-100">
                             <label class="form-label mb-1">Standort ${locationIndex + 1}</label>
                             <input type="text" 
@@ -805,7 +819,7 @@
                                 placeholder="Geben Sie einen Ort ein" />
                         </div>
                     </div>
-                    <div class="col-md-5 mt-3 location-fade-in">
+                    <div class="col-md-5 mt-3 location-fade-in radius-col">
                         <div class="d-flex flex-column">
                             <label class="form-label mb-1">Radius</label>
                             <div class="text-center mb-1">

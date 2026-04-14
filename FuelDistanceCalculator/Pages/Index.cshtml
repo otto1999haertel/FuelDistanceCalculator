@@ -160,26 +160,26 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5">
+                   <div class="col-md-5">
                         <div class="d-flex flex-column h-100">
                             <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
-                            <div class="d-flex align-items-center gap-3 h-100">
-                                <label class="text-nowrap">1</label>
-                                <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                    <input type="range"
-                                        name="RadiusPlaces[0]"
-                                        class="form-range"
-                                        min="1"
-                                        max="25"
-                                        step="1"
-                                        value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                        id="RadiusPlace0"
-                                        oninput="document.getElementById('outputRadius0').textContent = this.value" />
-                                </div>
+                            <div class="text-center mb-1">
                                 <output id="outputRadius0" class="value-output">
-                                    @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)
+                                    @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
                                 </output>
-                                <label class="text-nowrap">km</label>
+                            </div>
+                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                <input type="range"
+                                    name="RadiusPlaces[0]"
+                                    class="form-range"
+                                    min="1" max="25" step="1"
+                                    value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
+                                    id="RadiusPlace0"
+                                    oninput="document.getElementById('outputRadius0').textContent = this.value + ' km'" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">1 km</small>
+                                <small class="text-muted">25 km</small>
                             </div>
                         </div>
                     </div>
@@ -199,24 +199,24 @@
                     <!-- Radius Standort 2 -->
                     <div class="col-md-5 mt-3">
                         <div class="d-flex flex-column h-100">
-                            <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
-                            <div class="d-flex align-items-center gap-3 h-100">
-                                <label class="text-nowrap">1</label>
-                                <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                    <input type="range"
-                                        name="RadiusPlaces[1]"
-                                        class="form-range custom-range"
-                                        min="1"
-                                        max="25"
-                                        step="1"
-                                        value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
-                                        id="RadiusPlace1"
-                                        oninput="document.getElementById('outputRadius1').textContent = this.value" />
-                                </div>
+                            <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
+                            <div class="text-center mb-1">
                                 <output id="outputRadius1" class="value-output text-center">
-                                    @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)
+                                    @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
                                 </output>
-                                <label class="text-nowrap">km</label>
+                            </div>
+                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                <input type="range"
+                                    name="RadiusPlaces[1]"
+                                    class="form-range custom-range"
+                                    min="1" max="25" step="1"
+                                    value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
+                                    id="RadiusPlace1"
+                                    oninput="document.getElementById('outputRadius1').textContent = this.value + ' km'" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">1 km</small>
+                                <small class="text-muted">25 km</small>
                             </div>
                         </div>
                     </div>
@@ -234,24 +234,24 @@
                         </div>
                         <div class="col-md-5 mt-3">
                             <div class="d-flex flex-column h-100">
-                                <label for="RadiusPlace2" class="form-label mb-1">Radius</label>
-                                <div class="d-flex align-items-center gap-3 h-100">
-                                    <label class="text-nowrap">1</label>
-                                    <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                        <input type="range"
-                                            name="RadiusPlaces[@i]"
-                                            class="form-range custom-range"
-                                            min="1"
-                                            max="25"
-                                            step="1"
-                                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[i] : 10)"
-                                            id="RadiusPlace@(i)"
-                                            oninput="document.getElementById('outputRadius[@i]').textContent = this.value" />
-                                    </div>
-                                    <output id="outputRadius[@i]" class="value-output text-center">
-                                        @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[i] : 10)
+                                <label class="form-label mb-1">Radius</label>
+                                <div class="text-center mb-1">
+                                    <output id="outputRadius@(i)" class="value-output text-center">
+                                        @(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10) km
                                     </output>
-                                    <label class="text-nowrap">km</label>
+                                </div>
+                                <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                    <input type="range"
+                                        name="RadiusPlaces[@i]"
+                                        class="form-range custom-range"
+                                        min="1" max="25" step="1"
+                                        value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
+                                        id="RadiusPlace@(i)"
+                                        oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'" />
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">1 km</small>
+                                    <small class="text-muted">25 km</small>
                                 </div>
                             </div>
                         </div>
@@ -297,23 +297,23 @@
 
                 <div class="col-md-5">
                     <div class="d-flex flex-column h-100">
-                        <label for="generalRadius" class="form-label mb-1">Radius</label>
-                        <div class="d-flex align-items-center gap-3 h-100">
-                            <label class="text-nowrap">1</label>
-                            <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                <input type="range"
-                                    id="generalRadius"
-                                    class="form-range custom-range"
-                                    min="1" max="25" step="1"
-                                    asp-for="Radius" />
-                            </div>
-                            <output id="radiusValue" class="value-output">
-                                @(Model.Radius)
-                            </output>
-                            <label class="text-nowrap">km</label>
+                        <label class="form-label mb-1">Radius</label>
+                        <div class="text-center mb-1">
+                            <output id="radiusValue" class="value-output">@(Model.Radius) km</output>
+                        </div>
+                        <div class="slider-container flex-grow-1 d-flex align-items-center">
+                            <input type="range"
+                                id="generalRadius"
+                                class="form-range custom-range"
+                                min="1" max="25" step="1"
+                                asp-for="Radius" />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">1 km</small>
+                            <small class="text-muted">25 km</small>
                         </div>
                         <input type="number" asp-for="Radius" class="d-none" min="1" max="25" />
-                    </div>
+                </div>
                 </div>
             </div>
 
@@ -412,18 +412,6 @@
         let map;
         let Tiles;
         let locationIndex = @Model.NamePlaces.Count;
-
-        const slider = document.getElementById('generalRadius');
-            const output = document.getElementById('radiusValue');
-
-            // Initialwert setzen
-            output.textContent = slider.value ;
-
-            // Bei Änderung aktualisieren
-            slider.addEventListener('input', () => {
-                output.textContent = slider.value;
-            });
-
 
         function calculateAndStore(input) {
             try 
@@ -658,6 +646,15 @@
             document.getElementById("geoButton")?.addEventListener("click", getLocation);
             document.getElementById("geoButton2")?.addEventListener("click", getLocation);
 
+            const slider = document.getElementById('generalRadius');
+            const output = document.getElementById('radiusValue');
+            
+            if (slider && output) {
+                output.textContent = slider.value + ' km';
+                slider.addEventListener('input', () => {
+                    output.textContent = slider.value + ' km';
+                });
+            }
 
 
         });
@@ -811,23 +808,21 @@
                     <div class="col-md-5 mt-3 location-fade-in">
                         <div class="d-flex flex-column">
                             <label class="form-label mb-1">Radius</label>
-                            <div class="d-flex align-items-center gap-2 h-100">
-                                <label class="text-nowrap">1</label>
-                                <div class="slider-container flex-grow-1">
-                                    <input type="range"
-                                        name="RadiusPlaces[${locationIndex}]"
-                                        class="form-range custom-range"
-                                        min="1"
-                                        max="25"
-                                        step="1"
-                                        value="10"
-                                        id="RadiusPlace${locationIndex}"
-                                        oninput="document.getElementById('outputRadius${locationIndex}').textContent = this.value" />
-                                </div>
-                                <output id="outputRadius${locationIndex}" class="value-output text-center">
-                                    10
-                                </output>
-                                <label class="text-nowrap">km</label>
+                            <div class="text-center mb-1">
+                                <output id="outputRadius${locationIndex}" class="value-output text-center">10 km</output>
+                            </div>
+                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                                <input type="range"
+                                    name="RadiusPlaces[${locationIndex}]"
+                                    class="form-range custom-range"
+                                    min="1" max="25" step="1"
+                                    value="10"
+                                    id="RadiusPlace${locationIndex}"
+                                    oninput="document.getElementById('outputRadius${locationIndex}').textContent = this.value + ' km'" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">1 km</small>
+                                <small class="text-muted">25 km</small>
                             </div>
                         </div>
                     </div>`;

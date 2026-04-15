@@ -78,14 +78,40 @@
 
                 <!-- Tankmenge -->
                 <div class="mb-3">
-                    <label for="fuelAmount">Vorrausichtliche Tankmenge (@Model.VolumeUnit)</label>
+                    <label for="fuelAmount">
+                        Vorrausichtliche Tankmenge (@Model.VolumeUnit)
+                        <span style="bold" id="fuelAmountValue">@Model.FuelAmount</span>
+                    </label>
                     <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
-                        title="Du kannst auch Berechnungen mit +, −, *, / durchführen. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
+                        title="Nutze das Textfeld für die Angabe der maximalen Tankmenge und den Slider für das Einstellen der aktuellen Tankmenge">
                         ⓘ
                     </span>
-                    <input type="text" id="FuelAmountDisplay" class="form-control" required
-                        onblur="calculateAndStore(this)" value="@Model.FuelAmount" />
-                    <input type="hidden" id="FuelAmount" name="FuelAmount" value="@Model.FuelAmount" />
+                    <div class="d-flex align-items-center gap-2">
+
+                    <!-- Links: Min Label -->
+                    <small class="text-muted">0</small>
+
+                    <!-- Slider -->
+                    <div class="flex-grow-1">
+                        <input type="range"
+                            name="FuelAmount"
+                            class="form-range"
+                            min="0"
+                            max="25"
+                            step="1"
+                            value="@(Model.FuelAmount)"
+                            id="FuelAmountRange"
+                            oninput="updateFuel(this.value)">
+                    </div>
+
+                    <!-- Rechts: Input für Max -->
+                    <input type="number"
+                        id="MaximumFuelAmount"
+                        class="form-control"
+                        style="width: 80px;"
+                        value="@Model.FuelAmount"
+                        oninput="updateMax(this.value)">
+                </div>
                 </div>
 
                 <!-- Fahrzeugtyp & Kosten pro KM -->
@@ -448,6 +474,15 @@
         let Tiles;
         let locationIndex = @Model.NamePlaces.Count;
 
+        function updateFuel(value) {
+            document.getElementById('fuelAmountValue').textContent = value;
+        }
+
+        function updateMax(value) {
+            document.getElementById('FuelAmountRange').max = value;
+            localStorage.setItem("maxVolume", value);
+        }
+
         function calculateAndStore(input) {
             try 
             {
@@ -676,6 +711,12 @@
                 if (radio) {
                     radio.checked = true;
                 }
+            }
+
+            const maxVolume = localStorage.getItem("maxVolume");
+            if (maxVolume) {
+                document.getElementById('MaximumFuelAmount').value = maxVolume;
+                document.getElementById('FuelAmountRange').max = maxVolume;
             }
 
             document.getElementById("geoButton")?.addEventListener("click", getLocation);

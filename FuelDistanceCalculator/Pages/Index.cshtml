@@ -183,7 +183,7 @@
 
                             <!-- Slider -->
                             <div class="d-flex align-items-center gap-2 mt-1">
-                                <small class="text-muted.ms-1">1 km</small>
+                                <small class="text-muted ms-1">1 km</small>
 
                                 <div class="flex-grow-1">
                                     <input type="range"
@@ -195,7 +195,7 @@
                                         oninput="document.getElementById('outputRadius0').textContent = this.value + ' km'">
                                 </div>
 
-                                <small class="text-muted.ms-1">25 km</small>
+                                <small class="text-muted ms-1">25 km</small>
                             </div>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                             </div>
 
                             <div class="d-flex align-items-center gap-2 mt-1">
-                                <small class="text-muted.ms-1">1 km</small>
+                                <small class="text-muted ms-1">1 km</small>
 
                                 <div class="flex-grow-1">
                                     <input type="range"
@@ -239,7 +239,7 @@
                                         oninput="document.getElementById('outputRadius1').textContent = this.value + ' km'">
                                 </div>
 
-                                <small class="text-muted.ms-1">25 km</small>
+                                <small class="text-muted ms-1">25 km</small>
                             </div>
                         </div>
                     </div>
@@ -275,7 +275,7 @@
                             </div>
 
                             <div class="d-flex align-items-center gap-2 mt-1">
-                                <small class="text-muted.ms-1">1 km</small>
+                                <small class="text-muted ms-1">1 km</small>
 
                                 <div class="flex-grow-1">
                                     <input type="range"
@@ -287,14 +287,14 @@
                                         oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'">
                                 </div>
 
-                                <small class="text-muted.ms-1">25 km</small>
+                                <small class="text-muted ms-1">25 km</small>
                             </div>
                         </div>
                     </div>
                     }
                 }
 
-            <div id="dynamicLocations" class="row mt-3"></div>
+            <div id="dynamicLocations" class="row g-3 align-items-start"></div>
 
             <div class="row justify-content-center mt-3">
                 <button type="button" id="addStandort" class="btn btn-primary" style="width: 200px"
@@ -340,7 +340,7 @@
                     </div>
                     <!-- Zeile 3: Slider -->
                     <div class="d-flex align-items-center gap-2 mt-1">
-                        <small class="text-muted.ms-1">1 km</small>
+                        <small class="text-muted ms-1">1 km</small>
                         <div class="slider-container flex-grow-1 d-flex align-items-center">
                             <input type="range"
                                 id="generalRadius"
@@ -348,7 +348,7 @@
                                 min="1" max="25" step="1"
                                 asp-for="Radius" />
                         </div>
-                        <small class="text-muted.ms-1">25 km</small>
+                        <small class="text-muted ms-1">25 km</small>
                     </div>
                 </div>
             </div>
@@ -831,22 +831,28 @@
             const container = document.getElementById("dynamicLocations");
             if (locationIndex < 4) {
                 const html = `
-                    <div class="col-md-5 offset-md-1 mt-3 location-fade-in standort-col">
-                        <div class="d-flex flex-column h-100">
-                            <label class="form-label mb-1">Standort ${locationIndex + 1}</label>
-                            <input type="text" 
-                                name="NamePlaces[${locationIndex}]" 
-                                class="form-control" 
-                                placeholder="Geben Sie einen Ort ein" />
-                        </div>
+                     <div class="col-md-5 offset-md-1 mt-3 location-fade-in standort-col">
+                        <label class="form-label mb-1">Standort ${locationIndex + 1}</label>
+
+                        <input type="text" 
+                            name="NamePlaces[${locationIndex}]" 
+                            class="form-control" 
+                            placeholder="Geben Sie einen Ort ein" />
                     </div>
+
                     <div class="col-md-5 mt-3 location-fade-in radius-col">
-                        <div class="d-flex flex-column">
-                            <label class="form-label mb-1">Radius</label>
-                            <div class="text-center mb-1">
-                                <output id="outputRadius${locationIndex}" class="value-output text-center">10 km</output>
+
+                        <div class="d-flex align-items-center mb-1">
+                            <label class="form-label mb-0">Radius</label>
+                            <div class="flex-grow-1 text-center">
+                                <output id="outputRadius${locationIndex}" class="value-output">10 km</output>
                             </div>
-                            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <small class="text-muted ms-1">1 km</small>
+
+                            <div class="flex-grow-1">
                                 <input type="range"
                                     name="RadiusPlaces[${locationIndex}]"
                                     class="form-range custom-range"
@@ -855,11 +861,10 @@
                                     id="RadiusPlace${locationIndex}"
                                     oninput="document.getElementById('outputRadius${locationIndex}').textContent = this.value + ' km'" />
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">1 km</small>
-                                <small class="text-muted">25 km</small>
-                            </div>
+
+                            <small class="text-muted ms-1">25 km</small>
                         </div>
+
                     </div>`;
                 
                 container.insertAdjacentHTML("beforeend", html);

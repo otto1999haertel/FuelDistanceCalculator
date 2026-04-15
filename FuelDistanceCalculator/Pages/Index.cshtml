@@ -143,88 +143,103 @@
 
         <!-- Vergleich-Modus -->
         <div id="manualInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
-            <div class="row g-3 align-items-start">
+                
                 @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
                 {
-                    <!-- Standort 1 -->
-                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
-                        <!-- Zeile 1: Label -->
-                        <label for="generalLocation" class="form-label mb-0">Standort 1</label>
-                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
-                        <div style="visibility: hidden;">
-                            <label class="form-label mb-0">x</label>
-                        </div>
-                        <!-- Zeile 3: Input -->
+                    <div class="row g-3 align-items-start">
+
+                        <!-- Standort 1 -->
+                        <div class="col-md-5 offset-md-1">
+                            <label class="form-label mb-0">Standort 1</label>
+
+                            <!-- Input -->
                             <div class="input-group">
-                                <input type="text" name="NamePlaces[0]" id="FirstComparePlace" class="form-control"
+                                <input type="text"
+                                    name="NamePlaces[0]"
+                                    class="form-control"
+                                    id="FirstComparePlace"
                                     value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
                                     placeholder="Geben Sie einen Ort ein" />
-                                <button id="geoButton2" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center locationButton" type="button">
+
+                                <button id="geoButton2" class="btn btn-primary btn-sm locationButton" type="button">
                                     <img src="location.png" alt="Standort">
                                 </button>
                             </div>
-                    </div>
-                   <div class="col-md-5 radius-col">
-                        <div class="d-flex flex-column h-100">
-                            <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
-                            <div class="text-center mb-1">
-                                <output id="outputRadius0" class="value-output">
-                                    @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
-                                </output>
+                        </div>
+
+                        <!-- Radius 1 -->
+                        <div class="col-md-5">
+
+                            <!-- Label + Output (gleich wie autoInputFields) -->
+                            <div class="d-flex align-items-center mb-1">
+                                <label for="RadiusPlace0"  class="form-label mb-0">Radius</label>
+
+                                <div class="flex-grow-1 text-center">
+                                    <output id="outputRadius0" class="value-output">
+                                        @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
+                                    </output>
+                                </div>
                             </div>
-                            <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                <input type="range"
-                                    name="RadiusPlaces[0]"
-                                    class="form-range"
-                                    min="1" max="25" step="1"
-                                    value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                    id="RadiusPlace0"
-                                    oninput="document.getElementById('outputRadius0').textContent = this.value + ' km'" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">1 km</small>
-                                <small class="text-muted">25 km</small>
+
+                            <!-- Slider -->
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <small class="text-muted.ms-1">1 km</small>
+
+                                <div class="flex-grow-1">
+                                    <input type="range"
+                                        name="RadiusPlaces[0]"
+                                        class="form-range"
+                                        min="1" max="25" step="1"
+                                        value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
+                                        id="RadiusPlace0"
+                                        oninput="document.getElementById('outputRadius0').textContent = this.value + ' km'">
+                                </div>
+
+                                <small class="text-muted.ms-1">25 km</small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Standort 2 -->
-                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
-                        <!-- Zeile 1: Label -->
-                        <label for="generalLocation" class="form-label mb-0">Standort 2</label>
-                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
-                        <div style="visibility: hidden;">
-                            <label class="form-label mb-0">x</label>
-                        </div>
-                        <!-- Zeile 3: Input -->
+                    <div class="row g-3 align-items-start">
+
+                        <!-- Standort 2 -->
+                        <div class="col-md-5 offset-md-1">
+                            <label class="form-label mb-0">Standort 2</label>
+
                             <input type="text"
                                 name="NamePlaces[1]"
                                 class="form-control"
                                 value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
                                 placeholder="Geben Sie einen Ort ein" />
-                    </div>
+                        </div>
 
-                    <!-- Radius Standort 2 -->
-                    <div class="col-md-5 mt-3 radius-col">
-                        <div class="d-flex flex-column h-100">
-                            <label for="RadiusPlace1" class="form-label mb-1">Radius</label>
-                            <div class="text-center mb-1">
-                                <output id="outputRadius1" class="value-output text-center">
-                                    @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
-                                </output>
+                        <!-- Radius 2 -->
+                        <div class="col-md-5">
+
+                            <div class="d-flex align-items-center mb-1">
+                                <label for="RadiusPlace1" class="form-label mb-0">Radius</label>
+
+                                <div class="flex-grow-1 text-center">
+                                    <output id="outputRadius1" class="value-output">
+                                        @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
+                                    </output>
+                                </div>
                             </div>
-                            <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                <input type="range"
-                                    name="RadiusPlaces[1]"
-                                    class="form-range custom-range"
-                                    min="1" max="25" step="1"
-                                    value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
-                                    id="RadiusPlace1"
-                                    oninput="document.getElementById('outputRadius1').textContent = this.value + ' km'" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">1 km</small>
-                                <small class="text-muted">25 km</small>
+
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <small class="text-muted.ms-1">1 km</small>
+
+                                <div class="flex-grow-1">
+                                    <input type="range"
+                                        name="RadiusPlaces[1]"
+                                        class="form-range"
+                                        min="1" max="25" step="1"
+                                        value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
+                                        id="RadiusPlace1"
+                                        oninput="document.getElementById('outputRadius1').textContent = this.value + ' km'">
+                                </div>
+
+                                <small class="text-muted.ms-1">25 km</small>
                             </div>
                         </div>
                     </div>
@@ -234,18 +249,19 @@
                     @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
                         <div class="col-md-5 offset-md-1">
-                    <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
-                        <!-- Zeile 1: Label -->
-                        <label for="generalLocation" class="form-label mb-0">Standort  @(i + 1)</label>
-                        <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
-                        <div style="visibility: hidden;">
-                            <label class="form-label mb-0">x</label>
+                            <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
+                                <!-- Zeile 1: Label -->
+                                <label for="generalLocation" class="form-label mb-0">Standort  @(i + 1)</label>
+                                <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
+                                <div style="visibility: hidden;">
+                                    <label class="form-label mb-0">x</label>
+                                </div>
+                                <!-- Zeile 3: Input -->
+                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
+                                            placeholder="Geben Sie einen Ort ein" />
+                            </div>
                         </div>
-                        <!-- Zeile 3: Input -->
-                        <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
-                                    placeholder="Geben Sie einen Ort ein" />
-                    </div>
-                </div>
+
                         <div class="col-md-5 mt-3">
                             <div class="d-flex flex-column h-100">
                                 <label class="form-label mb-1">Radius</label>
@@ -253,6 +269,7 @@
                             <output id="outputRadius@(i)" class="value-output text-center">
                                         @(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10) km
                             </output>
+                            </div>
                         </div>
                             <div class="slider-container flex-grow-1 d-flex align-items-center">
                                 <input type="range"
@@ -268,10 +285,8 @@
                                     <small class="text-muted">25 km</small>
                                 </div>
                         </div>
-                    </div>
                     }
                 }
-            </div>
 
             <div id="dynamicLocations" class="row mt-3"></div>
 

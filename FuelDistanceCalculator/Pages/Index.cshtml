@@ -83,35 +83,38 @@
                         <span style="bold" id="fuelAmountValue">@Model.FuelAmount</span>
                     </label>
                     <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
-                        title="Nutze das Textfeld für die Angabe der maximalen Tankmenge und den Slider für das Einstellen der aktuellen Tankmenge">
+                        title="Nutze das Textfeld für die Angabe der maximalen Tankmenge und den Slider für das Einstellen der aktuellen Tankmenge. Falls du 0 eingibst wird die Liste nach Spritpreisen sortiert">
                         ⓘ
                     </span>
                     <div class="d-flex align-items-center gap-2">
+                        <!-- Slider -->
+                        <div class="flex-grow-1 position-relative" style="min-width: 0;">
+                            <input type="range"
+                                name="FuelAmount"
+                                class="form-range"
+                                min="0" max="25" step="0.5"
+                                value="@(Model.FuelAmount)"
+                                id="FuelAmountRange"
+                                style="width: 100%; padding: 0;"
+                                oninput="updateFuel(this.value)">
 
-                    <!-- Links: Min Label -->
-                    <small class="text-muted">0</small>
+                            <div style="position: relative; height: 20px; margin-top: 4px;">
+                                <small style="position: absolute; left: 10px; transform: translateX(-50%); color: var(--text-color); opacity: 0.6;">0</small>
+                                <small style="position: absolute; left: calc(25% - 2.5px); transform: translateX(-50%); color: var(--text-color); opacity: 0.6;">1/4</small>
+                                <small style="position: absolute; left: calc(50%); transform: translateX(-50%); color: var(--text-color); opacity: 0.6;">1/2</small>
+                                <small style="position: absolute; left: calc(75% + 2.5px); transform: translateX(-50%); color: var(--text-color); opacity: 0.6;">3/4</small>
+                                <small style="position: absolute; left: calc(100% - 10px); transform: translateX(-50%); color: var(--text-color); opacity: 0.6;">max</small>
+                            </div>
+                        </div>
 
-                    <!-- Slider -->
-                    <div class="flex-grow-1">
-                        <input type="range"
-                            name="FuelAmount"
-                            class="form-range"
-                            min="0"
-                            max="25"
-                            step="1"
-                            value="@(Model.FuelAmount)"
-                            id="FuelAmountRange"
-                            oninput="updateFuel(this.value)">
-                    </div>
-
-                    <!-- Rechts: Input für Max -->
-                    <input type="number"
-                        id="MaximumFuelAmount"
-                        class="form-control"
-                        style="width: 80px;"
-                        value="@Model.FuelAmount"
-                        oninput="updateMax(this.value)">
-                </div>
+                        <!-- Input -->
+                        <input type="number"
+                            id="MaximumFuelAmount"
+                            class="form-control flex-shrink-0"
+                            style="width: 80px;"
+                            value="@Model.FuelAmount"
+                            oninput="updateMax(this.value)"/>
+                    </div>    
                 </div>
 
                 <!-- Fahrzeugtyp & Kosten pro KM -->

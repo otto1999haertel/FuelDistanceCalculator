@@ -248,43 +248,49 @@
                 {
                     @for (int i = 2; i < Model.NamePlaces.Count; i++)
                     {
+                        <div class="row g-3 align-items-start">
+
+                        <!-- Standort 2 -->
                         <div class="col-md-5 offset-md-1">
-                            <div style="display: grid; grid-template-rows: auto auto auto; gap: 4px;">
-                                <!-- Zeile 1: Label -->
-                                <label for="generalLocation" class="form-label mb-0">Standort  @(i + 1)</label>
-                                <!-- Zeile 2: Unsichtbar - gleiche Höhe wie Radius+Output -->
-                                <div style="visibility: hidden;">
-                                    <label class="form-label mb-0">x</label>
-                                </div>
-                                <!-- Zeile 3: Input -->
-                                <input type="text" name="NamePlaces[@i]" class="form-control" value="@Model.NamePlaces[i]"
-                                            placeholder="Geben Sie einen Ort ein" />
-                            </div>
+                            <label class="form-label mb-0">Standort @(i+1)</label>
+
+                            <input type="text"
+                                name="NamePlaces[@i]"
+                                class="form-control"
+                                value="@Model.NamePlaces[i]"
+                                placeholder="Geben Sie einen Ort ein" />
                         </div>
 
-                        <div class="col-md-5 mt-3">
-                            <div class="d-flex flex-column h-100">
-                                <label class="form-label mb-1">Radius</label>
-                                <div class="text-center mb-1">
-                            <output id="outputRadius@(i)" class="value-output text-center">
+                        <!-- Radius 2 -->
+                        <div class="col-md-5">
+
+                            <div class="d-flex align-items-center mb-1">
+                                <label class="form-label mb-0">Radius</label>
+
+                                <div class="flex-grow-1 text-center">
+                                    <output id="outputRadius@(i)" class="value-output">
                                         @(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10) km
-                            </output>
-                            </div>
-                        </div>
-                            <div class="slider-container flex-grow-1 d-flex align-items-center">
-                                <input type="range"
-                                    name="RadiusPlaces[@i]"
-                                    class="form-range custom-range"
-                                    min="1" max="25" step="1"
-                                    value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
-                                        id="RadiusPlace@(i)"
-                                        oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'" />
-                            </div>
-                                <div class="d-flex justify-content-between">
-                                    <small class="text-muted">1 km</small>
-                                    <small class="text-muted">25 km</small>
+                                    </output>
                                 </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <small class="text-muted.ms-1">1 km</small>
+
+                                <div class="flex-grow-1">
+                                    <input type="range"
+                                        name="RadiusPlaces[@i]"
+                                        class="form-range"
+                                        min="1" max="25" step="1"
+                                        value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
+                                        id="RadiusPlace@(i)"
+                                        oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'">
+                                </div>
+
+                                <small class="text-muted.ms-1">25 km</small>
+                            </div>
                         </div>
+                    </div>
                     }
                 }
 

@@ -93,7 +93,6 @@
                                 name="FuelAmount"
                                 class="form-range"
                                 min="0" max="25" step="0.5"
-                                value="@(Model.FuelAmount)"
                                 id="FuelAmountRange"
                                 style="width: 100%; padding: 0;"
                                 oninput="updateFuel(this.value)">
@@ -325,7 +324,7 @@
 
             <div id="dynamicLocations" class="row g-3 align-items-start"></div>
 
-            <div class="row justify-content-center mt-3">
+            <div class="row justify-content-center mt-4">
                 <button type="button" id="addStandort" class="btn btn-primary" style="width: 200px"
                     onclick="addLocation()" @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
                     @(Model.NamePlaces.Count >= 4 ? "Maximale Standorte erreicht" : "Standort hinzufügen")
@@ -721,6 +720,11 @@
                 document.getElementById('MaximumFuelAmount').value = maxVolume;
                 document.getElementById('FuelAmountRange').max = maxVolume;
             }
+
+            const fuelRange = document.getElementById('FuelAmountRange');
+            const fuelValue = @Model.FuelAmount;
+            fuelRange.value = fuelValue;
+            document.getElementById('fuelAmountValue').textContent = fuelValue;
 
             document.getElementById("geoButton")?.addEventListener("click", getLocation);
             document.getElementById("geoButton2")?.addEventListener("click", getLocation);

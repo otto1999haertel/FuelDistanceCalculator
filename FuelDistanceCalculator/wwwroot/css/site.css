@@ -838,3 +838,283 @@ html.dark-mode .loader {
         transform: rotate(360deg);
     }
 }
+
+/* ---------- Hero ---------- */
+.hero-section {
+    padding: 2.5rem 1rem 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+        rgba(199, 125, 88, 0.10),
+        rgba(212, 165, 116, 0.04));
+    border: 1px solid var(--border-color);
+}
+
+html.dark-mode .hero-section {
+    background: linear-gradient(135deg,
+        rgba(212, 165, 116, 0.15),
+        rgba(199, 125, 88, 0.05));
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light-mode) .hero-section {
+        background: linear-gradient(135deg,
+            rgba(212, 165, 116, 0.15),
+            rgba(199, 125, 88, 0.05));
+    }
+}
+
+.hero-section h1 { font-variation-settings: 'wght' 700; margin-bottom: 0.5rem; }
+.hero-section p  { color: var(--text-color); opacity: 0.8; margin-bottom: 0; }
+
+/* ---------- Haupt-Card ---------- */
+.main-card,
+.results-card {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background-color: var(--navbar-bg);
+    color: var(--text-color);          /* <-- NEU: sorgt dafür, dass Text in beiden Modi sichtbar ist */
+    box-shadow: var(--shadow-neumorphic);
+}
+
+.card {
+    color: var(--text-color);
+}
+
+/* ---------- Modus-Tabs ---------- */
+.mode-tabs {
+    display: flex;
+    background-color: var(--table-head-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    list-style: none;
+    margin: 0 0 1.5rem 0;
+}
+.mode-tabs .nav-item { flex: 1; margin: 0; }
+
+.hidden-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+.mode-tab {
+    display: block;
+    text-align: center;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    margin: 0;
+    user-select: none;
+}
+.mode-tab:hover { background-color: var(--hover-bg); }
+
+.hidden-radio:checked + .mode-tab,
+.mode-tab.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(199, 125, 88, 0.25);
+}
+html.dark-mode .hidden-radio:checked + .mode-tab,
+html.dark-mode .mode-tab.active {
+    color: var(--bg-color);
+    box-shadow: 0 2px 8px rgba(212, 165, 116, 0.25);
+}
+
+/* ---------- Spritart als Pills ---------- */
+.fuel-type-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.fuel-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+.fuel-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    background: transparent;
+    color: var(--text-color);
+    margin: 0;
+    user-select: none;
+}
+.fuel-label:hover {
+    border-color: var(--primary-color);
+    background-color: var(--hover-bg);
+}
+.fuel-radio:checked + .fuel-label {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+html.dark-mode .fuel-radio:checked + .fuel-label { color: var(--bg-color); }
+.fuel-radio:checked + .fuel-label:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* ---------- Erweiterte Einstellungen (Collapse) ---------- */
+.advanced-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background-color: var(--table-head-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.2s ease, border-radius 0.2s ease;
+    cursor: pointer;
+}
+.advanced-toggle:hover { background-color: var(--hover-bg); }
+.advanced-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-shadow);
+}
+.advanced-toggle .arrow-indicator {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+.advanced-toggle[aria-expanded="true"] .arrow-indicator { transform: rotate(180deg); }
+.advanced-toggle[aria-expanded="true"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: transparent;
+}
+.advanced-content {
+    padding: 1.25rem;
+    background-color: var(--table-head-bg);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+}
+
+/* ---------- Standort-Zeilen (Compare-Modus) ---------- */
+.location-row {
+    padding: 1rem;
+    background-color: var(--table-head-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+}
+
+/* ---------- Werte-Output & Section-Label ---------- */
+.value-output {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+.section-label {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* ---------- Tooltip-Icon ---------- */
+.input-group-text-icon {
+    cursor: help;
+    opacity: 0.65;
+    font-size: 0.9rem;
+    margin-left: 4px;
+    color: var(--text-color);
+    transition: opacity 0.2s ease;
+}
+.input-group-text-icon:hover { opacity: 1; }
+
+/* ---------- Tankmenge-Slider-Zeile ---------- */
+.fuel-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.fuel-slider-wrap input[type="number"] {
+    width: 90px;
+    flex-shrink: 0;
+}
+
+/* ---------- Submit-Buttons ---------- */
+.submit-btn {
+    padding: 0.85rem 2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* Fix des bestehenden .btn-primary:hover (darken() ist SASS,
+   funktioniert in reinem CSS nicht -> Fallback auf Accent-Farbe) */
+.btn-primary:hover,
+.btn-primary.submit-btn:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+}
+html.dark-mode .btn-primary:hover,
+html.dark-mode .btn-primary.submit-btn:hover {
+    color: var(--bg-color);
+}
+
+/* ---------- Location-Button (ersetzt die alte .locationButton) ---------- */
+.location-btn {
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.location-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+/* ---------- Footer-Note ---------- */
+.footer-note {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.65;
+    padding-left: 1.5rem;
+}
+
+.sort-arrow {
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 576px) {
+    .mode-tab       { font-size: 0.85rem; padding: 0.55rem 0.4rem; }
+    .fuel-label     { font-size: 0.85rem; padding: 0.4rem 0.9rem; }
+    .hero-section   { padding: 1.5rem 1rem; }
+    .main-card .card-body { padding: 1.25rem !important; }
+    .advanced-content     { padding: 1rem; }
+}

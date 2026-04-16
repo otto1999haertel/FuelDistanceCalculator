@@ -1,227 +1,244 @@
 @page
 @model ContactModel
 @{
-    ViewData["Title"] = "Kontakt";
+    ViewData["Title"] = "Impressum";
 }
+
 <!-- Google tag (gtag.js) -->
-@if(Model.IsProduction){
+@if (Model.IsProduction)
+{
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
 }
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-JEP2Q2QZMH');
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-JEP2Q2QZMH');
 </script>
 
+<!-- HERO -->
+<div class="hero-section text-center">
+    <h1 class="display-5">Impressum &amp; Rechtliches</h1>
+    <p class="lead">Impressum, Datenschutz und Nutzungsbedingungen auf einen Blick</p>
+</div>
 
-<h1>@ViewData["Title"]</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
 
+            <!-- QUICK-NAV -->
+            <div class="card main-card mb-4">
+                <div class="card-body p-4">
+                    <label class="section-label mb-3">Inhalt</label>
+                    <div class="fuel-type-buttons">
+                        <a href="#impressum" class="fuel-label text-decoration-none">Impressum</a>
+                        <a href="#haftungsausschluss" class="fuel-label text-decoration-none">Haftungsausschluss</a>
+                        <a href="#datenschutzerklaerung" class="fuel-label text-decoration-none">Datenschutz</a>
+                        <a href="#nutzungsbedingungen" class="fuel-label text-decoration-none">Nutzungsbedingungen</a>
+                    </div>
+                </div>
+            </div>
 
-<!-- Impressum -->
-<section id="impressum">
-    <h2>Impressum</h2>
-    <p>Otto Härtel</p>
-    <p>
-        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank">GitHub Repository</a>
-    </p>
-</section>
+            <!-- IMPRESSUM -->
+            <div class="card main-card mb-4" id="impressum">
+                <div class="card-body p-4">
+                    <h2>Impressum</h2>
+                    <p class="mb-2"><strong>Otto Härtel</strong></p>
+                    <p class="mb-0">
+                        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank" rel="noopener">
+                            🔗 GitHub Repository
+                        </a>
+                    </p>
+                </div>
+            </div>
 
-<!-- Haftungsausschluss -->
-<section id="haftungsausschluss">
-    <h2>Haftungsausschluss</h2>
-    <p>
-        Die in dieser Webanwendung bereitgestellten Berechnungen basieren auf eigens entwickelten Algorithmen sowie auf Daten, die über externe API-Dienste (z. B. Nominatim OpenStreetMap API und Tankerkönig API) bezogen werden. Trotz größtmöglicher Sorgfalt übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der dargestellten Informationen und Berechnungen. Die Ergebnisse stellen unverbindliche Richtwerte dar und ersetzen keine verbindliche Kostenkalkulation.
-    </p>
-    <p>
-        Die über externe APIs abgerufenen Daten unterliegen den jeweiligen Nutzungsbedingungen und werden von uns in unmodifizierter Form übernommen. Wir haben keinen Einfluss auf die Richtigkeit, Aktualität oder Vollständigkeit dieser Daten. Für Fehler, Verzögerungen oder Ausfälle, die aus der Nutzung dieser Drittanbieterdienste resultieren, wird keine Haftung übernommen.
-    </p>
-    <p>
-        Die Nutzung dieser Webanwendung erfolgt auf eigenes Risiko. Weder wir noch Dritte haften für unmittelbare oder mittelbare Schäden, die aus der Nutzung oder der Unmöglichkeit der Nutzung der Anwendung entstehen – insbesondere nicht für finanzielle oder sonstige materielle Schäden, die durch fehlerhafte oder unvollständige Informationen, Berechnungen oder technische Störungen verursacht werden.
-    </p>
-    <p>
-        Mit der Nutzung dieser Webanwendung erkennen Sie diesen Haftungsausschluss ausdrücklich an. Dieser Haftungsausschluss ist Bestandteil der Nutzungsbedingungen.
-    </p>
-</section>
+            <!-- HAFTUNGSAUSSCHLUSS -->
+            <div class="card main-card mb-4" id="haftungsausschluss">
+                <div class="card-body p-4">
+                    <h2>Haftungsausschluss</h2>
+                    <p>
+                        Die in dieser Webanwendung bereitgestellten Berechnungen basieren auf eigens entwickelten Algorithmen sowie auf Daten, die über externe API-Dienste (z. B. Nominatim OpenStreetMap API und Tankerkönig API) bezogen werden. Trotz größtmöglicher Sorgfalt übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der dargestellten Informationen und Berechnungen. Die Ergebnisse stellen unverbindliche Richtwerte dar und ersetzen keine verbindliche Kostenkalkulation.
+                    </p>
+                    <p>
+                        Die über externe APIs abgerufenen Daten unterliegen den jeweiligen Nutzungsbedingungen und werden von uns in unmodifizierter Form übernommen. Wir haben keinen Einfluss auf die Richtigkeit, Aktualität oder Vollständigkeit dieser Daten. Für Fehler, Verzögerungen oder Ausfälle, die aus der Nutzung dieser Drittanbieterdienste resultieren, wird keine Haftung übernommen.
+                    </p>
+                    <p>
+                        Die Nutzung dieser Webanwendung erfolgt auf eigenes Risiko. Weder wir noch Dritte haften für unmittelbare oder mittelbare Schäden, die aus der Nutzung oder der Unmöglichkeit der Nutzung der Anwendung entstehen – insbesondere nicht für finanzielle oder sonstige materielle Schäden, die durch fehlerhafte oder unvollständige Informationen, Berechnungen oder technische Störungen verursacht werden.
+                    </p>
+                    <p class="mb-0">
+                        Mit der Nutzung dieser Webanwendung erkennen Sie diesen Haftungsausschluss ausdrücklich an. Dieser Haftungsausschluss ist Bestandteil der Nutzungsbedingungen.
+                    </p>
+                </div>
+            </div>
 
-<!-- Datenschutzerklärung -->
-<section id="datenschutzerklaerung">
-    <h2 id="datenschutz">Datenschutzerklärung</h2>
-    <p>
-        Verantwortlicher für die Datenverarbeitung auf dieser Website ist:
-    </p>
-    <p>
-        Otto Härtel<br>
-    </p>
-    
-    <h3>1. Datenerhebung und -verarbeitung</h3>
-    <p>
-        Diese Webanwendung („FuelGo“) wird von einer Privatperson betrieben. Es werden keinerlei personenbezogene Daten dauerhaft gespeichert, weder in Datenbanken noch in Dateien. Zur Optimierung der Berechnung und zur Reduzierung von API-Abfragen können anonymisierte Ortsbezeichnungen und deren Ortskoordinaten, die keinen Rückschluss auf einzelne Personen zulassen, temporär für bis zu ein Jahr in einem Cache gespeichert werden. Alle weiteren von Ihnen eingegebenen Daten (z. B. Tankmenge oder der Raius der Tankstelle) werden ausschließlich für die Berechnung verwendet und unmittelbar nach der Verarbeitung gelöscht.
-    </p>
-    <p>
-        Zur Fehlerdiagnose und Aufrechterhaltung des Serverbetriebs können vorübergehend technische Daten (z. B. IP-Adressen) in Server-Logs erfasst werden. Diese Daten werden jedoch nicht dauerhaft gespeichert und dienen lediglich der systeminternen Analyse.
-    </p>
+            <!-- DATENSCHUTZERKLÄRUNG -->
+            <div class="card main-card mb-4" id="datenschutzerklaerung">
+                <div class="card-body p-4">
+                    <h2 id="datenschutz">Datenschutzerklärung</h2>
+                    <p>Verantwortlicher für die Datenverarbeitung auf dieser Website ist:</p>
+                    <p><strong>Otto Härtel</strong></p>
 
-    <p>
-        Sofern Sie der Standortfreigabe über Ihren Browser zustimmen, werden Ihre aktuellen geografischen Koordinaten (Breiten- und Längengrad) an den Server übertragen, um die nächstgelegenen Tankstellen zu ermitteln. Die übermittelten Koordinaten werden ausschließlich zur Umrechnung in eine Adresse (Reverse Geocoding) verwendet und in anonymisierter Form inkl. des dazugehörigen Ortes für bis zu einem Jahr zwischengespeichert, um die Performance der Anwendung zu verbessern und unnötige API-Anfragen zu vermeiden.
-    </p>
+                    <h3>1. Datenerhebung und -verarbeitung</h3>
+                    <p>
+                        Diese Webanwendung („FuelGo") wird von einer Privatperson betrieben. Es werden keinerlei personenbezogene Daten dauerhaft gespeichert, weder in Datenbanken noch in Dateien. Zur Optimierung der Berechnung und zur Reduzierung von API-Abfragen können anonymisierte Ortsbezeichnungen und deren Ortskoordinaten, die keinen Rückschluss auf einzelne Personen zulassen, temporär für bis zu ein Jahr in einem Cache gespeichert werden. Alle weiteren von Ihnen eingegebenen Daten (z. B. Tankmenge oder der Radius der Tankstelle) werden ausschließlich für die Berechnung verwendet und unmittelbar nach der Verarbeitung gelöscht.
+                    </p>
+                    <p>
+                        Zur Fehlerdiagnose und Aufrechterhaltung des Serverbetriebs können vorübergehend technische Daten (z. B. IP-Adressen) in Server-Logs erfasst werden. Diese Daten werden jedoch nicht dauerhaft gespeichert und dienen lediglich der systeminternen Analyse.
+                    </p>
+                    <p>
+                        Sofern Sie der Standortfreigabe über Ihren Browser zustimmen, werden Ihre aktuellen geografischen Koordinaten (Breiten- und Längengrad) an den Server übertragen, um die nächstgelegenen Tankstellen zu ermitteln. Die übermittelten Koordinaten werden ausschließlich zur Umrechnung in eine Adresse (Reverse Geocoding) verwendet und in anonymisierter Form inkl. des dazugehörigen Ortes für bis zu einem Jahr zwischengespeichert, um die Performance der Anwendung zu verbessern und unnötige API-Anfragen zu vermeiden.
+                    </p>
+                    <p>
+                        Zur Verbesserung der Nutzererfahrung wird der zuletzt verwendete Kostensatz pro Kilometer lokal im Browser gespeichert. Es werden keine personenbezogenen Daten übertragen oder gespeichert.
+                    </p>
 
-    <p>
-        Zur Verbesserung der Nutzererfahrung wird der zuletzt verwendete Kostensatz pro Kilometer lokal im Browser gespeichert. Es werden keine personenbezogenen Daten übertragen oder gespeichert.
-    </p>
-    
-    <h3>2. Nutzung externer APIs</h3>
-    <p>
-        Für die Umrechnung von Ortsnamen in geographische Koordinaten sowie zur Abfrage aktueller Spritpreise werden folgende externe API-Dienste genutzt:
-    </p>
-    <ul>
-        <li><strong>Nominatim OpenStreetMap API</strong>: Umwandlung von Ortsangaben in Koordinaten.</li>
-        <li><strong>Tankerkönig API</strong>: Abfrage der aktuellen Spritpreise auf Basis von Koordinaten und Radius.</li>
-        <li><strong>OpenStreetMap API</strong>: Darstellung deren Tankstellen auf einer Karte.</li>
-        <li><strong>Google Maps API</strong>: Verlinkung und Öffnung der Tankstellen auf einer Google Maps Karte zur Routenberechnung.</li>
-        <li><strong>openrouteservice</strong>: Berechnung der tatsächlichen Entfernung zwischen Orten</li>
-    </ul>
-    <p>
-        Beim Reverse-Geocoding (Umwandlung von GPS-Koordinaten in eine Adresse) werden die Koordinaten an die Nominatim OpenStreetMap API übermittelt. Dies geschieht ausschließlich auf Grundlage Ihrer Zustimmung zur Standortfreigabe im Browser. Um die Performance der Anwendung zu verbessern und unnötige API-Anfragen zu vermeiden können die übermittelten Koordinaten und der dazugehörige Ort in anonymisierter Form für bis zu einem Jahr zwischengespeichert werden.
-    </p>
-    <p>
-        Bei der Nutzung dieser Dienste werden die von Ihnen eingegebenen Daten, insbesondere der Ortsname, an die jeweiligen API-Anbieter übermittelt. Diese Daten dienen ausschließlich der Bereitstellung der gewünschten Informationen und werden nicht von uns dauerhaft gespeichert. Wir haben keinen Einfluss auf die Verarbeitung dieser Daten durch die Drittanbieter. Bitte informieren Sie sich über die jeweiligen Datenschutzhinweise der API-Anbieter.
-    </p>
+                    <h3>2. Nutzung externer APIs</h3>
+                    <p>
+                        Für die Umrechnung von Ortsnamen in geographische Koordinaten sowie zur Abfrage aktueller Spritpreise werden folgende externe API-Dienste genutzt:
+                    </p>
+                    <ul>
+                        <li><strong>Nominatim OpenStreetMap API</strong>: Umwandlung von Ortsangaben in Koordinaten.</li>
+                        <li><strong>Tankerkönig API</strong>: Abfrage der aktuellen Spritpreise auf Basis von Koordinaten und Radius.</li>
+                        <li><strong>OpenStreetMap API</strong>: Darstellung deren Tankstellen auf einer Karte.</li>
+                        <li><strong>Google Maps API</strong>: Verlinkung und Öffnung der Tankstellen auf einer Google Maps Karte zur Routenberechnung.</li>
+                        <li><strong>openrouteservice</strong>: Berechnung der tatsächlichen Entfernung zwischen Orten.</li>
+                    </ul>
+                    <p>
+                        Beim Reverse-Geocoding (Umwandlung von GPS-Koordinaten in eine Adresse) werden die Koordinaten an die Nominatim OpenStreetMap API übermittelt. Dies geschieht ausschließlich auf Grundlage Ihrer Zustimmung zur Standortfreigabe im Browser. Um die Performance der Anwendung zu verbessern und unnötige API-Anfragen zu vermeiden, können die übermittelten Koordinaten und der dazugehörige Ort in anonymisierter Form für bis zu einem Jahr zwischengespeichert werden.
+                    </p>
+                    <p>
+                        Bei der Nutzung dieser Dienste werden die von Ihnen eingegebenen Daten, insbesondere der Ortsname, an die jeweiligen API-Anbieter übermittelt. Diese Daten dienen ausschließlich der Bereitstellung der gewünschten Informationen und werden nicht von uns dauerhaft gespeichert. Wir haben keinen Einfluss auf die Verarbeitung dieser Daten durch die Drittanbieter. Bitte informieren Sie sich über die jeweiligen Datenschutzhinweise der API-Anbieter.
+                    </p>
 
-    <p>
-        Diese Website verwendet folgende Drittanbieter-Bibliotheken:
-        <ul id="externalLibraries">
-        <li id ="bootstrap">Bootstrap 5.3.8 – <a href="https://getbootstrap.com/" target="_blank">getbootstrap.com</a> – Lizenz: MIT</li>
-        <li id ="jquery">jQuery 3.7.1 – <a href="https://jquery.com/" target="_blank">jquery.com</a> – Lizenz: MIT</li>
-        <li id ="jquery-validation">jQuery-Validation 1.21.0 – <a href="https://github.com/jquery-validation/jquery-validation" target="_blank">jquery-validation</a> – Lizenz: MIT</li>
-        <li id ="jquery-validation-unobtrusive">jQuery-Validation-Unobtrusive 4.0.0 – <a href="https://github.com/aspnet/jquery-validation-unobtrusive" target="_blank">GitHub</a> – Lizenz: MIT</li>
-        </ul>
-    </p>
+                    <p>Diese Website verwendet folgende Drittanbieter-Bibliotheken:</p>
+                    <ul id="externalLibraries">
+                        <li id="bootstrap">Bootstrap 5.3.8 – <a href="https://getbootstrap.com/" target="_blank" rel="noopener">getbootstrap.com</a> – Lizenz: MIT</li>
+                        <li id="jquery">jQuery 3.7.1 – <a href="https://jquery.com/" target="_blank" rel="noopener">jquery.com</a> – Lizenz: MIT</li>
+                        <li id="jquery-validation">jQuery-Validation 1.21.0 – <a href="https://github.com/jquery-validation/jquery-validation" target="_blank" rel="noopener">jquery-validation</a> – Lizenz: MIT</li>
+                        <li id="jquery-validation-unobtrusive">jQuery-Validation-Unobtrusive 4.0.0 – <a href="https://github.com/aspnet/jquery-validation-unobtrusive" target="_blank" rel="noopener">GitHub</a> – Lizenz: MIT</li>
+                    </ul>
 
-    <h3>3. Google Analytics</h3>
-    <p>
-        Diese Website verwendet Google Analytics, einen Webanalysedienst der Google Ireland Limited, 
-        Gordon House, Barrow Street, Dublin 4, Irland. Google Analytics wird nur nach Ihrer 
-        ausdrücklichen Einwilligung aktiviert (Art. 6 Abs. 1 lit. a DSGVO).
-    </p>
-    <p>
-        Google Analytics verwendet Cookies, um die Nutzung der Website zu analysieren. 
-        Die durch den Cookie erzeugten Informationen werden an einen Server von Google 
-        in den USA übertragen und dort gespeichert. IP-Adressen werden auf dieser Website 
-        anonymisiert (<strong>IP-Anonymisierung</strong>), bevor sie übertragen werden.
-    </p>
-    <p>
-        Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie auf den untenstehenden 
-        Button klicken. Weitere Informationen zur Datenverarbeitung durch Google finden Sie unter: 
-        <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a>
-    </p>
+                    <h3>3. Google Analytics</h3>
+                    <p>
+                        Diese Website verwendet Google Analytics, einen Webanalysedienst der Google Ireland Limited,
+                        Gordon House, Barrow Street, Dublin 4, Irland. Google Analytics wird nur nach Ihrer
+                        ausdrücklichen Einwilligung aktiviert (Art. 6 Abs. 1 lit. a DSGVO).
+                    </p>
+                    <p>
+                        Google Analytics verwendet Cookies, um die Nutzung der Website zu analysieren.
+                        Die durch den Cookie erzeugten Informationen werden an einen Server von Google
+                        in den USA übertragen und dort gespeichert. IP-Adressen werden auf dieser Website
+                        anonymisiert (<strong>IP-Anonymisierung</strong>), bevor sie übertragen werden.
+                    </p>
+                    <p>
+                        Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie auf den untenstehenden
+                        Button klicken. Weitere Informationen zur Datenverarbeitung durch Google finden Sie unter:
+                        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>
+                    </p>
 
-    <!-- Widerruf-Button -->
-    <button onclick="revokeConsent()" 
-        class="btn btn-sm mt-2"
-        style="
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            border-radius: 8px;
-            padding: 6px 16px;">
-        🍪 Cookie-Einwilligung widerrufen
-    </button>
-    <span id="consentStatus" class="ms-3" 
-        style="font-size: 0.85rem; color: var(--text-color); opacity: 0.7;">
-    </span>
-    
-    <h3>4. Datenweitergabe</h3>
-    <p>
-        Eine Weitergabe Ihrer Daten an Dritte erfolgt ausschließlich im Rahmen der oben genannten externen API-Dienste. Eine darüberhinausgehende Übermittlung oder dauerhafte Speicherung findet nicht statt.
-    </p>
-    
-    <h3>5. Sicherheit</h3>
-    <p>
-        Wir setzen technische und organisatorische Maßnahmen ein, um Ihre Daten vor unbefugtem Zugriff zu schützen. Da keine dauerhafte Speicherung erfolgt, sind Ihre Daten nur während der aktiven Nutzung der Anwendung temporär vorhanden.
-    </p>
-    
-    <h3>6. Ihre Rechte</h3>
-    <p>
-        Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu erhalten. Ebenso können Sie die Berichtigung, Löschung oder Einschränkung der Verarbeitung Ihrer Daten verlangen.
-    </p>
-    
-    <h3>7. Kontakt</h3>
-    <p>
-        Bei Fragen zur Verarbeitung Ihrer personenbezogenen Daten oder zu dieser Datenschutzerklärung können Sie uns jederzeit kontaktieren.
-    </p>
-</section>
-<!-- Nutzungsbedingungen -->
-<section id="nutzungsbedingungen">
-    <h2>Nutzungsbedingungen</h2>
-    <p>
-        Mit der Nutzung dieser Webanwendung (FuelGo) erklären Sie sich mit den nachfolgenden Nutzungsbedingungen einverstanden.
-    </p>
-    
-    <h3>1. Geltungsbereich</h3>
-    <p>
-        Diese Nutzungsbedingungen regeln die Nutzung der Webanwendung sowie der darin enthaltenen Funktionen, insbesondere der Berechnungsfunktionen zur Schätzung von Tankkosten und der Nutzung externer API-Dienste.
-    </p>
-    
-    <h3>2. Unverbindliche Schätzungen</h3>
-    <p>
-        Die von dieser Anwendung bereitgestellten Berechnungen und Schätzungen basieren auf eigens entwickelten Algorithmen und den von externen Diensten gelieferten Daten. Diese Angaben sind unverbindliche Richtwerte und ersetzen keine verbindliche Kostenkalkulation. Jegliche Handlungen, die auf Basis der bereitgestellten Informationen erfolgen, erfolgen auf eigenes Risiko.
-    </p>
-    
-    <h3>3. Nutzung externer APIs</h3>
-    <p>
-        Für die Berechnung werden externe API-Dienste genutzt, wie beispielsweise die Nominatim OpenStreetMap API zur Umwandlung von Ortsangaben in geographische Koordinaten sowie die Tankerkönig API zur Abfrage aktueller Spritpreise. Bitte beachten Sie, dass diese Dienste jeweils eigenen Nutzungs- und Lizenzbedingungen unterliegen. Insbesondere gelten für die OpenStreetMap-Daten die Bestimmungen der Open Database License (ODbL). Wir haben keinen Einfluss auf Änderungen dieser Bedingungen und übernehmen hierfür keine Haftung.
-    </p>
-    
-    <h3>4. Urheberrecht und Lizenz</h3>
-    <p>
-        Alle Inhalte, insbesondere die durch externe API-Dienste bereitgestellten Daten, unterliegen dem jeweiligen Urheberrecht. Die Nutzung der OpenStreetMap-Daten erfolgt unter den Bedingungen der ODbL. Es ist nicht gestattet, Inhalte dieser Webanwendung ohne ausdrückliche schriftliche Genehmigung zu reproduzieren oder weiterzuverwenden.
-    </p>
-    
-    <h3>5. Haftungsausschluss</h3>
-    <p>
-        Trotz größtmöglicher Sorgfalt kann keine Garantie für die Richtigkeit, Vollständigkeit oder Aktualität der von der Anwendung bereitgestellten Informationen übernommen werden. Wir schließen die Haftung für Schäden, die direkt oder indirekt aus der Nutzung der Anwendung oder der bereitgestellten Daten entstehen, ausdrücklich aus.
-    </p>
-    
-    <h3>6. Änderungen der Nutzungsbedingungen</h3>
-    <p>
-        Wir behalten uns das Recht vor, diese Nutzungsbedingungen jederzeit zu ändern. Es wird empfohlen, sich regelmäßig über die jeweils aktuelle Version zu informieren.
-    </p>
-    
-    <h3>7. Anwendbares Recht und Gerichtsstand</h3>
-    <p>
-        Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, Hoyerswerda.
-    </p>
-    
-    <p>
-        Mit der Nutzung dieser Webanwendung bestätigen Sie, dass Sie diese Nutzungsbedingungen gelesen haben und ihnen zustimmen.
-    </p>
-</section>
+                    <!-- Widerruf-Button (nutzt jetzt Standard btn-Klassen statt Inline-Style) -->
+                    <div class="d-flex align-items-center gap-3 flex-wrap mt-3">
+                        <button onclick="revokeConsent()" type="button" class="btn btn-primary">
+                            🍪 Cookie-Einwilligung widerrufen
+                        </button>
+                        <span id="consentStatus" class="value-output" style="font-size: 0.9rem;"></span>
+                    </div>
+
+                    <h3>4. Datenweitergabe</h3>
+                    <p>
+                        Eine Weitergabe Ihrer Daten an Dritte erfolgt ausschließlich im Rahmen der oben genannten externen API-Dienste. Eine darüberhinausgehende Übermittlung oder dauerhafte Speicherung findet nicht statt.
+                    </p>
+
+                    <h3>5. Sicherheit</h3>
+                    <p>
+                        Wir setzen technische und organisatorische Maßnahmen ein, um Ihre Daten vor unbefugtem Zugriff zu schützen. Da keine dauerhafte Speicherung erfolgt, sind Ihre Daten nur während der aktiven Nutzung der Anwendung temporär vorhanden.
+                    </p>
+
+                    <h3>6. Ihre Rechte</h3>
+                    <p>
+                        Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu erhalten. Ebenso können Sie die Berichtigung, Löschung oder Einschränkung der Verarbeitung Ihrer Daten verlangen.
+                    </p>
+
+                    <h3>7. Kontakt</h3>
+                    <p class="mb-0">
+                        Bei Fragen zur Verarbeitung Ihrer personenbezogenen Daten oder zu dieser Datenschutzerklärung können Sie uns jederzeit kontaktieren.
+                    </p>
+                </div>
+            </div>
+
+            <!-- NUTZUNGSBEDINGUNGEN -->
+            <div class="card main-card mb-4" id="nutzungsbedingungen">
+                <div class="card-body p-4">
+                    <h2>Nutzungsbedingungen</h2>
+                    <p>
+                        Mit der Nutzung dieser Webanwendung (FuelGo) erklären Sie sich mit den nachfolgenden Nutzungsbedingungen einverstanden.
+                    </p>
+
+                    <h3>1. Geltungsbereich</h3>
+                    <p>
+                        Diese Nutzungsbedingungen regeln die Nutzung der Webanwendung sowie der darin enthaltenen Funktionen, insbesondere der Berechnungsfunktionen zur Schätzung von Tankkosten und der Nutzung externer API-Dienste.
+                    </p>
+
+                    <h3>2. Unverbindliche Schätzungen</h3>
+                    <p>
+                        Die von dieser Anwendung bereitgestellten Berechnungen und Schätzungen basieren auf eigens entwickelten Algorithmen und den von externen Diensten gelieferten Daten. Diese Angaben sind unverbindliche Richtwerte und ersetzen keine verbindliche Kostenkalkulation. Jegliche Handlungen, die auf Basis der bereitgestellten Informationen erfolgen, erfolgen auf eigenes Risiko.
+                    </p>
+
+                    <h3>3. Nutzung externer APIs</h3>
+                    <p>
+                        Für die Berechnung werden externe API-Dienste genutzt, wie beispielsweise die Nominatim OpenStreetMap API zur Umwandlung von Ortsangaben in geographische Koordinaten sowie die Tankerkönig API zur Abfrage aktueller Spritpreise. Bitte beachten Sie, dass diese Dienste jeweils eigenen Nutzungs- und Lizenzbedingungen unterliegen. Insbesondere gelten für die OpenStreetMap-Daten die Bestimmungen der Open Database License (ODbL). Wir haben keinen Einfluss auf Änderungen dieser Bedingungen und übernehmen hierfür keine Haftung.
+                    </p>
+
+                    <h3>4. Urheberrecht und Lizenz</h3>
+                    <p>
+                        Alle Inhalte, insbesondere die durch externe API-Dienste bereitgestellten Daten, unterliegen dem jeweiligen Urheberrecht. Die Nutzung der OpenStreetMap-Daten erfolgt unter den Bedingungen der ODbL. Es ist nicht gestattet, Inhalte dieser Webanwendung ohne ausdrückliche schriftliche Genehmigung zu reproduzieren oder weiterzuverwenden.
+                    </p>
+
+                    <h3>5. Haftungsausschluss</h3>
+                    <p>
+                        Trotz größtmöglicher Sorgfalt kann keine Garantie für die Richtigkeit, Vollständigkeit oder Aktualität der von der Anwendung bereitgestellten Informationen übernommen werden. Wir schließen die Haftung für Schäden, die direkt oder indirekt aus der Nutzung der Anwendung oder der bereitgestellten Daten entstehen, ausdrücklich aus.
+                    </p>
+
+                    <h3>6. Änderungen der Nutzungsbedingungen</h3>
+                    <p>
+                        Wir behalten uns das Recht vor, diese Nutzungsbedingungen jederzeit zu ändern. Es wird empfohlen, sich regelmäßig über die jeweils aktuelle Version zu informieren.
+                    </p>
+
+                    <h3>7. Anwendbares Recht und Gerichtsstand</h3>
+                    <p>
+                        Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, Hoyerswerda.
+                    </p>
+
+                    <p class="mb-0">
+                        Mit der Nutzung dieser Webanwendung bestätigen Sie, dass Sie diese Nutzungsbedingungen gelesen haben und ihnen zustimmen.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
-<script>
-    // Aktuellen Status anzeigen
-    const consent = localStorage.getItem('cookieConsent');
-    const statusEl = document.getElementById('consentStatus');
+    <script>
+        // Aktuellen Status anzeigen
+        const consent = localStorage.getItem('cookieConsent');
+        const statusEl = document.getElementById('consentStatus');
 
-    if (consent === 'accepted') {
-        statusEl.textContent = '✅ Analytics aktiv';
-        statusEl.style.opacity = '1';
-        statusEl.style.color = 'var(--primary-color)';
-    } else if (consent === 'declined') {
-        statusEl.textContent = '❌ Analytics deaktiviert';
-        statusEl.style.opacity = '0.6';
-    } else {
-        statusEl.textContent = 'ℹ️ Noch keine Entscheidung';
-        statusEl.style.opacity = '0.6';
-    }
+        if (consent === 'accepted') {
+            statusEl.textContent = '✅ Analytics aktiv';
+        } else if (consent === 'declined') {
+            statusEl.textContent = '❌ Analytics deaktiviert';
+            statusEl.style.opacity = '0.6';
+        } else {
+            statusEl.textContent = 'ℹ️ Noch keine Entscheidung';
+            statusEl.style.opacity = '0.6';
+        }
 
-    function revokeConsent() {
-        localStorage.removeItem('cookieConsent');
-        statusEl.textContent = '✅ Widerrufen – Banner erscheint beim nächsten Besuch';
-        statusEl.style.color = 'var(--primary-color)';
-        statusEl.style.opacity = '1';
-    }
-</script>
+        function revokeConsent() {
+            localStorage.removeItem('cookieConsent');
+            statusEl.textContent = '✅ Widerrufen – Banner erscheint beim nächsten Besuch';
+            statusEl.style.opacity = '1';
+        }
+    </script>
 }

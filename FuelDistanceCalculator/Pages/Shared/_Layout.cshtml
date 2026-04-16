@@ -175,7 +175,7 @@
                             </li>
                         </ul>
                         <!-- Dark Mode Toggle Buttons -->
-                        <button id="autoDarkModeToggle" class="btn btn-primary mx-2">🤖 Auto</button>
+                        <button id="autoDarkModeToggle" class="btn btn-primary mx-2">Auto</button>
                         <button id="darkModeToggle" class="btn btn-primary mx-2">🌙 Mode</button>
                     </div>
                 </div>
@@ -189,8 +189,15 @@
         </div>
 
         <footer class="border-top footer">
-            <div class="container" id="Copyright">
-                &copy; 2025 - @DateTime.Now.Year - FuelGo - <a asp-area="" asp-page="/Contact">Impressum</a>
+            <div class="container footer-content">
+                <div id="Copyright">
+                    &copy; 2025 - @DateTime.Now.Year - FuelGo -
+                    <a asp-area="" asp-page="/Contact">Impressum</a>
+                </div>
+
+                <span class="footer-made">
+                    Made with <span class="heart">♥</span> in Germany
+                </span>
             </div>
         </footer>
 

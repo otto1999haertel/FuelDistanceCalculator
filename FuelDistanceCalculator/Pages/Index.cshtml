@@ -52,7 +52,7 @@
                         <ul class="mode-tabs" role="tablist">
                             @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
                             {
-                                var displayText = mode == InputMode.auto ? "🔍 Optimale Suche" : "📊 Standortvergleich";
+                                var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
                                 var radioId = $"mode_{mode}";
                                 var isActive = Model.SelectInputMode == mode ? "active" : "";
 
@@ -92,7 +92,6 @@
                                     data-bs-toggle="collapse" data-bs-target="#advancedOptions"
                                     aria-expanded="@(advancedHasValue ? "true" : "false")"
                                     aria-controls="advancedOptions">
-                                <span class="me-2">⚙️</span>
                                 <span>Erweiterte Einstellungen</span>
                                 <span class="arrow-indicator">▼</span>
                             </button>
@@ -184,14 +183,14 @@
                             <div class="mb-3">
                                 <div class="d-flex align-items-center mb-1">
                                     <label for="fuelAmount" class="section-label mb-0">
-                                        Tankmenge (@Model.VolumeUnit)
+                                        Tankmenge
                                     </label>
                                     <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
                                           title="Nutze das Textfeld für die maximale Tankmenge und den Slider für die aktuelle Tankmenge. Bei 0 wird nach Spritpreisen sortiert.">
                                         ⓘ
                                     </span>
                                     <div class="flex-grow-1 text-center">
-                                        <span class="value-output" id="fuelAmountValue">@Model.FuelAmount</span>
+                                        <span class="value-output" id="fuelAmountValue">@Model.FuelAmount + "l"</span>
                                     </div>
                                 </div>
                                 <div class="fuel-slider-wrap">
@@ -224,7 +223,7 @@
                             <button type="submit" class="btn btn-primary submit-btn"
                                     asp-page-handler="Search" id="SearchBtn"
                                     onclick="document.getElementById('loader-search').style.display='inline-block'">
-                                🔍 Tankstellen suchen
+                                Tankstellen suchen
                                 <div class="loader" id="loader-search"></div>
                             </button>
                         </div>
@@ -372,7 +371,7 @@
                             <button type="submit" class="btn btn-primary submit-btn"
                                     asp-page-handler="CalculateAverageCost"
                                     onclick="document.getElementById('loader-compare').style.display='inline-block'">
-                                📊 Preise vergleichen
+                                Preise vergleichen
                                 <div class="loader" id="loader-compare"></div>
                             </button>
                         </div>
@@ -409,7 +408,9 @@
                                     </div>
 
                                     <div class="d-flex align-items-center gap-2 ms-md-auto">
-                                        <label for="sortMode" class="form-label mb-0 fw-semibold" id="sortLabel">Sortieren nach</label>
+                                        <label for="sortMode" class="form-label mb-0 fw-semibold" id="sortLabel">
+                                            Sortierung <span class="sort-arrow">↓</span>
+                                        </label>
                                         <div id="sortModeCustom" class="custom-select">
                                             <div class="select-trigger" onclick="toggleDropdownSort()">
                                                 <span id="selectedSortValue">
@@ -470,7 +471,7 @@
                             @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
                             {
                                 <p class="mb-2">
-                                    <strong>@place.Key:</strong>
+                                    @place.Key:
                                     @(place.Value > 0 ? $"{Model.ToDisplay(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
                                 </p>
                             }
@@ -503,7 +504,7 @@
     let locationIndex = @Model.NamePlaces.Count;
 
     function updateFuel(value) {
-        document.getElementById('fuelAmountValue').textContent = value;
+        document.getElementById('fuelAmountValue').textContent = value + ' l';
     }
 
     function updateMax(value) {
@@ -743,7 +744,7 @@
         const fuelRange = document.getElementById('FuelAmountRange');
         const fuelValue = @Model.FuelAmount;
         fuelRange.value = fuelValue;
-        document.getElementById('fuelAmountValue').textContent = fuelValue;
+        document.getElementById('fuelAmountValue').textContent = fuelValue + ' l';
 
         document.getElementById("geoButton")?.addEventListener("click", getLocation);
         document.getElementById("geoButton2")?.addEventListener("click", getLocation);

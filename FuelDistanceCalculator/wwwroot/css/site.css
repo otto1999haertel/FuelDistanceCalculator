@@ -1105,6 +1105,11 @@ html.dark-mode .btn-primary.submit-btn:hover {
     padding-left: 1.5rem;
 }
 
+.sort-arrow {
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 576px) {
     .mode-tab       { font-size: 0.85rem; padding: 0.55rem 0.4rem; }

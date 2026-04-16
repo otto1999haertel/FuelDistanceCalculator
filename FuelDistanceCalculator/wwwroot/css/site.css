@@ -1110,6 +1110,25 @@ html.dark-mode .btn-primary.submit-btn:hover {
   margin-left: 4px;
 }
 
+.footer-content {
+  display: flex;
+  justify-content: space-between; /* 👈 verteilt links & rechts */
+  align-items: center;
+  flex-wrap: wrap; /* 👈 wichtig für mobile */
+  gap: 10px;
+}
+
+.footer-made {
+  white-space: nowrap;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.heart {
+  color: #e25555;
+  margin: 0 2px;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 576px) {
     .mode-tab       { font-size: 0.85rem; padding: 0.55rem 0.4rem; }

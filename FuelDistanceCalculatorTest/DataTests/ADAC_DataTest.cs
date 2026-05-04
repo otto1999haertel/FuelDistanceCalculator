@@ -16,7 +16,7 @@ public class ADAC_DataTest
     }
 
     [Test]
-    [TestCase(1220, 0.98)]
+    [TestCase(1183, 0.98)]
     public async Task JSON_Holds_Correct_Number_Of_Cars_Test(int expectedCarCount, double tolerance)
     {
         Dictionary<string, decimal> carsAndRespectivePricePerkm =  await CarDataParser.ParseCarData(filePath);

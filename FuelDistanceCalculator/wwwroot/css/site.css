@@ -399,10 +399,10 @@ select:focus::placeholder,
   bottom: 0;
   width: 100%;
   white-space: nowrap;
-  line-height: 60px;
   background-color: var(--navbar-bg);
   color: var(--text-color);
   box-shadow: var(--shadow-neumorphic) inset;
+  padding: 1rem 0;   
 }
 /* Tables (verwende Variablen für Konsistenz in Light und Dark) */
 .table {
@@ -1116,6 +1116,9 @@ html.dark-mode .btn-primary.submit-btn:hover {
   align-items: center;
   flex-wrap: wrap; /* 👈 wichtig für mobile */
   gap: 10px;
+  line-height: 1.5; 
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .footer-made {

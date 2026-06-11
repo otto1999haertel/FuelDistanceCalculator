@@ -12,6 +12,7 @@
         !string.IsNullOrWhiteSpace(Model.StationBrand)
         || !string.IsNullOrWhiteSpace(Model.DiscountPercentOrAbsolute)
         || !string.IsNullOrWhiteSpace(Model.SelectedCarType);
+    var oilPriceHasValue = false; 
 }
 
 <!-- Google tag (gtag.js) -->
@@ -138,6 +139,28 @@
                                             <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required
                                                    asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatAndSavePricePerKm(this)"
                                                    step="any" min="0.01" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button class="advanced-toggle" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#internationalOilPrice"
+                                    aria-expanded="@(oilPriceHasValue ? "true" : "false")"
+                                    aria-controls="internationalOilPrice">
+                                <span>Internationaler Öl-Preis</span>
+                                <span class="arrow-indicator">▼</span>
+                            </button>
+
+                            <div class="collapse @(oilPriceHasValue ? "show" : "")" id="internationalOilPrice">
+                                <div class="advanced-content">
+                                    <div class="row gx-3 mb-3">
+                                        <div class="col-md-6 mb-3 mb-md-0">
+                                            <label class="section-label">Täglich</label>
+                                            <label class="section-label">Wöchentlich</label>
+                                            <label class="section-label">Monatlich</label>
                                         </div>
                                     </div>
                                 </div>

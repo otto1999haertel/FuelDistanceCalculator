@@ -1132,6 +1132,88 @@ html.dark-mode .btn-primary.submit-btn:hover {
   margin: 0 2px;
 }
 
+/* ---------- Rohöl-Trend ---------- */
+.oil-trend-section {
+    margin-bottom: 1rem;
+}
+
+.oil-trend-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.oil-trend-title {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--text-color);
+}
+
+.oil-trend-price {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.65;
+}
+
+.oil-trend-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 0.75rem;
+}
+
+.oil-trend-card {
+    background-color: var(--table-row-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    box-shadow: var(--shadow-neumorphic);
+}
+
+.oil-trend-period {
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.65;
+    margin-bottom: 6px;
+}
+
+.oil-trend-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.oil-trend-value.is-down { color: #0F6E56; }
+.oil-trend-value.is-up   { color: #A32D2D; }
+
+html.dark-mode .oil-trend-value.is-down { color: #5DCAA5; }
+html.dark-mode .oil-trend-value.is-up   { color: #F09595; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light-mode) .oil-trend-value.is-down { color: #5DCAA5; }
+    :root:not(.light-mode) .oil-trend-value.is-up   { color: #F09595; }
+}
+
+.oil-trend-sub {
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.65;
+}
+
+.oil-trend-note {
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.65;
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+    line-height: 1.5;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+
 /* ---------- Mobile ---------- */
 @media (max-width: 576px) {
     .mode-tab       { font-size: 0.85rem; padding: 0.55rem 0.4rem; }
@@ -1139,4 +1221,7 @@ html.dark-mode .btn-primary.submit-btn:hover {
     .hero-section   { padding: 1.5rem 1rem; }
     .main-card .card-body { padding: 1.25rem !important; }
     .advanced-content     { padding: 1rem; }
+        .oil-trend-grid {
+        grid-template-columns: 1fr;
+    }
 }

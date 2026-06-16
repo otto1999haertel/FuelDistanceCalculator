@@ -1,6 +1,7 @@
 using FuelDistanceCalculator.Interafces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services.Common;
+using System.Text.Json;
 
 namespace FuelDistanceCalculator.Services;
 
@@ -16,31 +17,25 @@ public class OilPriceService : BaseService, IOilPriceService
     }
     public async Task<OilPriceResult> GetOilPriceChangeAsync()
     {
-        // Simulate fetching oil price change data from an API or database
-         Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
+        Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
 
-
-        var requestUrl = $"https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1mo";
-        // For demonstration purposes, we return a hardcoded result
+        var requestUrl = "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1mo";
 
         string responseContent;
         try
         {
             if (Mode.Equals("Production"))
             {
-                // Production: Echte HTTP-Anfrage
                 HttpResponseMessage response = await HttpRequestClient.GetAsync(requestUrl);
-                response.EnsureSuccessStatusCode();  // Wirft Exception bei Fehlern (z. B. 404)
+                response.EnsureSuccessStatusCode();
                 responseContent = await response.Content.ReadAsStringAsync();
             }
             else
             {
-                // Development/Test: Lade JSON aus File
                 string jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Oil_price_API_response.json");
                 if (!File.Exists(jsonFilePath))
-                {
                     throw new FileNotFoundException($"JSON-File nicht gefunden: {jsonFilePath}");
-                }
+
                 responseContent = await File.ReadAllTextAsync(jsonFilePath);
             }
         }
@@ -50,14 +45,72 @@ public class OilPriceService : BaseService, IOilPriceService
             return new OilPriceResult
             {
                 IsSuccess = false,
-                ErrorMessage = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message
+                ErrorMessage = "Verbindungsfehler zur Öl-API: " + httpEx.Message
             };
         }
-        var priceChange = new OilPriceChange(day: 1.5, week: -0.5, month: 2.0, currentPrice: 80.0);
-        return new OilPriceResult
+
+        try
         {
-            IsSuccess = true,
-            PriceChange = priceChange
-        };
+            using var doc = JsonDocument.Parse(responseContent);
+
+            // Navigiere zu close-Array
+            var closes = doc.RootElement
+                .GetProperty("chart")
+                .GetProperty("result")[0]
+                .GetProperty("indicators")
+                .GetProperty("quote")[0]
+                .GetProperty("close")
+                .EnumerateArray()
+                .Select(x => x.GetDecimal())
+                .ToList();
+
+            // Aktueller Preis direkt aus meta
+            var currentPrice = doc.RootElement
+                .GetProperty("chart")
+                .GetProperty("result")[0]
+                .GetProperty("meta")
+                .GetProperty("regularMarketPrice")
+                .GetDecimal();
+
+            if (closes.Count < 8)
+                return new OilPriceResult
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Nicht genügend Datenpunkte für Berechnung."
+                };
+
+            var today = closes[^1];   // aktuellster Wert
+            var yesterday = closes[^2];   // gestern
+            var lastWeek = closes[^8];   // vor 7 Handelstagen
+            var lastMonth = closes[0];    // ältester Wert ~1 Monat
+
+            var priceChange = new OilPriceChange(
+                day: CalculateChangePct(today, yesterday),
+                week: CalculateChangePct(today, lastWeek),
+                month: CalculateChangePct(today, lastMonth),
+                currentPrice: (double)currentPrice
+            );
+
+            return new OilPriceResult
+            {
+                IsSuccess = true,
+                PriceChange = priceChange
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Parse error: " + ex.Message);
+            return new OilPriceResult
+            {
+                IsSuccess = false,
+                ErrorMessage = "Fehler beim Verarbeiten der API-Antwort: " + ex.Message
+            };
+        }
+    }
+
+    private static double CalculateChangePct(decimal current, decimal reference)
+    {
+        if (reference == 0) return 0;
+        return (double)Math.Round((current - reference) / reference * 100, 2);
     }
 }

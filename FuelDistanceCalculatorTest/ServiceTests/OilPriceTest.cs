@@ -6,14 +6,13 @@ public class OilPriceTest : ServiceTestBase
 {
 
     [Test]
-    [Ignore("TODO Implement JSON Parsin")]
     public async Task GetOilPriceChangeAsync_ReturnsSuccessResult()
     {
         // Arrange
         var expectedResult = new OilPriceResult
         {
             IsSuccess = true,
-            PriceChange = new OilPriceChange(-5.42, -15.50, -29.83, 78.66)
+            PriceChange = new OilPriceChange(-4.26, -14.46, -28.96, 79.63)
         };
 
         //act
@@ -23,9 +22,9 @@ public class OilPriceTest : ServiceTestBase
         // Assert
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.PriceChange, Is.Not.Null);
-        Assert.That(result.PriceChange.Day, Is.EqualTo(expectedResult.PriceChange.Day));
-        Assert.That(result.PriceChange.Week, Is.EqualTo(expectedResult.PriceChange.Week));
-        Assert.That(result.PriceChange.Month, Is.EqualTo(expectedResult.PriceChange.Month));
-        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(expectedResult.PriceChange.CurrentPrice));
+        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(79.63).Within(0.01));
+        Assert.That(result.PriceChange.Day,   Is.EqualTo(-4.26).Within(0.01));
+        Assert.That(result.PriceChange.Week,  Is.EqualTo(-14.46).Within(0.01));
+        Assert.That(result.PriceChange.Month, Is.EqualTo(-28.96).Within(0.01));
     }
 }

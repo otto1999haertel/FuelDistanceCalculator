@@ -6,10 +6,13 @@ public class OilPriceChange
     public double Week { get; private set; }
     public double Month { get; private set; }
 
-    public OilPriceChange(double day, double week, double month)
+    public double CurrentPrice { get; private set; }
+
+    public OilPriceChange(double day, double week, double month, double currentPrice)
     {
         Day = day;
         Week = week;
         Month = month;
+        CurrentPrice = currentPrice;
     }
 }

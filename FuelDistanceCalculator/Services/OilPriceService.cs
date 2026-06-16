@@ -53,7 +53,7 @@ public class OilPriceService : BaseService, IOilPriceService
                 ErrorMessage = "Verbindungsfehler zur Tankstellen-API: " + httpEx.Message
             };
         }
-        var priceChange = new OilPriceChange(day: 1.5, week: -0.5, month: 2.0);
+        var priceChange = new OilPriceChange(day: 1.5, week: -0.5, month: 2.0, currentPrice: 80.0);
         return new OilPriceResult
         {
             IsSuccess = true,

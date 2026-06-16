@@ -40,7 +40,6 @@ if (env.IsEnvironment("Testing"))
 
     builder.Services.AddSingleton<IConnectionMultiplexer>(mockConnectionMultiplexer.Object);
     builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo("/app/dataprotection-keys"))
         .SetApplicationName("FuelGo");
 }
 else
@@ -49,6 +48,7 @@ else
     builder.Services.AddSingleton<IConnectionMultiplexer>(
         ConnectionMultiplexer.Connect(redisConnectionString));
     builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("/app/dataprotection-keys"))
         .SetApplicationName("FuelGo");
 }
 
@@ -62,7 +62,7 @@ builder.Services.AddSession(options =>
 // Registriere IGeoLocationService mit GeoLocationService
 builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
 //Registriere IOilPriceService mit OilPriceService
-builder.Services.AddScoped<IOilPriceService, OilPriceService>();
+builder.Services.AddHttpClient<IOilPriceService, OilPriceService>();
 
 // Add services to the container
 builder.Services.AddRazorPages();

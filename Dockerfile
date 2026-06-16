@@ -62,6 +62,11 @@ COPY Scripts/start.sh /app/start.sh
 # dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh
 
+RUN id app 2>/dev/null || useradd -r -s /bin/false app && \
+    mkdir -p /app/dataprotection-keys && \
+    chown -R app:app /app/dataprotection-keys && \
+    chown -R app:app /app
+
 # SICHERHEIT: Anwendung als Non-Root-User ausführen (Neu hinzugefügt!)
 USER app
 

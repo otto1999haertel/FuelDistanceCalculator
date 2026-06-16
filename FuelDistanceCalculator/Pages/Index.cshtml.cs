@@ -182,6 +182,7 @@ public class IndexModel : PageModel
 
     public async Task OnPostSearch()
     {
+        CheapestResultStations = new List<GasStation>(); 
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
@@ -322,6 +323,7 @@ public class IndexModel : PageModel
 
     public async Task OnPostCalculateAverageCost()
     {
+        CheapestResultStations = new List<GasStation>(); 
         ThreadPool.SetMinThreads(10, 10);
         ThreadPool.GetAvailableThreads(out int workerThreads, out int completionPortThreads);
         Console.WriteLine($"[Calculation Post Thread {Thread.CurrentThread.ManagedThreadId}] Available Worker Threads: {workerThreads}, Completion Port Threads: {completionPortThreads} at {DateTime.Now:HH:mm:ss.fff}");

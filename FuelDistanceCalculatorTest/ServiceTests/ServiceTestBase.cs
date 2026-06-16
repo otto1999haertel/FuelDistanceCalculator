@@ -1,4 +1,5 @@
-﻿using FuelDistanceCalculator.Model;
+﻿using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Moq;
 using StackExchange.Redis;
@@ -12,6 +13,8 @@ public class ServiceTestBase
 
     protected IGeoLocationService _geoLocationService;
 
+    protected IOilPriceService _oilPriceService;
+
     [SetUp]
     public virtual async Task Setup()
     {
@@ -23,6 +26,7 @@ public class ServiceTestBase
         var mockConfiguration = new Mock<IConfiguration>();
         mockConfiguration.Setup(c => c["ApiSettings:TankApiKey"]).Returns("test-api-key");
         mockConfiguration.Setup(c => c["ApiSettings:OpenRouteServiceApiKey"]).Returns("test-ors-api-key");
+        mockConfiguration.Setup(c => c["ApiSettings:OilPriceApiKey"]).Returns("test-oil-price-api-key");
         mockConfiguration.Setup(c => c["MODE_TYPE"]).Returns("Development"); // Add MODE_TYPE to configuration
         services.AddSingleton(mockConfiguration.Object); // Registriere IConfiguration
 
@@ -44,6 +48,9 @@ public class ServiceTestBase
         // Registriere IMarketFuelPriceService mit MarketFuelPriceService
         services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
 
+        // Registriere IOilPriceService mit OilPriceService
+        services.AddHttpClient<IOilPriceService, OilPriceService>();
+
         // Erstelle ServiceProvider
         var serviceProvider = services.BuildServiceProvider();
 
@@ -52,6 +59,9 @@ public class ServiceTestBase
 
         // Hole GeoLocationService
         _geoLocationService = serviceProvider.GetRequiredService<IGeoLocationService>();
+
+        // Hole OilPriceService
+        _oilPriceService = serviceProvider.GetRequiredService<IOilPriceService>();
 
         // Lade Tankstellen aus JSON-Datei
         _fakeGasStationList = await GetFakeGasStationsAsync();

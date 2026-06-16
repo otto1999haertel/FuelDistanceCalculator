@@ -1,24 +1,23 @@
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using FuelDistanceCalculator.Model;
+using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Services.Common;
 
 namespace FuelDistanceCalculator.Services;
 
-public class MarketFuelPriceService : IMarketFuelPriceService
+public class MarketFuelPriceService : BaseAPIKeyService, IMarketFuelPriceService
 {
-    private readonly HttpClient _httpClient;
-    private readonly string _apiKey;
-    private readonly string _mode;
     private readonly IGeoLocationService _geoLocationService;
     public MarketFuelPriceService(IConfiguration configuration, HttpClient httpClient, IGeoLocationService geoLocationService)
     {
-        _httpClient = httpClient;
+        HttpRequestClient = httpClient;
         var apiKeyFromConfig = configuration["ApiSettings:TankApiKey"];
-        _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
-        _mode = configuration["MODE_TYPE"] ?? "Production";
+        APIKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
+        Mode = configuration["MODE_TYPE"] ?? "Production";
         _geoLocationService = geoLocationService;
-        Console.WriteLine("API Key loaded: " + _apiKey);
-        Console.WriteLine("Mode: " + _mode);
+        Console.WriteLine("API Key loaded: " + APIKey);
+        Console.WriteLine("Mode: " + Mode);
     }
 
     public async Task<GasStationResult> GetGasStationsAsync(double latitude, double longitude, double radius, string fueltype)
@@ -26,7 +25,7 @@ public class MarketFuelPriceService : IMarketFuelPriceService
         Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
         Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
 
-        var requestUrl = $"https://creativecommons.tankerkoenig.de/api/v4/stations/search?apikey={_apiKey}&lat={latitude}&lng={longitude}&rad={radius}";
+        var requestUrl = $"https://creativecommons.tankerkoenig.de/api/v4/stations/search?apikey={APIKey}&lat={latitude}&lng={longitude}&rad={radius}";
         Console.WriteLine("Request URL: " + requestUrl);
         try
         {
@@ -35,11 +34,11 @@ public class MarketFuelPriceService : IMarketFuelPriceService
                 await Task.Delay(new Random().Next(400, 750));
             }
             string responseContent;
-            Console.WriteLine("Mode " + _mode);
-            if (_mode.Equals("Production"))
+            Console.WriteLine("Mode " + Mode);
+            if (Mode.Equals("Production"))
             {
                 // Production: Echte HTTP-Anfrage
-                HttpResponseMessage response = await _httpClient.GetAsync(requestUrl);
+                HttpResponseMessage response = await HttpRequestClient.GetAsync(requestUrl);
                 response.EnsureSuccessStatusCode();  // Wirft Exception bei Fehlern (z. B. 404)
                 responseContent = await response.Content.ReadAsStringAsync();
             }

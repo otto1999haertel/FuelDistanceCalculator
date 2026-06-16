@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
 using Moq;
+using FuelDistanceCalculator.Interafces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+//Registriere IOilPriceService mit OilPriceService
+builder.Services.AddScoped<IOilPriceService, OilPriceService>();
 
 // Add services to the container
 builder.Services.AddRazorPages();

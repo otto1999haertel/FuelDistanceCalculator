@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Constants;
+using FuelDistanceCalculator.Interafces;
 using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculator.Services;

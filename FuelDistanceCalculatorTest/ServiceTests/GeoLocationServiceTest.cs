@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using FuelDistanceCalculator.Interafces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Moq;

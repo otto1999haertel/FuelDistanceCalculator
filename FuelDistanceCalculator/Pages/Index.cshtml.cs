@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using FuelDistanceCalculator.Model;
+using FuelDistanceCalculator.Interafces;
 
 namespace FuelDistanceCalculator.Pages;
 
@@ -17,6 +18,8 @@ public class IndexModel : PageModel
 
     private readonly IMarketFuelPriceService _MarketfuelPriceService;
     private readonly IGeoLocationService _geoLocationService;
+
+    private readonly IOilPriceService _oilPriceService;
 
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
     private IConfiguration _configuration;
@@ -116,6 +119,9 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public string DataSourceDate{get;private set; }
+
+    [BindProperty]
+    public OilPriceChange OilPriceChange {get; set; }   
     
     public SortModeEnum SortMode { get; set; }
 
@@ -123,12 +129,13 @@ public class IndexModel : PageModel
 
     private const string InputDataSessionKey = "InputData";
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, IMarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, IMarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IOilPriceService oilPriceService, IConfiguration configuration)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
         _MarketfuelPriceService = marketFuelPriceService;
         _geoLocationService = geoLocationService;
+        _oilPriceService = oilPriceService;
         if (NamePlaces == null || !NamePlaces.Any())
         {
             NamePlaces = new List<string>();
@@ -178,6 +185,7 @@ public class IndexModel : PageModel
             AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
         }
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
     }
 
     public async Task OnPostSearch()
@@ -398,7 +406,7 @@ public class IndexModel : PageModel
                     SortMode = (string)null,
                     Discount = string.Empty
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService,_configuration)
+            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService, _oilPriceService,_configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,
@@ -495,6 +503,21 @@ public class IndexModel : PageModel
         if (carsMetaData != null && carsMetaData.ContainsKey("generated_at"))
         {
             DataSourceDate = carsMetaData["source"];
+        }
+    }
+
+    private async Task GetOilPriceChange()
+    {
+        var oilPriceResult = await _oilPriceService.GetOilPriceChangeAsync();
+        if (oilPriceResult.IsSuccess)
+        {
+            OilPriceChange = oilPriceResult.PriceChange;
+        }
+        else
+        {
+            Console.WriteLine($"Fehler bei Ölpreisänderungsabfrage: {oilPriceResult.ErrorMessage}");
+            TempData["ToastType"] = "error";
+            TempData["ToastMessage"] = "Fehler bei Ölpreisänderungsabfrage";
         }
     }
 

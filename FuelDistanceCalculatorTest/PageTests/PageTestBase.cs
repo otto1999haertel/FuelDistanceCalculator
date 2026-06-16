@@ -32,6 +32,7 @@ public class PageTestBase
                         // ensure test has values so GeoLocationService doesn’t throw
                         ["ApiSettings:TankApiKey"] = Environment.GetEnvironmentVariable("TANK_API_KEY") ?? "test",
                         ["ApiSettings:OpenRouteServiceApiKey"] = Environment.GetEnvironmentVariable("OPENROUTESERVICE_API_KEY") ?? "test",
+                        ["ApiSettings:OilPriceApiKey"] = Environment.GetEnvironmentVariable("OIL_PRICE_API_KEY") ?? "test",
                         ["Redis:Configuration"] = "" // avoid actual Redis config
                     };
                     config.AddInMemoryCollection(dict);

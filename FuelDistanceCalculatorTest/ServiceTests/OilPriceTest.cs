@@ -13,7 +13,7 @@ public class OilPriceTest : ServiceTestBase
         var expectedResult = new OilPriceResult
         {
             IsSuccess = true,
-            PriceChange = new OilPriceChange(1.5, 3.0, 5.0, 78.66)
+            PriceChange = new OilPriceChange(-5.42, -15.50, -29.83, 78.66)
         };
 
         //act

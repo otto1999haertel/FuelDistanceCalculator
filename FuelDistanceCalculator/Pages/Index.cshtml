@@ -163,27 +163,36 @@
                                             <span class="oil-trend-price">@Model.OilPriceChange.CurrentPrice $ / Barrel</span>
                                         </div>
 
+                                        @{
+                                            string TrendClass(double value) => value < 0 ? "is-down" : "is-up";
+                                            string TrendIcon(double value) => value < 0 ? "ti-trending-down" : "ti-trending-up";
+                                            string TrendSign(double value) => value > 0 ? "+" : "";
+                                        }
+
                                         <div class="oil-trend-grid">
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Täglich</div>
-                                                <div class="oil-trend-value is-down">
-                                                    <i class="ti ti-trending-down"></i> @Model.OilPriceChange.Day %
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Day)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Day)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Day)@Model.OilPriceChange.Day.ToString("F1") %
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. gestern</div>
                                             </div>
 
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Wöchentlich</div>
-                                                <div class="oil-trend-value is-down">
-                                                    <i class="ti ti-trending-down"></i> @Model.OilPriceChange.Week %
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Week)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Week)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Week)@Model.OilPriceChange.Week.ToString("F1") %
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vorwoche</div>
                                             </div>
 
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Monatlich</div>
-                                                <div class="oil-trend-value is-up">
-                                                    <i class="ti ti-trending-up"></i> @Model.OilPriceChange.Month %
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Month)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Month)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Month)@Model.OilPriceChange.Month.ToString("F1") %
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vormonat</div>
                                             </div>

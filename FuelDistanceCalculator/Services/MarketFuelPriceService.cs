@@ -26,6 +26,8 @@ public class MarketFuelPriceService : BaseAPIKeyService, IMarketFuelPriceService
         Console.WriteLine($"Lat {latitude}, Long {longitude}, Radius {radius}, Fueltype {fueltype}");
 
         var requestUrl = $"https://creativecommons.tankerkoenig.de/api/v4/stations/search?apikey={APIKey}&lat={latitude}&lng={longitude}&rad={radius}";
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        request.Headers.Add("User-Agent", "FuelGo/1.0");
         Console.WriteLine("Request URL: " + requestUrl);
         try
         {
@@ -38,7 +40,7 @@ public class MarketFuelPriceService : BaseAPIKeyService, IMarketFuelPriceService
             if (Mode.Equals("Production"))
             {
                 // Production: Echte HTTP-Anfrage
-                HttpResponseMessage response = await HttpRequestClient.GetAsync(requestUrl);
+                HttpResponseMessage response = await HttpRequestClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();  // Wirft Exception bei Fehlern (z. B. 404)
                 responseContent = await response.Content.ReadAsStringAsync();
             }

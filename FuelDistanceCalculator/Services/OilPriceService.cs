@@ -20,13 +20,14 @@ public class OilPriceService : BaseService, IOilPriceService
         Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
 
         var requestUrl = "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=1mo";
-
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        request.Headers.Add("User-Agent", "FuelGo/1.0");
         string responseContent;
         try
         {
             if (Mode.Equals("Production"))
             {
-                HttpResponseMessage response = await HttpRequestClient.GetAsync(requestUrl);
+                HttpResponseMessage response = await HttpRequestClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
                 responseContent = await response.Content.ReadAsStringAsync();
             }

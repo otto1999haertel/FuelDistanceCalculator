@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using FuelDistanceCalculator;
 using Moq;
 using FuelDistanceCalculator.Interafces;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,16 +39,18 @@ if (env.IsEnvironment("Testing"))
         .Returns(mockDatabase.Object);
 
     builder.Services.AddSingleton<IConnectionMultiplexer>(mockConnectionMultiplexer.Object);
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("/app/dataprotection-keys"))
+        .SetApplicationName("FuelGo");
 }
 else
 {
     // 👉 In allen anderen Umgebungen: echte Verbindung
     builder.Services.AddSingleton<IConnectionMultiplexer>(
         ConnectionMultiplexer.Connect(redisConnectionString));
+    builder.Services.AddDataProtection()
+        .SetApplicationName("FuelGo");
 }
-
-// Registriere IGeoLocationService mit GeoLocationService
-builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
 
 builder.Services.AddSession(options =>
 {
@@ -56,6 +59,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Registriere IGeoLocationService mit GeoLocationService
+builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
 //Registriere IOilPriceService mit OilPriceService
 builder.Services.AddScoped<IOilPriceService, OilPriceService>();
 

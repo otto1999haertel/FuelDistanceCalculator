@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Caching.Distributed;
@@ -40,11 +41,14 @@ public class PageTestBase
 
                 builder.ConfigureTestServices(services =>
                 {
+                    // DataProtection auf In-Memory umstellen – kein Filesystem nötig
+                    services.AddDataProtection()
+                        .UseEphemeralDataProtectionProvider();
+
                     // Mock RedisCache completely
                     services.RemoveAll(typeof(IDistributedCache));
                     services.AddSingleton<IDistributedCache>(_ => new Mock<IDistributedCache>().Object);
 
-                    // if needed, mock other services too
                     services.AddSingleton<FuelPriceService>(_ => new FuelPriceService());
                     services.AddHttpClient<MarketFuelPriceService>();
                     services.AddScoped<GeoLocationService, GeoLocationService>();

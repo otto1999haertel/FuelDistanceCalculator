@@ -52,10 +52,8 @@ public class IndexModel : PageModel
     [BindProperty]
     public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; set; }
 
-    [BindProperty]
     public double AverageCostPlace1 { get; private set; }
 
-    [BindProperty]
     public double AverageCostPlace2 { get; private set; }
 
     [BindProperty]
@@ -92,7 +90,6 @@ public class IndexModel : PageModel
     [BindProperty]
     public double LatitudePlace { get; set; }
 
-    [BindProperty]
     public List<GasStation> CheapestResultStations { get; set; }
 
     public Dictionary<string, decimal> CarsAndRespectivePricePerkm { get; private set; } = new Dictionary<string, decimal>();
@@ -100,15 +97,12 @@ public class IndexModel : PageModel
     [BindProperty]
     public string SelectedCarType { get; set; }
 
-    [BindProperty]
     public bool IsProduction { get; private set; }
 
-    [BindProperty]
     public bool SearchExecuted { get; private set; }
 
-    [BindProperty]
     public decimal SavingsToNearestStation { get;  set; }
-    [BindProperty]
+
     public decimal SavingsToCheapestStation { get; set; }
 
     [BindProperty]
@@ -117,10 +111,8 @@ public class IndexModel : PageModel
     [BindProperty]
     public string DiscountPercentOrAbsolute{get; set; }
 
-    [BindProperty]
     public string DataSourceDate{get;private set; }
 
-    [BindProperty]
     public OilPriceChange OilPriceChange {get; set; }   
     
     public SortModeEnum SortMode { get; set; }
@@ -191,6 +183,7 @@ public class IndexModel : PageModel
     public async Task OnPostSearch()
     {
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
@@ -342,6 +335,7 @@ public class IndexModel : PageModel
         ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls: 1);
 
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
         _fuelPriceService = new FuelPriceService();
         string fuelTypeForAPI = GetFuelTypeForAPI();
         object lockObj = new object();
@@ -509,6 +503,7 @@ public class IndexModel : PageModel
     private async Task GetOilPriceChange()
     {
         var oilPriceResult = await _oilPriceService.GetOilPriceChangeAsync();
+        Console.WriteLine($"Oil price change result: Success={oilPriceResult.IsSuccess}, PriceChange={oilPriceResult.PriceChange}, ErrorMessage={oilPriceResult.ErrorMessage}");
         if (oilPriceResult.IsSuccess)
         {
             OilPriceChange = oilPriceResult.PriceChange;
@@ -518,6 +513,7 @@ public class IndexModel : PageModel
             Console.WriteLine($"Fehler bei Ölpreisänderungsabfrage: {oilPriceResult.ErrorMessage}");
             TempData["ToastType"] = "error";
             TempData["ToastMessage"] = "Fehler bei Ölpreisänderungsabfrage";
+            OilPriceChange = new OilPriceChange(0, 0, 0, 0); //Fallback
         }
     }
 

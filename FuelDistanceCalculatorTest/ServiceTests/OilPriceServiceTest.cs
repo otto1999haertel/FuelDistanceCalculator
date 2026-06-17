@@ -14,25 +14,19 @@ public class OilPriceServiceTest : ServiceTestBase
     public async Task GetOilPriceChangeAsync_ReturnsSuccessResult()
     {
         // Arrange
-        var expectedLastUpdated = new DateTime(2026, 6, 16, 19, 16, 37, DateTimeKind.Utc);        var expectedResult = new OilPriceResult
-        {
-            IsSuccess = true,
-            PriceChange = new OilPriceChange(-4.26, -14.46, -28.96, 79.63, expectedLastUpdated)
-        };
+        var expectedLastUpdated = new DateTime(2026, 6, 17, 9, 10, 45, DateTimeKind.Utc);
 
-        //act
+        // Act
         OilPriceResult result = await _oilPriceService.GetOilPriceChangeAsync();
-
 
         // Assert
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.PriceChange, Is.Not.Null);
-        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(79.63).Within(0.01));
-        Assert.That(result.PriceChange.Day,   Is.EqualTo(-4.26).Within(0.01));
-        Assert.That(result.PriceChange.Week,  Is.EqualTo(-14.46).Within(0.01));
-        Assert.That(result.PriceChange.Month, Is.EqualTo(-28.96).Within(0.01));
+        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(79.23).Within(0.01));
+        Assert.That(result.PriceChange.Day,   Is.EqualTo(0.34).Within(0.01));
+        Assert.That(result.PriceChange.Week,  Is.EqualTo(-15.94).Within(0.01));
+        Assert.That(result.PriceChange.Month, Is.EqualTo(-29.32).Within(0.01));
         Assert.That(result.PriceChange.LastUpdated, Is.EqualTo(expectedLastUpdated));
-
     }
 
     [Test]

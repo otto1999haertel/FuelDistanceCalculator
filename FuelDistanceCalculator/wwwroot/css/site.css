@@ -1206,8 +1206,8 @@ html.dark-mode .oil-trend-value.is-up   { color: #F09595; }
     color: var(--text-color);
     opacity: 0.65;
     display: flex;
-    gap: 5px;
-    align-items: flex-start;
+    flex-direction: column; /* ← neu */
+    gap: 4px;
     line-height: 1.5;
     padding-top: 0.5rem;
     border-top: 1px solid var(--border-color);

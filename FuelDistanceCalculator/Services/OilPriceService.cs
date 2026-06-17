@@ -85,11 +85,22 @@ public class OilPriceService : BaseService, IOilPriceService
             var lastWeek = closes[^8];   // vor 7 Handelstagen
             var lastMonth = closes[0];    // ältester Wert ~1 Monat
 
+            var marketTime = doc.RootElement
+                .GetProperty("chart")
+                .GetProperty("result")[0]
+                .GetProperty("meta")
+                .GetProperty("regularMarketTime")
+                .GetInt64();
+
+            var lastUpdated = DateTimeOffset.FromUnixTimeSeconds(marketTime)
+                .UtcDateTime;
+
             var priceChange = new OilPriceChange(
                 day: CalculateChangePct(today, yesterday),
                 week: CalculateChangePct(today, lastWeek),
                 month: CalculateChangePct(today, lastMonth),
                 currentPrice: (double)currentPrice
+                , lastUpdated: lastUpdated
             );
 
             return new OilPriceResult

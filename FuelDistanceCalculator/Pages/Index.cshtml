@@ -196,8 +196,14 @@
                                         </div>
 
                                         <div class="oil-trend-note">
-                                            <i class="ti ti-info-circle"></i>
-                                            Spritpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Nur zur Orientierung, kein Kaufsignal.
+                                            <span>
+                                                <i class="ti ti-clock" aria-hidden="true"></i>
+                                                Letzte Aktualisierung: @Model.OilPriceChange.LastUpdated?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                            </span>
+                                            <span>
+                                                <i class="ti ti-info-circle" aria-hidden="true"></i>
+                                                Spritpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Nur zur Orientierung, kein Kaufsignal.
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

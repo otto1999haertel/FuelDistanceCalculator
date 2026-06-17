@@ -8,9 +8,9 @@ public class OilPriceChange
 
     public double CurrentPrice { get; private set; }
 
-    public DateTime? LastUpdated { get; private set; }
+    public DateTimeOffset? LastUpdated { get; private set; }
 
-    public OilPriceChange(double day, double week, double month, double currentPrice, DateTime? lastUpdated = null)
+    public OilPriceChange(double day, double week, double month, double currentPrice, DateTimeOffset? lastUpdated = null)
     {
         Day = day;
         Week = week;

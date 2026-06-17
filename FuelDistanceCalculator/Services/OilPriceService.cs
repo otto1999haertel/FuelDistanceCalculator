@@ -123,8 +123,11 @@ public class OilPriceService : BaseService, IOilPriceService
                 .GetProperty("regularMarketTime")
                 .GetInt64();
 
-            var lastUpdated = DateTimeOffset.FromUnixTimeSeconds(marketTime)
-                .UtcDateTime;
+            var utcTime = DateTimeOffset.FromUnixTimeSeconds(marketTime);
+
+            var germanTimeZone = GetGermanTimeZone();
+
+            var lastUpdated = TimeZoneInfo.ConvertTime(utcTime, germanTimeZone);
 
             var priceChange = new OilPriceChange(
                 day: CalculateChangePct(today, yesterday),
@@ -155,5 +158,17 @@ public class OilPriceService : BaseService, IOilPriceService
     {
         if (reference == 0) return 0;
         return (double)Math.Round((current - reference) / reference * 100, 2);
+    }
+
+    private static TimeZoneInfo GetGermanTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"); // Linux / Docker
+        }
+        catch
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time"); // Windows
+        }
     }
 }

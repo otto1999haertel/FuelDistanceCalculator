@@ -14,7 +14,7 @@ public class OilPriceServiceTest : ServiceTestBase
     public async Task GetOilPriceChangeAsync_ReturnsSuccessResult()
     {
         // Arrange
-        var expectedLastUpdated = new DateTime(2026, 6, 17, 9, 10, 45, DateTimeKind.Utc);
+        var expectedLastUpdated = new DateTimeOffset(new DateTime(2026, 6, 17, 9, 10, 45, DateTimeKind.Utc));
 
         // Act
         OilPriceResult result = await _oilPriceService.GetOilPriceChangeAsync();

@@ -1,21 +1,52 @@
 using FuelDistanceCalculator.Interafces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services.Common;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
 namespace FuelDistanceCalculator.Services;
 
 public class OilPriceService : BaseService, IOilPriceService
 {
-
-    public OilPriceService(IConfiguration configuration, HttpClient httpClient)
+    private readonly IMemoryCache _cache;
+    private const string CacheKey = "brent_oil_price";
+    public OilPriceService(IConfiguration configuration, HttpClient httpClient, IMemoryCache cache)
     {
         var apiKeyFromConfig = configuration["ApiSettings:OilPriceApiKey"];
         Mode = configuration["MODE_TYPE"] ?? "Production";
         HttpRequestClient = httpClient;
+        _cache = cache;
         Console.WriteLine("Mode: " + Mode);
     }
     public async Task<OilPriceResult> GetOilPriceChangeAsync()
+    {
+        // Immer zuerst API versuchen
+        var result = await FetchAndCalculateAsync();
+
+        if (result.IsSuccess)
+        {
+            var expiry = Math.Abs(result.PriceChange.Day) >= 10
+                ? TimeSpan.FromHours(1)
+                : TimeSpan.FromHours(3);
+
+            // Erfolgreiches Ergebnis cachen
+            _cache.Set(CacheKey, result, expiry);
+            return result;
+        }
+
+        // API fehlgeschlagen → Fallback auf Cache
+        if (_cache.TryGetValue(CacheKey, out OilPriceResult cached))
+        {
+            Console.WriteLine("API fehlgeschlagen – gecachter Wert wird verwendet");
+            return cached;
+        }
+
+        // Weder API noch Cache verfügbar
+        Console.WriteLine("API fehlgeschlagen und kein Cache vorhanden");
+        return result;
+    }
+
+    private async Task<OilPriceResult> FetchAndCalculateAsync()
     {
         Console.WriteLine($"Called from Fuel API method with Thread {Thread.CurrentThread.ManagedThreadId}");
 

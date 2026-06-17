@@ -51,6 +51,8 @@ public class ServiceTestBase
         // Registriere IOilPriceService mit OilPriceService
         services.AddHttpClient<IOilPriceService, OilPriceService>();
 
+        services.AddMemoryCache(); 
+
         // Erstelle ServiceProvider
         var serviceProvider = services.BuildServiceProvider();
 

@@ -809,6 +809,15 @@
                     if (output) output.textContent = this.value + ' km';
                 });
             });
+
+
+            const stationContainer = document.getElementById('stationListContainer');
+            if (stationContainer) {
+                stationContainer.addEventListener('click', function(e) {
+                    const summary = e.target.closest('.station-summary');
+                    if (summary) toggleDetails(summary);
+                });
+            }
             
         });
     document.addEventListener('input', function (e) {
@@ -1029,9 +1038,6 @@
             })
             .then(html => {
                 container.innerHTML = html;
-                document.querySelectorAll('.station-summary').forEach(el => {
-                    el.addEventListener('click', () => toggleDetails(el));
-                });
             })
             .catch(err => {
                 console.error('Fehler:', err);

@@ -29,7 +29,7 @@
         @foreach (GasStation station in Model.CheapestResultStations.Take(10))
         {
             <li class="station-item">
-                <div class="station-summary" onclick="toggleDetails(this)">
+                <div class="station-summary">
                     @if(!station.Brand.IsNullOrEmpty()){
                         <span>@station.Brand</span> 
                     }

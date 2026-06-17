@@ -504,7 +504,8 @@ public class IndexModel : PageModel
 
     private async Task GetOilPriceChange()
     {
-        var oilPriceResult = await _oilPriceService.GetOilPriceChangeAsync();
+        ApiThrottle oilPriceThrottle = new ApiThrottle();
+        var oilPriceResult = await oilPriceThrottle.ExecuteWithThrottle("OilPrice", () => _oilPriceService.GetOilPriceChangeAsync());
         Console.WriteLine($"Oil price change result: Success={oilPriceResult.IsSuccess}, PriceChange={oilPriceResult.PriceChange}, ErrorMessage={oilPriceResult.ErrorMessage}");
         if (oilPriceResult.IsSuccess)
         {

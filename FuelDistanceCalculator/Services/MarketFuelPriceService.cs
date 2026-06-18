@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using FuelDistanceCalculator.Model;
-using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Services.Common;
 
 namespace FuelDistanceCalculator.Services;

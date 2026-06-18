@@ -1,5 +1,5 @@
 using FuelDistanceCalculator.Model;
-namespace FuelDistanceCalculator.Interafces;
+namespace FuelDistanceCalculator.Interfaces;
 
 public interface IGeoLocationService
 {

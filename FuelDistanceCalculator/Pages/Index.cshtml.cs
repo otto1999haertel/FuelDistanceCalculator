@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using FuelDistanceCalculator.Model;
-using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Interfaces;
 
 namespace FuelDistanceCalculator.Pages;
 

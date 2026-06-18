@@ -1,4 +1,4 @@
-using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services.Common;
 using Newtonsoft.Json.Linq;

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using StackExchange.Redis;
 using FuelDistanceCalculator;
 using Moq;
-using FuelDistanceCalculator.Interafces;
+using FuelDistanceCalculator.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);

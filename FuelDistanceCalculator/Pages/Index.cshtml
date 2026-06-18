@@ -354,7 +354,8 @@
                                                    name="NamePlaces[1]"
                                                    class="form-control"
                                                    value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
-                                                   placeholder="Ort eingeben" />
+                                                   placeholder="Ort eingeben" 
+                                                   id ="SecondComparePlace"/>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
@@ -712,6 +713,39 @@
                 radio.addEventListener('change', () => saveFuelType(radio));
             });
 
+            //Standort
+            document.getElementById('generalLocation')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("generalLocation", this.value);
+                }
+                else{
+                    localStorage.removeItem("generalLocation");
+                }
+            });
+
+            //Standort 1 Vergleich
+            document.getElementById('FirstComparePlace')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("FirstComparePlace", this.value);
+                }
+                else{
+                    localStorage.removeItem("FirstComparePlace");
+                }
+            });
+
+            //Standort 2 Vergleich
+            document.getElementById('SecondComparePlace')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("SecondComparePlace", this.value);
+                }
+                else{
+                    localStorage.removeItem("SecondComparePlace");
+                }
+            });
+
             // Tankmenge Slider
             document.getElementById('FuelAmountRange')
                 ?.addEventListener('input', function () { updateFuel(this.value); });
@@ -817,6 +851,30 @@
                     const summary = e.target.closest('.station-summary');
                     if (summary) toggleDetails(summary);
                 });
+            }
+
+            const generalLocationInput = localStorage.getItem("generalLocation");
+            if(generalLocationInput){
+                const generalLocationField = document.getElementById("generalLocation");
+                if(generalLocationField){
+                    generalLocationField.value = generalLocationInput;
+                }
+            }
+
+            const FirstComparePlaceInput = localStorage.getItem("FirstComparePlace");
+            if(FirstComparePlaceInput){
+                const firstComparePlace = document.getElementById("FirstComparePlace");
+                if(firstComparePlace && firstComparePlace.value.trim() === ""){
+                    firstComparePlace.value = FirstComparePlaceInput;
+                }
+            }
+
+            const SecondComparePlaceInput = localStorage.getItem("SecondComparePlace");
+            if(SecondComparePlaceInput){
+                const secondComparePlace = document.getElementById("SecondComparePlace");
+                if(secondComparePlace){
+                    secondComparePlace.value = SecondComparePlaceInput;
+                }
             }
             
         });
@@ -931,6 +989,7 @@
             if (result.success && result.address) {
                 if (document.getElementById("generalLocation")) {
                     document.getElementById("generalLocation").value = result.address;
+                    localStorage.removeItem("generalLocation")
                 }
                 if (document.getElementById("GeoStandort")) {
                     document.getElementById("GeoStandort").value = result.address;
@@ -1069,6 +1128,11 @@
         const value = element.getAttribute('data-value');
         document.getElementById('sortOptionsList').style.display = 'none';
         sortList(value);
+    }
+
+    function isPLZ(input){
+        const plzRegex = /^\d{5}$/;
+        return plzRegex.test(input);
     }
 
     document.addEventListener('click', function (event) {

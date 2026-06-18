@@ -37,7 +37,12 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
     {
         if (place == null || place.Trim().Equals(string.Empty)) return null;
+        Console.WriteLine($"GetCoordinatesAsync called with place: {place}");
         place = NormalizeAddressKey(place);
+        if(IsPLZ(place)){
+            place = place + ", Deutschland";
+        }
+
         string cacheKey = $"geo:{place.ToLower()}";
 
         // 🔍 Prüfe, ob Daten als Hash im Redis-Cache vorhanden sind
@@ -74,6 +79,8 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         string latKey = coordinates.Latitude.ToString("F3", CultureInfo.InvariantCulture);
         string lonKey = coordinates.Longitude.ToString("F3", CultureInfo.InvariantCulture);
         string reverseKey = $"geo:reverse:{latKey}:{lonKey}";
+
+        Console.WriteLine($"Got coordinates from API: {coordinates.Latitude}, {coordinates.Longitude} for place: {place}");
 
         await _redisDb.StringSetAsync(reverseKey, place, cacheDuration);
 
@@ -381,5 +388,10 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
             }
 
             return responseString;
+    }
+
+    private bool IsPLZ(string input)
+    {
+        return Regex.IsMatch(input, @"^\d{5}$");
     }
 }

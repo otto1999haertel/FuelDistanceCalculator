@@ -1,4 +1,5 @@
 using FuelDistanceCalculator.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Caching.Distributed;
@@ -32,6 +33,7 @@ public class PageTestBase
                         // ensure test has values so GeoLocationService doesn’t throw
                         ["ApiSettings:TankApiKey"] = Environment.GetEnvironmentVariable("TANK_API_KEY") ?? "test",
                         ["ApiSettings:OpenRouteServiceApiKey"] = Environment.GetEnvironmentVariable("OPENROUTESERVICE_API_KEY") ?? "test",
+                        ["ApiSettings:OilPriceApiKey"] = Environment.GetEnvironmentVariable("OIL_PRICE_API_KEY") ?? "test",
                         ["Redis:Configuration"] = "" // avoid actual Redis config
                     };
                     config.AddInMemoryCollection(dict);
@@ -39,11 +41,14 @@ public class PageTestBase
 
                 builder.ConfigureTestServices(services =>
                 {
+                    // DataProtection auf In-Memory umstellen – kein Filesystem nötig
+                    services.AddDataProtection()
+                        .UseEphemeralDataProtectionProvider();
+
                     // Mock RedisCache completely
                     services.RemoveAll(typeof(IDistributedCache));
                     services.AddSingleton<IDistributedCache>(_ => new Mock<IDistributedCache>().Object);
 
-                    // if needed, mock other services too
                     services.AddSingleton<FuelPriceService>(_ => new FuelPriceService());
                     services.AddHttpClient<MarketFuelPriceService>();
                     services.AddScoped<GeoLocationService, GeoLocationService>();

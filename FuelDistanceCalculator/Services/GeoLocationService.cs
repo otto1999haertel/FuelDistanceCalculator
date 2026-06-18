@@ -1,4 +1,6 @@
+using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
+using FuelDistanceCalculator.Services.Common;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 using System.Globalization;
@@ -7,16 +9,11 @@ using System.Text.RegularExpressions;
 
 namespace FuelDistanceCalculator.Services;
 
-public class GeoLocationService : IGeoLocationService
+public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 {
     private readonly IDatabase _redisDb;
-    private readonly HttpClient _httpClient;
 
     private readonly TimeSpan cacheDuration = TimeSpan.FromDays(365);
-
-    private readonly string _apiKey;
-
-    private readonly string _mode;
 
     private const double EarthRadiusMeters = 6371000; // Erdradius in Metern
 
@@ -28,19 +25,24 @@ public class GeoLocationService : IGeoLocationService
 
     public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
-        _httpClient = httpClientFactory.CreateClient();
+        HttpRequestClient = httpClientFactory.CreateClient();
         _redisDb = redis.GetDatabase();
         var apiKeyFromConfig = configuration["ApiSettings:OpenRouteServiceApiKey"];
-        _apiKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
-        _mode = configuration["MODE_TYPE"] ?? "Production";
-        Console.WriteLine("API Key loaded: " + _apiKey);
-        Console.WriteLine("Mode: " + _mode);
+        APIKey = string.IsNullOrEmpty(apiKeyFromConfig) ? throw new Exception("API Key missing") : apiKeyFromConfig;
+        Mode = configuration["MODE_TYPE"] ?? "Production";
+        Console.WriteLine("API Key loaded: " + APIKey);
+        Console.WriteLine("Mode: " + Mode);
     }
 
     public async Task<CoordinatesDTO> GetCoordinatesAsync(string place)
     {
         if (place == null || place.Trim().Equals(string.Empty)) return null;
+        Console.WriteLine($"GetCoordinatesAsync called with place: {place}");
         place = NormalizeAddressKey(place);
+        if(IsPLZ(place)){
+            place = place + ", Deutschland";
+        }
+
         string cacheKey = $"geo:{place.ToLower()}";
 
         // 🔍 Prüfe, ob Daten als Hash im Redis-Cache vorhanden sind
@@ -78,6 +80,8 @@ public class GeoLocationService : IGeoLocationService
         string lonKey = coordinates.Longitude.ToString("F3", CultureInfo.InvariantCulture);
         string reverseKey = $"geo:reverse:{latKey}:{lonKey}";
 
+        Console.WriteLine($"Got coordinates from API: {coordinates.Latitude}, {coordinates.Longitude} for place: {place}");
+
         await _redisDb.StringSetAsync(reverseKey, place, cacheDuration);
 
         return coordinates;
@@ -102,7 +106,7 @@ public class GeoLocationService : IGeoLocationService
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
 
-        var response = await _httpClient.SendAsync(request);
+        var response = await HttpRequestClient.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
             throw new Exception("Fehler beim Reverse Geocoding");
@@ -151,7 +155,7 @@ public class GeoLocationService : IGeoLocationService
         foreach (GasStation station in stations)
         {
             string responseString = string.Empty;
-            if (_mode == "Development")
+            if (Mode == "Development")
             {
                 responseString = await AlternateResponse(latitudeStart, longitudeStart, alternater, station);
                 alternater++;
@@ -322,7 +326,7 @@ public class GeoLocationService : IGeoLocationService
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("User-Agent", "FuelGo/1.0");
 
-        var response = await _httpClient.SendAsync(request);
+        var response = await HttpRequestClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -345,12 +349,12 @@ public class GeoLocationService : IGeoLocationService
         string responseString = "";
         Console.WriteLine("Start Coordinates: " + latitudeStart + ", " + longitudeStart);
         Console.WriteLine("End Coordinates: " + latitudeEnd + ", " + longitudeEnd);
-        if (_mode == "Production")
+        if (Mode == "Production")
         {
-            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={_apiKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
+            var url = $"https://api.openrouteservice.org/v2/directions/driving-car?api_key={APIKey}&start={longitudeStart},{latitudeStart}&end={longitudeEnd},{latitudeEnd}"; // Example: Munich center
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("User-Agent", "FuelGo/1.0");
-            var response = await _httpClient.SendAsync(request);
+            var response = await HttpRequestClient.SendAsync(request);
             Console.WriteLine("Response from routing service " + response.StatusCode);
             if (response.IsSuccessStatusCode)
             {
@@ -384,5 +388,10 @@ public class GeoLocationService : IGeoLocationService
             }
 
             return responseString;
+    }
+
+    private bool IsPLZ(string input)
+    {
+        return Regex.IsMatch(input, @"^\d{5}$");
     }
 }

@@ -23,6 +23,8 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - ApiSettings__TankApiKey=${TANK_API_KEY}
       - ApiSettings__OpenRouteServiceApiKey=${OPENROUTESERVICE_API_KEY}
+    volumes:
+      - dataprotection-keys:/app/dataprotection-keys
     networks:
       - fuel-network
     deploy:
@@ -58,3 +60,4 @@ networks:
 volumes:
   postgres-data:
   redis_data:
+  dataprotection-keys:

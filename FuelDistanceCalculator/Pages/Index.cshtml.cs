@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using FuelDistanceCalculator.Model;
+using FuelDistanceCalculator.Interfaces;
 
 namespace FuelDistanceCalculator.Pages;
 
@@ -17,6 +18,8 @@ public class IndexModel : PageModel
 
     private readonly IMarketFuelPriceService _MarketfuelPriceService;
     private readonly IGeoLocationService _geoLocationService;
+
+    private readonly IOilPriceService _oilPriceService;
 
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new ConcurrentBag<(string, string)>();
     private IConfiguration _configuration;
@@ -49,10 +52,8 @@ public class IndexModel : PageModel
     [BindProperty]
     public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; set; }
 
-    [BindProperty]
     public double AverageCostPlace1 { get; private set; }
 
-    [BindProperty]
     public double AverageCostPlace2 { get; private set; }
 
     [BindProperty]
@@ -89,7 +90,6 @@ public class IndexModel : PageModel
     [BindProperty]
     public double LatitudePlace { get; set; }
 
-    [BindProperty]
     public List<GasStation> CheapestResultStations { get; set; }
 
     public Dictionary<string, decimal> CarsAndRespectivePricePerkm { get; private set; } = new Dictionary<string, decimal>();
@@ -97,15 +97,12 @@ public class IndexModel : PageModel
     [BindProperty]
     public string SelectedCarType { get; set; }
 
-    [BindProperty]
     public bool IsProduction { get; private set; }
 
-    [BindProperty]
     public bool SearchExecuted { get; private set; }
 
-    [BindProperty]
     public decimal SavingsToNearestStation { get;  set; }
-    [BindProperty]
+
     public decimal SavingsToCheapestStation { get; set; }
 
     [BindProperty]
@@ -114,8 +111,9 @@ public class IndexModel : PageModel
     [BindProperty]
     public string DiscountPercentOrAbsolute{get; set; }
 
-    [BindProperty]
     public string DataSourceDate{get;private set; }
+
+    public OilPriceChange OilPriceChange {get; set; }   
     
     public SortModeEnum SortMode { get; set; }
 
@@ -123,12 +121,13 @@ public class IndexModel : PageModel
 
     private const string InputDataSessionKey = "InputData";
 
-    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, IMarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IConfiguration configuration)
+    public IndexModel(ILogger<IndexModel> logger, FuelPriceService fuelPrice, IMarketFuelPriceService marketFuelPriceService, IGeoLocationService geoLocationService, IOilPriceService oilPriceService, IConfiguration configuration)
     {
         _logger = logger;
         _fuelPriceService = fuelPrice;
         _MarketfuelPriceService = marketFuelPriceService;
         _geoLocationService = geoLocationService;
+        _oilPriceService = oilPriceService;
         if (NamePlaces == null || !NamePlaces.Any())
         {
             NamePlaces = new List<string>();
@@ -178,11 +177,14 @@ public class IndexModel : PageModel
             AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
         }
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
     }
 
     public async Task OnPostSearch()
     {
+        CheapestResultStations = new List<GasStation>(); 
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
         CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
         string fuelTypeForAPI = GetFuelTypeForAPI();
@@ -321,6 +323,7 @@ public class IndexModel : PageModel
 
     public async Task OnPostCalculateAverageCost()
     {
+        CheapestResultStations = new List<GasStation>(); 
         ThreadPool.SetMinThreads(10, 10);
         ThreadPool.GetAvailableThreads(out int workerThreads, out int completionPortThreads);
         Console.WriteLine($"[Calculation Post Thread {Thread.CurrentThread.ManagedThreadId}] Available Worker Threads: {workerThreads}, Completion Port Threads: {completionPortThreads} at {DateTime.Now:HH:mm:ss.fff}");
@@ -334,6 +337,7 @@ public class IndexModel : PageModel
         ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls: 1);
 
         await GetCarsAndRespectivePricePerkm();
+        await GetOilPriceChange();
         _fuelPriceService = new FuelPriceService();
         string fuelTypeForAPI = GetFuelTypeForAPI();
         object lockObj = new object();
@@ -398,7 +402,7 @@ public class IndexModel : PageModel
                     SortMode = (string)null,
                     Discount = string.Empty
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService,_configuration)
+            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService, _oilPriceService,_configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,
@@ -495,6 +499,24 @@ public class IndexModel : PageModel
         if (carsMetaData != null && carsMetaData.ContainsKey("generated_at"))
         {
             DataSourceDate = carsMetaData["source"];
+        }
+    }
+
+    private async Task GetOilPriceChange()
+    {
+        ApiThrottle oilPriceThrottle = new ApiThrottle();
+        var oilPriceResult = await oilPriceThrottle.ExecuteWithThrottle("OilPrice", () => _oilPriceService.GetOilPriceChangeAsync());
+        Console.WriteLine($"Oil price change result: Success={oilPriceResult.IsSuccess}, PriceChange={oilPriceResult.PriceChange}, ErrorMessage={oilPriceResult.ErrorMessage}");
+        if (oilPriceResult.IsSuccess)
+        {
+            OilPriceChange = oilPriceResult.PriceChange;
+        }
+        else
+        {
+            Console.WriteLine($"Fehler bei Ölpreisänderungsabfrage: {oilPriceResult.ErrorMessage}");
+            TempData["ToastType"] = "error";
+            TempData["ToastMessage"] = "Fehler bei Ölpreisänderungsabfrage";
+            OilPriceChange = new OilPriceChange(0, 0, 0, 0); //Fallback
         }
     }
 

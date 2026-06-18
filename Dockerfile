@@ -53,6 +53,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
+    echo "Europe/Berlin" > /etc/timezone && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Kopiere die veröffentlichten Artefakte aus der 'build'-Stage
 COPY --from=build /app/publish .
 
@@ -61,6 +68,11 @@ COPY Scripts/start.sh /app/start.sh
 
 # dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh
+
+RUN id app 2>/dev/null || useradd -r -s /bin/false app && \
+    mkdir -p /app/dataprotection-keys && \
+    chown -R app:app /app/dataprotection-keys && \
+    chown -R app:app /app
 
 # SICHERHEIT: Anwendung als Non-Root-User ausführen (Neu hinzugefügt!)
 USER app

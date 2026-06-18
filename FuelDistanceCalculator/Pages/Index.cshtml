@@ -61,8 +61,7 @@
                                            class="hidden-radio"
                                            asp-for="SelectInputMode"
                                            value="@mode"
-                                           id="@radioId"
-                                           onchange="toggleInputMethod(this)" />
+                                           id="@radioId"/>
                                     <label class="mode-tab @isActive" for="@radioId">
                                         @displayText
                                     </label>
@@ -79,8 +78,7 @@
                                     <input type="radio" class="fuel-radio"
                                            asp-for="SelectedFuelType"
                                            value="@kvp.Key"
-                                           id="fuel_@kvp.Key"
-                                           onchange="saveFuelType(this)" />
+                                           id="fuel_@kvp.Key"/>
                                     <label class="fuel-label" for="fuel_@kvp.Key">@kvp.Value</label>
                                 }
                             </div>
@@ -136,13 +134,86 @@
                                                       title="Durchschnittliche Kosten pro Kilometer. Für Vorschläge nutze die Fahrzeugtypsuche.">ⓘ</span>
                                             </label>
                                             <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required
-                                                   asp-for="PricePerKm" value="@Model.PricePerKm" onblur="formatAndSavePricePerKm(this)"
-                                                   step="any" min="0.01" />
+                                                   asp-for="PricePerKm" value="@Model.PricePerKm" step="any" min="0.01" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Internationaler Öl-Preis -->
+                        @if (Model.OilPriceChange!=null && Model.OilPriceChange?.CurrentPrice != 0){
+                        <div class="mb-3">
+                            <button class="advanced-toggle" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#internationalOilPrice"
+                                    aria-expanded="false"
+                                    aria-controls="internationalOilPrice">
+                                <span>Internationaler Öl-Preis</span>
+                                <span class="arrow-indicator">▼</span>
+                            </button>
+
+                            <div class="collapse" id="internationalOilPrice">
+                                <div class="advanced-content">
+                                    <div class="oil-trend-section">
+                                        <div class="oil-trend-header">
+                                            <span class="oil-trend-title">Rohöl (Brent)</span>
+                                            <span class="oil-trend-price">@Model.OilPriceChange?.CurrentPrice $ / Barrel</span>
+                                        </div>
+
+                                        @{
+                                            string TrendClass(double value) => value < 0 ? "is-down" : "is-up";
+                                            string TrendIcon(double value) => value < 0 ? "ti-trending-down" : "ti-trending-up";
+                                            string TrendSign(double value) => value > 0 ? "+" : "";
+                                        }
+
+                                        <div class="oil-trend-grid">
+                                            <div class="oil-trend-card">
+                                                <div class="oil-trend-period">Täglich</div>
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Day)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Day)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Day)@Model.OilPriceChange.Day.ToString("F2") %
+                                                </div>
+                                                <div class="oil-trend-sub">ggü. gestern</div>
+                                            </div>
+
+                                            <div class="oil-trend-card">
+                                                <div class="oil-trend-period">Wöchentlich</div>
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Week)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Week)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Week)@Model.OilPriceChange.Week.ToString("F2") %
+                                                </div>
+                                                <div class="oil-trend-sub">ggü. Vorwoche</div>
+                                            </div>
+
+                                            <div class="oil-trend-card">
+                                                <div class="oil-trend-period">Monatlich</div>
+                                                <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Month)">
+                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Month)"></i>
+                                                    @TrendSign(Model.OilPriceChange.Month)@Model.OilPriceChange.Month.ToString("F2") %
+                                                </div>
+                                                <div class="oil-trend-sub">ggü. Vormonat</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="oil-trend-note">
+                                            <span>
+                                                <i class="ti ti-clock" aria-hidden="true"></i>
+                                                Letzte Aktualisierung: @Model.OilPriceChange.LastUpdated?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") Uhr
+                                            </span>
+                                            <span>
+                                                <i class="ti ti-info-circle" aria-hidden="true"></i>
+                                                Spritpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Nur zur Orientierung, kein Kaufsignal.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
+                        }
+                        else
+                        {
+                            <p>Ölpreisdaten momentan nicht verfügbar.</p> 
+                        }
 
                         <!-- ==================================================
                              MODE-DIV: OPTIMALE SUCHE (enthält Tankmenge + Submit)
@@ -207,22 +278,19 @@
                                                class="form-range"
                                                min="0" max="25" step="0.5"
                                                id="FuelAmountRange"
-                                               style="width: 100%; padding: 0;"
-                                               oninput="updateFuel(this.value)">
+                                               style="width: 100%; padding: 0;">
                                     </div>
                                     <input type="number"
                                            id="MaximumFuelAmount"
                                            class="form-control"
                                            value="@Model.FuelAmount"
-                                           onblur="updateMax(this.value)"
                                            title="Maximale Tankmenge" />
                                 </div>
                             </div>
 
                             <!-- SUBMIT: TANKSTELLEN SUCHEN -->
                             <button type="submit" class="btn btn-primary submit-btn"
-                                    asp-page-handler="Search" id="SearchBtn"
-                                    onclick="document.getElementById('loader-search').style.display='inline-block'">
+                                    asp-page-handler="Search" id="SearchBtn">
                                 Tankstellen suchen
                                 <div class="loader" id="loader-search"></div>
                             </button>
@@ -269,8 +337,7 @@
                                                            class="form-range"
                                                            min="1" max="25" step="1"
                                                            value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
-                                                           id="RadiusPlace0"
-                                                           oninput="document.getElementById('outputRadius0').textContent = this.value + ' km'">
+                                                           id="RadiusPlace0">
                                                 </div>
                                                 <small class="text-muted ms-1">25</small>
                                             </div>
@@ -287,7 +354,8 @@
                                                    name="NamePlaces[1]"
                                                    class="form-control"
                                                    value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
-                                                   placeholder="Ort eingeben" />
+                                                   placeholder="Ort eingeben" 
+                                                   id ="SecondComparePlace"/>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
@@ -306,8 +374,7 @@
                                                            class="form-range"
                                                            min="1" max="25" step="1"
                                                            value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
-                                                           id="RadiusPlace1"
-                                                           oninput="document.getElementById('outputRadius1').textContent = this.value + ' km'">
+                                                           id="RadiusPlace1">
                                                 </div>
                                                 <small class="text-muted ms-1">25</small>
                                             </div>
@@ -348,7 +415,7 @@
                                                                min="1" max="25" step="1"
                                                                value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
                                                                id="RadiusPlace@(i)"
-                                                               oninput="document.getElementById('outputRadius@(i)').textContent = this.value + ' km'">
+                                                               data-output-id="outputRadius@(i)">
                                                     </div>
                                                     <small class="text-muted ms-1">25</small>
                                                 </div>
@@ -362,15 +429,14 @@
 
                             <div class="text-center mt-3 mb-3">
                                 <button type="button" id="addStandort" class="btn btn-primary"
-                                        onclick="addLocation()" @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
+                                        @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
                                     @(Model.NamePlaces.Count >= 4 ? "✓ Maximale Standorte erreicht" : "+ Standort hinzufügen")
                                 </button>
                             </div>
 
                             <!-- SUBMIT: PREISE VERGLEICHEN -->
                             <button type="submit" class="btn btn-primary submit-btn"
-                                    asp-page-handler="CalculateAverageCost"
-                                    onclick="document.getElementById('loader-compare').style.display='inline-block'">
+                                    asp-page-handler="CalculateAverageCost">
                                 Preise vergleichen
                                 <div class="loader" id="loader-compare"></div>
                             </button>
@@ -389,13 +455,13 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <label for="viewMode" class="form-label mb-0 fw-semibold">Ansicht</label>
                                         <div id="viewModeCustom" class="custom-select">
-                                            <div class="select-trigger" onclick="toggleDropdown()">
+                                            <div class="select-trigger">
                                                 <span id="selectedValue">Liste</span>
                                                 <span class="arrow">▼</span>
                                             </div>
                                             <div id="optionsList" class="suggestions-box">
-                                                <div class="suggestion-item" data-value="list" onclick="selectOption(this)">Liste</div>
-                                                <div class="suggestion-item" data-value="map" onclick="selectOption(this)">Karte</div>
+                                                <div class="suggestion-item" data-value="list">Liste</div>
+                                                <div class="suggestion-item" data-value="map">Karte</div>
                                             </div>
                                         </div>
                                         @if (Model.FuelAmount > 0)
@@ -412,7 +478,7 @@
                                             Sortierung <span class="sort-arrow">↓</span>
                                         </label>
                                         <div id="sortModeCustom" class="custom-select">
-                                            <div class="select-trigger" onclick="toggleDropdownSort()">
+                                            <div class="select-trigger">
                                                 <span id="selectedSortValue">
                                                     @if (Model.FuelAmount > 0)
                                                     {
@@ -428,14 +494,14 @@
                                             <div id="sortOptionsList" class="suggestions-box">
                                                 @if (Model.FuelAmount > 0)
                                                 {
-                                                    <div class="suggestion-item" data-value="totalCost" onclick="selectOptionSort(this)">Gesamtkosten</div>
-                                                    <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
-                                                    <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                                    <div class="suggestion-item" data-value="totalCost">Gesamtkosten</div>
+                                                    <div class="suggestion-item" data-value="fuelPrice">Preis pro Liter</div>
+                                                    <div class="suggestion-item" data-value="distance">Entfernung</div>
                                                 }
                                                 else
                                                 {
-                                                    <div class="suggestion-item" data-value="fuelPrice" onclick="selectOptionSort(this)">Preis pro Liter</div>
-                                                    <div class="suggestion-item" data-value="distance" onclick="selectOptionSort(this)">Entfernung</div>
+                                                    <div class="suggestion-item" data-value="fuelPrice">Preis pro Liter</div>
+                                                    <div class="suggestion-item" data-value="distance">Entfernung</div>
                                                 }
                                             </div>
                                         </div>
@@ -632,45 +698,191 @@
     });
 
     document.addEventListener('DOMContentLoaded', function () {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-        const savedPricePerKm = localStorage.getItem("pricePerKm");
-        if (savedPricePerKm) {
-            $('#PricePerKm').val(savedPricePerKm);
-        }
 
-        const savedFuelType = localStorage.getItem("selectedFuelType");
-        if (savedFuelType) {
-            const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
-            if (radio) {
-                radio.checked = true;
-            }
-        }
+            // Tooltips (bereits vorhanden)
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
 
-        const maxVolume = localStorage.getItem("maxVolume");
-        if (maxVolume) {
-            document.getElementById('MaximumFuelAmount').value = maxVolume;
-            document.getElementById('FuelAmountRange').max = maxVolume;
-        }
-
-        const fuelRange = document.getElementById('FuelAmountRange');
-        const fuelValue = @Model.FuelAmount;
-        fuelRange.value = fuelValue;
-        document.getElementById('fuelAmountValue').textContent = fuelValue + ' l';
-
-        document.getElementById("geoButton")?.addEventListener("click", getLocation);
-        document.getElementById("geoButton2")?.addEventListener("click", getLocation);
-
-        const slider = document.getElementById('generalRadius');
-        const output = document.getElementById('radiusValue');
-
-        if (slider && output) {
-            output.textContent = slider.value + ' km';
-            slider.addEventListener('input', () => {
-                output.textContent = slider.value + ' km';
+            // Modus-Tabs
+            document.querySelectorAll('.hidden-radio').forEach(radio => {
+                radio.addEventListener('change', () => toggleInputMethod(radio));
             });
+
+            // Spritart
+            document.querySelectorAll('.fuel-radio').forEach(radio => {
+                radio.addEventListener('change', () => saveFuelType(radio));
+            });
+
+            //Standort
+            document.getElementById('generalLocation')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("generalLocation", this.value);
+                }
+                else{
+                    localStorage.removeItem("generalLocation");
+                }
+            });
+
+            //Standort 1 Vergleich
+            document.getElementById('FirstComparePlace')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("FirstComparePlace", this.value);
+                }
+                else{
+                    localStorage.removeItem("FirstComparePlace");
+                }
+            });
+
+            //Standort 2 Vergleich
+            document.getElementById('SecondComparePlace')?.addEventListener('blur', function () {
+                this.value = this.value.trim();
+                if(isPLZ(this.value)){
+                    localStorage.setItem("SecondComparePlace", this.value);
+                }
+                else{
+                    localStorage.removeItem("SecondComparePlace");
+                }
+            });
+
+            // Tankmenge Slider
+            document.getElementById('FuelAmountRange')
+                ?.addEventListener('input', function () { updateFuel(this.value); });
+
+            // Maximale Tankmenge
+            document.getElementById('MaximumFuelAmount')
+                ?.addEventListener('blur', function () { updateMax(this.value); });
+
+            // Kosten pro km
+            document.getElementById('PricePerKm')
+                ?.addEventListener('blur', function () { formatAndSavePricePerKm(this); });
+
+            // Radius Standort 1 & 2
+            document.getElementById('RadiusPlace0')
+                ?.addEventListener('input', function () {
+                    document.getElementById('outputRadius0').textContent = this.value + ' km';
+                });
+            document.getElementById('RadiusPlace1')
+                ?.addEventListener('input', function () {
+                    document.getElementById('outputRadius1').textContent = this.value + ' km';
+                });
+
+            // Standort hinzufügen
+            document.getElementById('addStandort')
+                ?.addEventListener('click', addLocation);
+
+            // Submit Loader Buttons
+            document.getElementById('SearchBtn')
+                ?.addEventListener('click', function () {
+                    document.getElementById('loader-search').style.display = 'inline-block';
+                });
+            document.getElementById('loader-compare')?.closest('button')
+                ?.addEventListener('click', function () {
+                    document.getElementById('loader-compare').style.display = 'inline-block';
+                });
+
+            // View Dropdown
+            document.getElementById('viewModeCustom')?.querySelector('.select-trigger')
+                ?.addEventListener('click', toggleDropdown);
+
+            document.querySelectorAll('#optionsList .suggestion-item').forEach(el => {
+                el.addEventListener('click', () => selectOption(el));
+            });
+
+            // Sort Dropdown
+            document.getElementById('sortModeCustom')?.querySelector('.select-trigger')
+                ?.addEventListener('click', toggleDropdownSort);
+
+            document.querySelectorAll('#sortOptionsList .suggestion-item').forEach(el => {
+                el.addEventListener('click', () => selectOptionSort(el));
+            });
+
+            // Geo Buttons (bereits vorhanden)
+            document.getElementById("geoButton")?.addEventListener("click", getLocation);
+            document.getElementById("geoButton2")?.addEventListener("click", getLocation);
+
+            // Radius Slider
+            const slider = document.getElementById('generalRadius');
+            const output = document.getElementById('radiusValue');
+            if (slider && output) {
+                output.textContent = slider.value + ' km';
+                slider.addEventListener('input', () => {
+                    output.textContent = slider.value + ' km';
+                });
+            }
+
+            // localStorage wiederherstellen (bereits vorhanden)
+            const savedPricePerKm = localStorage.getItem("pricePerKm");
+            if (savedPricePerKm) $('#PricePerKm').val(savedPricePerKm);
+
+            const savedFuelType = localStorage.getItem("selectedFuelType");
+            if (savedFuelType) {
+                const radio = document.querySelector(`input[name="SelectedFuelType"][value="${savedFuelType}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            const maxVolume = localStorage.getItem("maxVolume");
+            if (maxVolume) {
+                document.getElementById('MaximumFuelAmount').value = maxVolume;
+                document.getElementById('FuelAmountRange').max = maxVolume;
+            }
+
+            const fuelRange = document.getElementById('FuelAmountRange');
+            const fuelValue = @Model.FuelAmount;
+            if (fuelRange) {
+                fuelRange.value = fuelValue;
+                document.getElementById('fuelAmountValue').textContent = fuelValue + ' l';
+            }
+
+            // In DOMContentLoaded hinzufügen:
+            document.querySelectorAll('input[type="range"][data-output-id]').forEach(slider => {
+                slider.addEventListener('input', function () {
+                    const outputId = this.getAttribute('data-output-id');
+                    const output = document.getElementById(outputId);
+                    if (output) output.textContent = this.value + ' km';
+                });
+            });
+
+
+            const stationContainer = document.getElementById('stationListContainer');
+            if (stationContainer) {
+                stationContainer.addEventListener('click', function(e) {
+                    const summary = e.target.closest('.station-summary');
+                    if (summary) toggleDetails(summary);
+                });
+            }
+
+            const generalLocationInput = localStorage.getItem("generalLocation");
+            if(generalLocationInput){
+                const generalLocationField = document.getElementById("generalLocation");
+                if(generalLocationField){
+                    generalLocationField.value = generalLocationInput;
+                }
+            }
+
+            const FirstComparePlaceInput = localStorage.getItem("FirstComparePlace");
+            if(FirstComparePlaceInput){
+                const firstComparePlace = document.getElementById("FirstComparePlace");
+                if(firstComparePlace && firstComparePlace.value.trim() === ""){
+                    firstComparePlace.value = FirstComparePlaceInput;
+                }
+            }
+
+            const SecondComparePlaceInput = localStorage.getItem("SecondComparePlace");
+            if(SecondComparePlaceInput){
+                const secondComparePlace = document.getElementById("SecondComparePlace");
+                if(secondComparePlace){
+                    secondComparePlace.value = SecondComparePlaceInput;
+                }
+            }
+            
+        });
+    document.addEventListener('input', function (e) {
+        if (e.target.matches('input[type="range"][data-output-id]')) {
+            const outputId = e.target.getAttribute('data-output-id');
+            const output = document.getElementById(outputId);
+            if (output) output.textContent = e.target.value + ' km';
         }
     });
 
@@ -777,6 +989,7 @@
             if (result.success && result.address) {
                 if (document.getElementById("generalLocation")) {
                     document.getElementById("generalLocation").value = result.address;
+                    localStorage.removeItem("generalLocation")
                 }
                 if (document.getElementById("GeoStandort")) {
                     document.getElementById("GeoStandort").value = result.address;
@@ -835,7 +1048,7 @@
                                         min="1" max="25" step="1"
                                         value="10"
                                         id="RadiusPlace${locationIndex}"
-                                        oninput="document.getElementById('outputRadius${locationIndex}').textContent = this.value + ' km'" />
+                                        data-output-id="outputRadius${locationIndex}">
                                 </div>
                                 <small class="text-muted ms-1">25</small>
                             </div>
@@ -884,7 +1097,6 @@
             })
             .then(html => {
                 container.innerHTML = html;
-                document.querySelectorAll('.station-summary').forEach(el => el.onclick = () => toggleDetails(el));
             })
             .catch(err => {
                 console.error('Fehler:', err);
@@ -916,6 +1128,11 @@
         const value = element.getAttribute('data-value');
         document.getElementById('sortOptionsList').style.display = 'none';
         sortList(value);
+    }
+
+    function isPLZ(input){
+        const plzRegex = /^\d{5}$/;
+        return plzRegex.test(input);
     }
 
     document.addEventListener('click', function (event) {

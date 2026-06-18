@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Moq;
@@ -190,6 +191,42 @@ public class GeoLocationServiceTest : ServiceTestBase
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.EqualTo(fullAddress), "API wurde aufgerufen trotz Cache-Hit!");
+    }
+
+    [Test]
+    public async Task GetCoordinatsFromPLZNormalizesAndReturnsCoordinates()
+    {
+        // Arrange
+        string place = "12345";
+        string cacheKey = $"geo:{place.ToLower() + ", deutschland"}";
+
+        // Cache leeren
+        // SPEICHERE ALS STRING mit F6 (wie im Produktivcode!)
+        await _redisDb.HashSetAsync(cacheKey, new[]
+        {
+                new HashEntry("lat", 53.551.ToString("F3", CultureInfo.InvariantCulture)),
+                new HashEntry("lon", 9.993.ToString("F3", CultureInfo.InvariantCulture)) 
+            });
+
+        int requestCount = 0;
+        var service = CreateGeoLocationService((req, ct) =>
+        {
+            requestCount++;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(@"{""features"":[{""geometry"":{""coordinates"":[10.000,50.000]}}]}")
+            });
+        });
+        await _redisDb.KeyExpireAsync(cacheKey, TimeSpan.FromDays(365));
+
+        // Act
+        var result = await service.GetCoordinatesAsync(place);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Latitude, Is.EqualTo(53.551).Within(0.000001));
+        Assert.That(result.Longitude, Is.EqualTo(9.993).Within(0.000001));
+        Assert.That(requestCount, Is.EqualTo(0), "API wurde aufgerufen trotz Cache!");
     }
     
     [Test]

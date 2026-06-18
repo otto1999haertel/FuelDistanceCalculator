@@ -1,6 +1,6 @@
 using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Model;
-namespace FuelDistanceCalculator.Services;
+namespace FuelDistanceCalculator.Interfaces;
 public interface IRouteOptimizationService
 {
     public Task<GasStation> FindBestStationAsync(List<CoordinatesDTO> searchPointsOnRoute,

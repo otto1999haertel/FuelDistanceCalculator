@@ -86,8 +86,9 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "mkdir -p /home/$SSH_USER/fuelgo/nginx"
-          scp -P "$SSH_PORT" docker-compose.yml "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/docker-compose.yml"
-          scp -P "$SSH_PORT" nginx/default.conf "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/nginx/default.conf"
+
+          scp -P "$SSH_PORT" docker-compose.yml "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/"
+          scp -P "$SSH_PORT" nginx/default.conf "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/nginx/"
 
       - name: Deploy
         env:

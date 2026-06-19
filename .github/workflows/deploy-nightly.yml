@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   changes:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     outputs:
       any_changed: ${{ steps.changed.outputs.any_changed }}

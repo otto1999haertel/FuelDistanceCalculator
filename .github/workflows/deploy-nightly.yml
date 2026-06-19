@@ -27,14 +27,13 @@ jobs:
       - run: dotnet test --configuration Release
 
 # -------------------------
-# 2. DOCKER BUILD + PUSH (nur master Push)
+# 2. BUILD (nur wenn master OR nightly OR manual)
 # -------------------------
   build:
     needs: test
     runs-on: ubuntu-latest
 
-    # nur echte Änderungen auf master (kein PR, kein nightly)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
 
     outputs:
       image_tag: ${{ github.sha }}
@@ -45,7 +44,7 @@ jobs:
       - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-      - name: Build & Push Docker Image
+      - name: Build & Push
         run: |
           docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }} .
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
@@ -57,7 +56,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    # nur Nightly oder manuell
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
@@ -71,16 +69,14 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -e
 
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          IMAGE_TAG=${{ github.sha }}
+          echo "Pull latest image"
 
-          echo "Deploying: $IMAGE_TAG"
+          docker pull ghcr.io/otto1999haertel/fueldistancecalculator:${{ needs.build.outputs.image_tag }}
 
-          docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
-
-          IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+          IMAGE_TAG=${{ needs.build.outputs.image_tag }} docker compose --env-file .env.server up -d --no-deps --force-recreate fuelgo-webapp
           EOF

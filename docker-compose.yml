@@ -6,7 +6,7 @@ services:
       - redis_data:/data
 
   fuelgo-webapp:
-    image: ghcr.io/otto1999haertel/fueldistancecalculator:${IMAGE_TAG:-latest}
+    image: ghcr.io/otto1999haertel/fueldistancecalculator:${IMAGE_TAG}
     restart: always
 
     environment:

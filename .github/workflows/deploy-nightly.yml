@@ -21,48 +21,72 @@ jobs:
   docker:
     needs: test
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tag }}
+
     steps:
       - uses: actions/checkout@v5
 
       - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-      - name: Build
+      - name: Detect changes
+        id: changes
         run: |
-          docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:latest .
-          docker tag ghcr.io/otto1999haertel/fueldistancecalculator:latest \
-                     ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
+          git fetch origin master
+          if git diff --quiet HEAD~1 HEAD; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Push
+      - name: Build metadata
+        id: meta
+        if: steps.changes.outputs.changed == 'true'
+        run: echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build image
+        if: steps.changes.outputs.changed == 'true'
         run: |
-          docker push ghcr.io/otto1999haertel/fueldistancecalculator:latest
+          docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }} .
+
+      - name: Push image
+        if: steps.changes.outputs.changed == 'true'
+        run: |
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
   deploy:
-    needs: [test, docker]
+    needs: docker
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+
+    # nur master + kein PR + nur wenn build passiert ist
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && needs.docker.outputs.image_tag != ''
 
     steps:
       - name: Setup SSH
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy
+      - name: Deploy new image
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          set -e
+
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          docker compose --env-file .env.server pull fuelgo-webapp
-          docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+          echo "Pulling new image: ghcr.io/otto1999haertel/fueldistancecalculator:${{ needs.docker.outputs.image_tag }}"
+
+          export IMAGE_TAG=${{ needs.docker.outputs.image_tag }}
+
+          docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
+
+          # optional: compose override nutzen
+          IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+
           EOF

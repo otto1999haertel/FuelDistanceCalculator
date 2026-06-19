@@ -2,7 +2,7 @@ name: Nightly Deployment
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
   schedule:
     - cron: "0 1 * * *"
   workflow_dispatch:
@@ -41,7 +41,7 @@ jobs:
   deploy:
     needs: [test, docker]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
 
     steps:
       - name: Setup SSH

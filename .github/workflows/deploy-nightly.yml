@@ -1,11 +1,6 @@
-name: CI + Nightly Deploy
+name: Nightly Deploy
 
 on:
-  push:
-    branches: ["master"]
-
-  pull_request:
-
   schedule:
     - cron: "0 1 * * *"
 
@@ -15,9 +10,6 @@ permissions:
   contents: read
   packages: write
 
-# -------------------------
-# TESTS (immer)
-# -------------------------
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,46 +17,24 @@ jobs:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release
 
-# -------------------------
-# BUILD + PUSH (nur bei Master Push ODER Nightly ODER Manual)
-# -------------------------
   build:
     needs: test
     runs-on: ubuntu-latest
 
-    if: github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-
-    outputs:
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Set image tag
-        id: meta
-        run: echo "image_tag=${GITHUB_SHA}" >> $GITHUB_OUTPUT
 
       - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-      - name: Build Docker Image
+      - name: Build & Push
         run: |
           docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${GITHUB_SHA} .
-
-      - name: Push Docker Image
-        run: |
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${GITHUB_SHA}
 
-# -------------------------
-# DEPLOY (nur Nightly + Manual)
-# -------------------------
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Setup SSH
@@ -79,15 +49,11 @@ jobs:
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -e
-
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          IMAGE_TAG=${{ needs.build.outputs.image_tag }}
-
-          echo "Deploying image: $IMAGE_TAG"
+          IMAGE_TAG=${GITHUB_SHA}
 
           docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
 
           IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps --force-recreate fuelgo-webapp
-
           EOF

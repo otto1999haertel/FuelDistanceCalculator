@@ -38,6 +38,22 @@ jobs:
             fi
           fi
 
+  validate_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate secrets
+        run: |
+          echo "Validating API keys..."
+
+          for key in "${{ secrets.TANKAPIKEY }}" "${{ secrets.OPENROUTESERVICEAPIKEY }}"; do
+            if echo "$key" | grep -Ei "fake|test|local|dev|dummy"; then
+              echo "Invalid API key detected"
+              exit 1
+            fi
+          done
+
+          echo "API keys look valid"
+
   build:
     runs-on: ubuntu-latest
     steps:

@@ -74,4 +74,37 @@ public class OilPriceServiceTest : ServiceTestBase
         Assert.That(second.PriceChange.CurrentPrice,
             Is.EqualTo(first.PriceChange.CurrentPrice).Within(0.01));
     }
+
+    [Test]
+    [TestCase(80.12, "80,12 $")]
+    [TestCase(75.5, "75,50 $")]
+    [TestCase(100, "100,00 $")]
+    public void DisplayCurrentPrice_ReturnsFormattedString(double currentPrice, string expectedDisplay)
+    {
+        // Arrange
+        var priceChange = new OilPriceChange(0.34, -8.26, -28.00, currentPrice, DateTimeOffset.Now);
+
+        // Act
+        var display = priceChange.DisplayCurrentPriceWithCurrency();
+
+        // Assert
+        Assert.That(display, Is.EqualTo(expectedDisplay));
+    }
+
+    [Test]
+    [TestCase(0.34, "+0,34 %")]
+    [TestCase(-8.26, "-8,26 %")]
+    [TestCase(10.00, "+10,00 %")]
+    [TestCase(-10.00, "-10,00 %")]
+    public void DisplayChangeWithSign_ReturnsFormattedString(double change, string expectedDisplay)
+    {
+        // Arrange
+        var priceChange = new OilPriceChange(change, 0, 0, 80.12, DateTimeOffset.Now);
+
+        // Act
+        var display = priceChange.DisplayDayChangeWithSign(change);
+
+        // Assert
+        Assert.That(display, Is.EqualTo(expectedDisplay));
+    }
 }

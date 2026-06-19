@@ -1,4 +1,4 @@
-@page
+﻿@page
 @using FuelDistanceCalculator.Constants
 @using System.Globalization
 @using Microsoft.CodeAnalysis.CSharp.Syntax
@@ -157,21 +157,19 @@
                                     <div class="oil-trend-section">
                                         <div class="oil-trend-header">
                                             <span class="oil-trend-title">Rohöl (Brent)</span>
-                                            <span class="oil-trend-price">@Model.OilPriceChange?.CurrentPrice $ / Barrel</span>
+                                            <span class="oil-trend-price">@Model.OilPriceChange?.DisplayCurrentPriceWithCurrency() / Barrel</span>
                                         </div>
 
                                         @{
                                             string TrendClass(double value) => value < 0 ? "is-down" : "is-up";
                                             string TrendIcon(double value) => value < 0 ? "ti-trending-down" : "ti-trending-up";
-                                            string TrendSign(double value) => value > 0 ? "+" : "";
                                         }
 
                                         <div class="oil-trend-grid">
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Täglich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Day)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Day)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Day)@Model.OilPriceChange.Day.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayDayChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. gestern</div>
                                             </div>
@@ -179,8 +177,7 @@
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Wöchentlich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Week)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Week)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Week)@Model.OilPriceChange.Week.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayWeekChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vorwoche</div>
                                             </div>
@@ -188,8 +185,7 @@
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Monatlich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Month)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Month)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Month)@Model.OilPriceChange.Month.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayMonthChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vormonat</div>
                                             </div>

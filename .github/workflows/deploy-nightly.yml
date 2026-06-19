@@ -1,153 +1,66 @@
 name: Nightly Deployment
 
 on:
+  push:
+    branches: [ "main" ]
   schedule:
     - cron: '0 1 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  check-changes:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    outputs:
-      should_deploy: ${{ steps.check.outputs.should_deploy }}
-
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
-
-      - name: Check for new commits
-        id: check
-        run: |
-          LAST_COMMIT=$(git log -1 --format=%ct)
-          LAST_COMMIT_INFO=$(git log -1 --pretty=format:"%h - %s (%an, %ar)")
-          echo "Last commit: $LAST_COMMIT_INFO"
-          CURRENT_TIME=$(date +%s)
-          TIME_DIFF=$((CURRENT_TIME - LAST_COMMIT))
-
-          if [ $TIME_DIFF -lt 86400 ]; then
-            echo "should_deploy=true" >> $GITHUB_OUTPUT
-            echo "✓ Neue Commits gefunden (vor $((TIME_DIFF / 3600)) Stunden)"
-          else
-            echo "should_deploy=false" >> $GITHUB_OUTPUT
-            echo "✗ Keine neuen Commits in den letzten 24h"
-          fi
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: dotnet build --configuration Release
-
   test:
-    needs: build
     runs-on: ubuntu-latest
-    env:
-      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
-      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
     steps:
       - uses: actions/checkout@v5
-      - run: dotnet test --configuration Release
+      - name: Run tests
+        run: dotnet test --configuration Release
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Build image
+        run: |
+          docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:latest .
+          docker tag ghcr.io/otto1999haertel/fueldistancecalculator:latest \
+                     ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
+
+      - name: Push image
+        run: |
+          docker push ghcr.io/otto1999haertel/fueldistancecalculator:latest
+          docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
   deploy:
-    needs: [test, check-changes]
+    needs: [test, docker]
     runs-on: ubuntu-latest
-    if: needs.test.result == 'success' && needs.check-changes.outputs.should_deploy == 'true'
+
+    if: needs.test.result == 'success'
 
     steps:
-      - uses: actions/checkout@v5
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Sync source to server
+      - name: Deploy
         run: |
-          rsync -avz --delete \
-            --exclude '.env*' \
-            --exclude '.git' \
-            -e "ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }}" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/fuelgo
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-
-      - name: Create .env.server with API keys
-        run: |
-          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "cd /home/${{ secrets.SSH_USER }}/fuelgo && cat > .env.server << 'EOF'
-          CERT_CRT_PATH=/etc/letsencrypt/live/fuelgo.de/fullchain.pem
-          CERT_KEY_PATH=/etc/letsencrypt/live/fuelgo.de/privkey.pem
-          SERVER_NAME=fuelgo.de www.fuelgo.de
-          MODE_TYPE=Production
-          REDIS_HOST=redis:6379
-          TANK_API_KEY=${{ secrets.TANKAPIKEY }}
-          OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
-          EOF
-          "
-
-      - name: Verify .env.server on server
-        run: |
-          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-              echo "=== .env.server key check ==="
-              
-              TANK_KEY=\$(grep "TANK_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
-              ORS_KEY=\$(grep "OPENROUTESERVICE_API_KEY=" /home/${{ secrets.SSH_USER }}/fuelgo/.env.server | cut -d'=' -f2)
-              
-              if [ -z "\$TANK_KEY" ]; then
-                echo "✗ TANK_API_KEY is missing!"
-                exit 1
-              else
-                echo "✓ TANK_API_KEY present | starts with: \${TANK_KEY:0:4}... | length: \${#TANK_KEY}"
-              fi
-              
-              if [ -z "\$ORS_KEY" ]; then
-                echo "✗ OPENROUTESERVICE_API_KEY is missing!"
-                exit 1
-              else
-                echo "✓ ORS_KEY present | starts with: \${ORS_KEY:0:4}... | length: \${#ORS_KEY}"
-              fi
-          EOF
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-
-      - name: Deploy on remote server
-        run: |
-          ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-          if sudo systemctl is-active --quiet nginx; then
-            echo "Stopping native Nginx service"
-            sudo systemctl stop nginx
-          fi
-
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/fuelgo
-          sudo docker compose --env-file .env.server stop fuelgo-webapp nginx
-          sudo docker compose --env-file .env.server rm -f fuelgo-webapp nginx
-          sudo docker compose --env-file .env.server up --build -d
-          
-          echo "✓ Deployment completed successfully at \$(date)"
-          EOF
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
 
-      - name: Notify deployment status
-        if: always()
-        run: |
-          if [ "${{ needs.test.result }}" == "success" ]; then
-            echo "✓ Nightly deployment successful"
-          else
-            echo "✗ Deployment failed"
-            exit 1
-          fi
+          echo "Pulling image..."
+          docker compose --env-file .env.server pull fuelgo-webapp
+          docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+
+          EOF

@@ -71,6 +71,8 @@ builder.Services.AddAntiforgery();
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -112,6 +114,8 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 app.MapRazorPages();
+
+app.MapHealthChecks("/health");
 
 // ✅ Kein Portbinding in Tests
 if (app.Environment.IsEnvironment("Testing"))

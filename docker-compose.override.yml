@@ -1,0 +1,11 @@
+services:
+  fuelgo-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MODE_TYPE: Development
+      ASPNETCORE_ENVIRONMENT: Development
+      REDIS_HOST: redis:6379
+      TANK_API_KEY: fake-local
+      OPENROUTESERVICE_API_KEY: fake-local

@@ -55,22 +55,25 @@ jobs:
           echo "API keys look valid"
 
   validate_ssh_key:
-    run: |
-      echo "Checking SSH key format..."
+  runs-on: ubuntu-latest
+  steps:
+    - name: Check SSH key format
+      run: |
+        echo "Checking SSH key format..."
 
-      if [[ "${{ secrets.SSH_PRIVATE_KEY }}" == *"BEGIN"* ]]; then
-        echo "✓ Key contains BEGIN marker"
-      else
-        echo "✗ Key missing BEGIN marker"
-        exit 1
-      fi
+        if [[ "${{ secrets.SSH_PRIVATE_KEY }}" == *"BEGIN"* ]]; then
+          echo "✓ Key contains BEGIN marker"
+        else
+          echo "✗ Key missing BEGIN marker"
+          exit 1
+        fi
 
-      if [[ "${{ secrets.SSH_PRIVATE_KEY }}" == *"PRIVATE KEY"* ]]; then
-        echo "✓ Key looks like valid private key"
-      else
-        echo "✗ Key format invalid"
-        exit 1
-      fi
+        if [[ "${{ secrets.SSH_PRIVATE_KEY }}" == *"PRIVATE KEY"* ]]; then
+          echo "✓ Key looks valid"
+        else
+          echo "✗ Key format invalid"
+          exit 1
+        fi
   
   build:
     runs-on: ubuntu-latest

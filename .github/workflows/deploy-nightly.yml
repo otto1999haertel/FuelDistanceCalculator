@@ -1,28 +1,43 @@
-name: Nightly Deployment
+name: CI + Build + Nightly Deploy
 
 on:
   push:
     branches: ["master"]
+
+  pull_request:
+
   schedule:
     - cron: "0 1 * * *"
+
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
+# -------------------------
+# 1. TESTS (immer)
+# -------------------------
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release
 
-  docker:
+# -------------------------
+# 2. DOCKER BUILD + PUSH (nur master Push)
+# -------------------------
+  build:
     needs: test
     runs-on: ubuntu-latest
+
+    # nur echte Änderungen auf master (kein PR, kein nightly)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
     outputs:
-      image_tag: ${{ steps.meta.outputs.tag }}
+      image_tag: ${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v5
@@ -30,63 +45,42 @@ jobs:
       - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-      - name: Detect changes
-        id: changes
-        run: |
-          git fetch origin master
-          if git diff --quiet HEAD~1 HEAD; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Build metadata
-        id: meta
-        if: steps.changes.outputs.changed == 'true'
-        run: echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
-
-      - name: Build image
-        if: steps.changes.outputs.changed == 'true'
+      - name: Build & Push Docker Image
         run: |
           docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }} .
-
-      - name: Push image
-        if: steps.changes.outputs.changed == 'true'
-        run: |
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
+# -------------------------
+# 3. DEPLOY (nur Nightly + Manual)
+# -------------------------
   deploy:
-    needs: docker
+    needs: build
     runs-on: ubuntu-latest
 
-    # nur master + kein PR + nur wenn build passiert ist
-    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request' && needs.docker.outputs.image_tag != ''
+    # nur Nightly oder manuell
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
           ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy new image
+      - name: Deploy
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -e
 
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          echo "Pulling new image: ghcr.io/otto1999haertel/fueldistancecalculator:${{ needs.docker.outputs.image_tag }}"
+          IMAGE_TAG=${{ github.sha }}
 
-          export IMAGE_TAG=${{ needs.docker.outputs.image_tag }}
+          echo "Deploying: $IMAGE_TAG"
 
           docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
 
-          # optional: compose override nutzen
           IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
-
           EOF

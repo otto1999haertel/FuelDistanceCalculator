@@ -44,37 +44,31 @@ jobs:
     needs: [test, docker]
     runs-on: ubuntu-latest
 
-    if: needs.test.result == 'success'
-
     steps:
       - name: Setup SSH
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
           set -e
 
-          echo "SSH host length: ${#SSH_HOST}"
-          if [ -z "$SSH_HOST" ]; then
-            echo "ERROR: SSH_HOST is empty"
-            exit 1
-          fi
+          echo "Checking SSH config..."
 
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          echo "Scanning host..."
-          ssh-keyscan -T 10 -H "$SSH_HOST" >> ~/.ssh/known_hosts || {
-            echo "WARNING: ssh-keyscan failed, continuing anyway"
-          }
+          echo "Scanning host on port $SSH_PORT..."
+          ssh-keyscan -p "$SSH_PORT" -T 10 -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
           echo "SSH setup complete"
 
       - name: Deploy
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
           echo "Pulling image..."

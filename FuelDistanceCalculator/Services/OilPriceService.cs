@@ -113,7 +113,7 @@ public class OilPriceService : BaseService, IOilPriceService
 
             var today = closes[^1];   // aktuellster Wert
             var yesterday = closes[^2];   // gestern
-            var lastWeek = closes[^8];   // vor 7 Handelstagen
+            var lastWeek = closes[^6];   // vor 5 Handelstagen ~1 Woche
             var lastMonth = closes[0];    // ältester Wert ~1 Monat
 
             var marketTime = doc.RootElement

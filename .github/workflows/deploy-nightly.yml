@@ -79,7 +79,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Upload docker-compose.yml
+      - name: Upload configs
         env:
           SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -87,6 +87,7 @@ jobs:
         run: |
           ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "mkdir -p /home/$SSH_USER/fuelgo/nginx"
           scp -P "$SSH_PORT" docker-compose.yml "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/docker-compose.yml"
+          scp -P "$SSH_PORT" nginx/default.conf "$SSH_USER@$SSH_HOST:/home/$SSH_USER/fuelgo/nginx/default.conf"
 
       - name: Deploy
         env:
@@ -107,4 +108,4 @@ jobs:
           OPENROUTESERVICE_API_KEY=$OPENROUTESERVICE_API_KEY
           ENVEOF
             docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG &&
-            docker compose --env-file .env.server up -d --no-deps --force-recreate fuelgo-webapp"
+            docker compose --env-file .env.server up -d --force-recreate fuelgo-webapp"

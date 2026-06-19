@@ -2,9 +2,9 @@ name: Nightly Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '0 1 * * *'
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,26 +16,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Run tests
-        run: dotnet test --configuration Release
+      - run: dotnet test --configuration Release
 
   docker:
     needs: test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v5
 
-      - name: Login to GHCR
+      - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-      - name: Build image
+      - name: Build
         run: |
           docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:latest .
           docker tag ghcr.io/otto1999haertel/fueldistancecalculator:latest \
                      ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
-      - name: Push image
+      - name: Push
         run: |
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:latest
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
@@ -43,6 +41,7 @@ jobs:
   deploy:
     needs: [test, docker]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Setup SSH
@@ -51,28 +50,19 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
-          set -e
-
-          echo "Checking SSH config..."
-
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          echo "Scanning host on port $SSH_PORT..."
-          ssh-keyscan -p "$SSH_PORT" -T 10 -H "$SSH_HOST" >> ~/.ssh/known_hosts
-
-          echo "SSH setup complete"
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          echo "Pulling image..."
           docker compose --env-file .env.server pull fuelgo-webapp
           docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
-
           EOF

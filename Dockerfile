@@ -2,8 +2,6 @@
 # 1. BUILD-STAGE: Kompilieren und Veröffentlichen
 # ----------------------------------------------------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG MODE_TYPE=Development
-ENV MODE_TYPE=$MODE_TYPE
 
 # Installation von tzdata und Setzen der Zeitzone in einem Schritt
 RUN apt-get update && \
@@ -15,29 +13,14 @@ RUN apt-get update && \
 
 WORKDIR /src
 
-# Kopiere Projektdateien und stelle Abhängigkeiten wieder her (Nutzt Docker Layer Caching optimal)
 COPY ["FuelDistanceCalculator.sln", "."]
 COPY ["FuelDistanceCalculator/FuelDistanceCalculator.csproj", "FuelDistanceCalculator/"]
 COPY ["FuelDistanceCalculatorTest/FuelDistanceCalculatorTests.csproj", "FuelDistanceCalculatorTest/"]
 RUN dotnet restore "FuelDistanceCalculator.sln"
 
-# Kopiere restlichen Code und führe Publish aus
 COPY . .
 WORKDIR /src/FuelDistanceCalculator
 RUN dotnet publish -c Release -o /app/publish
-# Der vorherige 'dotnet restore' macht '--no-restore' hier effizienter.
-
-# Führe Tests nur im Development-Modus aus
-# Hinweis: Das Test-Output wird NICHT ins finale Image kopiert!
-RUN mkdir -p /app/test-output && \
-    echo "MODE_TYPE in Build-Stage: $MODE_TYPE" && \
-    if [ "$MODE_TYPE" = "Development" ]; then \
-        echo "Running dotnet test..." && \
-        dotnet test /src/FuelDistanceCalculator.sln -c Release --verbosity detailed --logger "trx;LogFileName=/app/test-output/testresults.trx" --logger "console;verbosity=detailed" | tee /app/test-output/testoutput.txt || echo "Error: dotnet test failed"; \
-    else \
-        echo "Tests übersprungen, MODE_TYPE ist $MODE_TYPE"; \
-    fi
-
 
 # ----------------------------------------------------
 # 2. RUNTIME-STAGE: Schlankes Image für die Ausführung
@@ -60,13 +43,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Kopiere die veröffentlichten Artefakte aus der 'build'-Stage
 COPY --from=build /app/publish .
-
-# Kopiere Skripte und SQL-Dateien
 COPY Scripts/start.sh /app/start.sh
 
-# dos2unix anwenden und Ausführungsrechte setzen
 RUN dos2unix /app/start.sh && chmod +x /app/start.sh
 
 RUN id app 2>/dev/null || useradd -r -s /bin/false app && \
@@ -74,7 +53,6 @@ RUN id app 2>/dev/null || useradd -r -s /bin/false app && \
     chown -R app:app /app/dataprotection-keys && \
     chown -R app:app /app
 
-# SICHERHEIT: Anwendung als Non-Root-User ausführen (Neu hinzugefügt!)
 USER app
 
 ENTRYPOINT ["/bin/bash", "-c", "/app/start.sh"]

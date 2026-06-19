@@ -48,16 +48,29 @@ jobs:
 
     steps:
       - name: Setup SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
+          set -e
+
+          echo "SSH host length: ${#SSH_HOST}"
+          if [ -z "$SSH_HOST" ]; then
+            echo "ERROR: SSH_HOST is empty"
+            exit 1
+          fi
+
           mkdir -p ~/.ssh
 
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
+          echo "Scanning host..."
+          ssh-keyscan -T 10 -H "$SSH_HOST" >> ~/.ssh/known_hosts || {
+            echo "WARNING: ssh-keyscan failed, continuing anyway"
+          }
+
+          echo "SSH setup complete"
 
       - name: Deploy
         run: |

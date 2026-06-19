@@ -3,7 +3,6 @@ name: Nightly Deploy
 on:
   schedule:
     - cron: "0 1 * * *"
-
   workflow_dispatch:
 
 permissions:
@@ -11,21 +10,44 @@ permissions:
   packages: write
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      any_changed: ${{ steps.changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: changed
+        uses: tj-actions/changed-files@v46
+
   test:
+    needs: changes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - run: dotnet test --configuration Release
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore
 
   build:
-    needs: test
+    needs: [changes, test]
+    if: needs.changes.outputs.any_changed == 'true'
     runs-on: ubuntu-latest
-
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
-
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set image tag
         id: meta
@@ -40,9 +62,9 @@ jobs:
           docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
   deploy:
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.any_changed == 'true'
     runs-on: ubuntu-latest
-
     steps:
       - name: Setup SSH
         run: |
@@ -53,17 +75,13 @@ jobs:
           ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Deploy
+        env:
+          IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-          set -e
-
-          cd /home/${{ secrets.SSH_USER }}/fuelgo
-
-          IMAGE_TAG=${{ needs.build.outputs.image_tag }}
-
-          echo "Deploying image: $IMAGE_TAG"
-
-          docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
-
-          IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps --force-recreate fuelgo-webapp
-          EOF
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "cd /home/$SSH_USER/fuelgo && \
+             docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG && \
+             IMAGE_TAG=$IMAGE_TAG docker compose --env-file .env.server up -d --no-deps --force-recreate fuelgo-webapp"

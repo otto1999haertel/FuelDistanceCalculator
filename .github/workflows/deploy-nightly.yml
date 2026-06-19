@@ -21,16 +21,23 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
 
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+
     steps:
       - uses: actions/checkout@v5
+
+      - name: Set image tag
+        id: meta
+        run: echo "image_tag=${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Build & Push
         run: |
-          docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${GITHUB_SHA} .
-          docker push ghcr.io/otto1999haertel/fueldistancecalculator:${GITHUB_SHA}
+          docker build -t ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }} .
+          docker push ghcr.io/otto1999haertel/fueldistancecalculator:${{ github.sha }}
 
   deploy:
     needs: build
@@ -49,9 +56,12 @@ jobs:
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
           set -e
+
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          IMAGE_TAG=${GITHUB_SHA}
+          IMAGE_TAG=${{ needs.build.outputs.image_tag }}
+
+          echo "Deploying image: $IMAGE_TAG"
 
           docker pull ghcr.io/otto1999haertel/fueldistancecalculator:$IMAGE_TAG
 

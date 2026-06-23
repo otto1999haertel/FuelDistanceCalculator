@@ -319,7 +319,7 @@
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
                                                 <label for="RadiusPlace0" class="section-label mb-0">Radius</label>
-                                                <div class="flex-grow-1 text-center">
+                                                <div class="flex-grow-1 text-center" id="RadiusPlace0Lbl">
                                                     <output id="outputRadius0" class="value-output">
                                                         @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
                                                     </output>
@@ -356,7 +356,7 @@
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
                                                 <label for="RadiusPlace1" class="section-label mb-0">Radius</label>
-                                                <div class="flex-grow-1 text-center">
+                                                <div class="flex-grow-1 text-center" id="RadiusPlace1Lbl">
                                                     <output id="outputRadius1" class="value-output">
                                                         @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
                                                     </output>
@@ -730,6 +730,10 @@
                     localStorage.removeItem("FirstComparePlace");
                 }
             });
+            //Radius Standort 1 Vergleich outputRadius0  RadiusPlace0Lbl
+            document.getElementById('RadiusPlace0')?.addEventListener('mouseup', function () {
+                localStorage.setItem("FirstComparePlaceRadius", this.value.trim());
+            });
 
             //Standort 2 Vergleich
             document.getElementById('SecondComparePlace')?.addEventListener('blur', function () {
@@ -740,6 +744,10 @@
                 else{
                     localStorage.removeItem("SecondComparePlace");
                 }
+            });
+            //Radius Standort 2 Vergleich outputRadius1  RadiusPlace1Lbl
+            document.getElementById('RadiusPlace1')?.addEventListener('mouseup', function () {
+                localStorage.setItem("SecondComparePlaceRadius", this.value.trim());
             });
 
             // Tankmenge Slider
@@ -870,6 +878,30 @@
                 const secondComparePlace = document.getElementById("SecondComparePlace");
                 if(secondComparePlace){
                     secondComparePlace.value = SecondComparePlaceInput;
+                }
+            }
+
+            const FirstComparePlaceRadiusInput = localStorage.getItem("FirstComparePlaceRadius");
+            if(FirstComparePlaceRadiusInput){
+                const firstComparePlaceRadius = document.getElementById("RadiusPlace0");
+                if(firstComparePlaceRadius){
+                    firstComparePlaceRadius.value = FirstComparePlaceRadiusInput;
+                }
+                const firstComparePlaceRadiusLbl = document.getElementById("outputRadius0");
+                if(firstComparePlaceRadiusLbl){
+                    firstComparePlaceRadiusLbl.textContent = FirstComparePlaceRadiusInput + ' km';
+                }
+            }
+
+            const SecondComparePlaceRadiusInput = localStorage.getItem("SecondComparePlaceRadius");
+            if(SecondComparePlaceRadiusInput){
+                const secondPlaceRadius = document.getElementById("RadiusPlace1");
+                if(secondPlaceRadius){
+                    secondPlaceRadius.value = SecondComparePlaceRadiusInput;
+                }
+                const secondComparePlaceRadiusLbl = document.getElementById("outputRadius1");
+                if(secondComparePlaceRadiusLbl){
+                    secondComparePlaceRadiusLbl.textContent = SecondComparePlaceRadiusInput + ' km';
                 }
             }
             

@@ -1,4 +1,4 @@
-@page
+﻿@page
 @using FuelDistanceCalculator.Constants
 @using System.Globalization
 @using Microsoft.CodeAnalysis.CSharp.Syntax
@@ -157,21 +157,19 @@
                                     <div class="oil-trend-section">
                                         <div class="oil-trend-header">
                                             <span class="oil-trend-title">Rohöl (Brent)</span>
-                                            <span class="oil-trend-price">@Model.OilPriceChange?.CurrentPrice $ / Barrel</span>
+                                            <span class="oil-trend-price">@Model.OilPriceChange?.DisplayCurrentPriceWithCurrency() / Barrel</span>
                                         </div>
 
                                         @{
                                             string TrendClass(double value) => value < 0 ? "is-down" : "is-up";
                                             string TrendIcon(double value) => value < 0 ? "ti-trending-down" : "ti-trending-up";
-                                            string TrendSign(double value) => value > 0 ? "+" : "";
                                         }
 
                                         <div class="oil-trend-grid">
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Täglich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Day)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Day)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Day)@Model.OilPriceChange.Day.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayDayChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. gestern</div>
                                             </div>
@@ -179,8 +177,7 @@
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Wöchentlich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Week)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Week)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Week)@Model.OilPriceChange.Week.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayWeekChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vorwoche</div>
                                             </div>
@@ -188,8 +185,7 @@
                                             <div class="oil-trend-card">
                                                 <div class="oil-trend-period">Monatlich</div>
                                                 <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Month)">
-                                                    <i class="ti @TrendIcon(Model.OilPriceChange.Month)"></i>
-                                                    @TrendSign(Model.OilPriceChange.Month)@Model.OilPriceChange.Month.ToString("F2") %
+                                                    @Model.OilPriceChange.DisplayMonthChangeWithSign()
                                                 </div>
                                                 <div class="oil-trend-sub">ggü. Vormonat</div>
                                             </div>
@@ -323,7 +319,7 @@
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
                                                 <label for="RadiusPlace0" class="section-label mb-0">Radius</label>
-                                                <div class="flex-grow-1 text-center">
+                                                <div class="flex-grow-1 text-center" id="RadiusPlace0Lbl">
                                                     <output id="outputRadius0" class="value-output">
                                                         @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
                                                     </output>
@@ -360,7 +356,7 @@
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center mb-1">
                                                 <label for="RadiusPlace1" class="section-label mb-0">Radius</label>
-                                                <div class="flex-grow-1 text-center">
+                                                <div class="flex-grow-1 text-center" id="RadiusPlace1Lbl">
                                                     <output id="outputRadius1" class="value-output">
                                                         @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
                                                     </output>
@@ -734,6 +730,10 @@
                     localStorage.removeItem("FirstComparePlace");
                 }
             });
+            //Radius Standort 1 Vergleich outputRadius0  RadiusPlace0Lbl
+            document.getElementById('RadiusPlace0')?.addEventListener('mouseup', function () {
+                localStorage.setItem("FirstComparePlaceRadius", this.value.trim());
+            });
 
             //Standort 2 Vergleich
             document.getElementById('SecondComparePlace')?.addEventListener('blur', function () {
@@ -744,6 +744,10 @@
                 else{
                     localStorage.removeItem("SecondComparePlace");
                 }
+            });
+            //Radius Standort 2 Vergleich outputRadius1  RadiusPlace1Lbl
+            document.getElementById('RadiusPlace1')?.addEventListener('mouseup', function () {
+                localStorage.setItem("SecondComparePlaceRadius", this.value.trim());
             });
 
             // Tankmenge Slider
@@ -874,6 +878,30 @@
                 const secondComparePlace = document.getElementById("SecondComparePlace");
                 if(secondComparePlace){
                     secondComparePlace.value = SecondComparePlaceInput;
+                }
+            }
+
+            const FirstComparePlaceRadiusInput = localStorage.getItem("FirstComparePlaceRadius");
+            if(FirstComparePlaceRadiusInput){
+                const firstComparePlaceRadius = document.getElementById("RadiusPlace0");
+                if(firstComparePlaceRadius){
+                    firstComparePlaceRadius.value = FirstComparePlaceRadiusInput;
+                }
+                const firstComparePlaceRadiusLbl = document.getElementById("outputRadius0");
+                if(firstComparePlaceRadiusLbl){
+                    firstComparePlaceRadiusLbl.textContent = FirstComparePlaceRadiusInput + ' km';
+                }
+            }
+
+            const SecondComparePlaceRadiusInput = localStorage.getItem("SecondComparePlaceRadius");
+            if(SecondComparePlaceRadiusInput){
+                const secondPlaceRadius = document.getElementById("RadiusPlace1");
+                if(secondPlaceRadius){
+                    secondPlaceRadius.value = SecondComparePlaceRadiusInput;
+                }
+                const secondComparePlaceRadiusLbl = document.getElementById("outputRadius1");
+                if(secondComparePlaceRadiusLbl){
+                    secondComparePlaceRadiusLbl.textContent = SecondComparePlaceRadiusInput + ' km';
                 }
             }
             

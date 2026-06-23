@@ -2,11 +2,40 @@ name: Nightly Deployment
 
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
-  check-changes:
+  check_adac:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check ADAC data freshness
+        run: |
+          JSON_PATH="FuelDistanceCalculator/Data/ADAC_car_data.json"
+
+          if [ ! -f "$JSON_PATH" ]; then
+            echo "::warning::ADAC data file not found at $JSON_PATH"
+            exit 0
+          fi
+
+          AGE_DAYS=$(python3 .github/scripts/check_adac.py "$JSON_PATH")
+
+          echo "Data age: $AGE_DAYS days"
+
+          if [ "$AGE_DAYS" -eq -1 ]; then
+            echo "::warning::ADAC data has no metadata - regenerate JSON with updated Python script"
+            exit 0
+          fi
+
+          if [ "$AGE_DAYS" -gt 180 ]; then
+            echo "::warning::ADAC data is $AGE_DAYS days old - consider updating the PDF"
+            if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+              exit 1
+            fi
+          fi
+
+  check_changes:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     outputs:
@@ -51,9 +80,9 @@ jobs:
       - run: dotnet test --configuration Release
 
   deploy:
-    needs: [test, check-changes]
+    needs: [test, check_changes]
     runs-on: ubuntu-latest
-    if: needs.test.result == 'success' && needs.check-changes.outputs.should_deploy == 'true'
+    if: needs.test.result == 'success' && needs.check_changes.outputs.should_deploy == 'true'
 
     steps:
       - uses: actions/checkout@v5

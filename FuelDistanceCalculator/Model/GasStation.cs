@@ -160,6 +160,19 @@ public class GasStation
                      .FirstOrDefault();
     }
 
+    public string DisplayUpdateAmount()
+    {
+        if(UpdateAmount.HasValue)
+        {
+            string signValue=  UpdateAmount.Value > 0 ? $"+{UpdateAmount.Value:F2} €" : $"{UpdateAmount.Value:F2} €";
+            return signValue.Replace(".",",");
+        }
+        else
+        {
+            return "N/A";
+        }
+    }
+
     public override string ToString()
     {
         return $"GasStation Info:\n" +

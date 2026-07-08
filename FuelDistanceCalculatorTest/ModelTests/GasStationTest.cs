@@ -109,4 +109,23 @@ public class GasStationTest : ServiceTestBase
         //Assrt
         Assert.That(testObject.UpdateAmount.Equals(expectedAmount));
     }
+
+    [Test]
+    [TestCase(1,"+1,00 €")]
+    [TestCase(-1,"-1,00 €")]
+    [TestCase(1.2, "+1,20 €")]
+    [TestCase(-1.2, "-1,20 €")]
+    [TestCase(1.23, "+1,23 €")]
+    [TestCase(-1.23, "-1,23 €")]
+    public void UpdateAmountDisplayedWithPlusTest(decimal updateAmount, string expectedDisplay)
+    {
+        //Act
+        GasStation testObject = new GasStation();
+        testObject.UpdateAmount = updateAmount;
+
+        //Assert
+        string displayAmount = testObject.DisplayUpdateAmount();
+
+        Assert.That(displayAmount.Equals(expectedDisplay));
+    }
 }

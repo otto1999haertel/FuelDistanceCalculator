@@ -1,7 +1,7 @@
 namespace FuelDistanceCalculatorTest.ServiceTests;
 
 [TestFixture]
-public class ApiKeyTest
+public class KeyTest
 {
     private IConfiguration _config;
 
@@ -25,22 +25,25 @@ public class ApiKeyTest
     }
 
     [Test]
-    public void ApiKeysMustBePresentInConfiguration()
+    public void KeysMustBePresentInConfiguration()
     {
         // Act: Lese die Keys aus der Config
         string tankKey = _config["ApiSettings:TankApiKey"];
         string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
+        string redisPassword = _config["REDIS_PASSWORD"];
 
         // Assert: Keys müssen gesetzt sein
         Assert.That(!string.IsNullOrWhiteSpace(tankKey),
             $"TankApiKey should not be empty. Current value: '{tankKey}'");
         Assert.That(!string.IsNullOrWhiteSpace(openrKey),
             $"OpenRouteServiceApiKey should not be empty. Current value: '{openrKey}'");
+        Assert.That(!string.IsNullOrWhiteSpace(redisPassword),
+            $"REDIS_PASSWORD should not be empty. Current value: '{redisPassword}'");
     }
 
     [Test]
     [Category("CI")] // Nur in CI ausführen
-    public void ApiKeysInCIMustBeProductionKeys()
+    public void KeysInCIMustBeProductionKeys()
     {
         // Dieser Test läuft NUR in der CI-Pipeline
         bool isCI = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI"))
@@ -54,6 +57,7 @@ public class ApiKeyTest
 
         string tankKey = _config["ApiSettings:TankApiKey"];
         string openrKey = _config["ApiSettings:OpenRouteServiceApiKey"];
+        string redisPassword = _config["REDIS_PASSWORD"];
 
         // Prüfe, dass es KEINE Fake-Keys sind
         var fakeKeyPrefixes = new[] { "fake", "test", "local", "dev", "dummy", "sample" };
@@ -65,6 +69,10 @@ public class ApiKeyTest
         Assert.That(!fakeKeyPrefixes.Any(prefix =>
             openrKey?.ToLower().Contains(prefix) ?? false),
             $"OpenRouteServiceApiKey appears to be a fake/test key in CI: '{openrKey}'");
+        
+        Assert.That(!fakeKeyPrefixes.Any(prefix =>
+            redisPassword?.ToLower().Contains(prefix) ?? false),
+            $"REDIS_PASSWORD appears to be a fake/test password in CI: '{redisPassword}'");
 
         // Keys sollten echte API-Key-Länge haben
         Assert.That(tankKey?.Length >= 20,

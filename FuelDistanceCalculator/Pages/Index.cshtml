@@ -563,7 +563,7 @@
     let locationIndex = @Model.NamePlaces.Count;
 
     function updateFuel(value) {
-        document.getElementById('fuelAmountValue').textContent = value + ' l';
+        document.getElementById('fuelAmountValue').textContent = String(value).replace('.', ',') + ' l';
     }
 
     function updateMax(value) {
@@ -836,7 +836,6 @@
             const fuelValue = @Model.FuelAmount;
             if (fuelRange) {
                 fuelRange.value = fuelValue;
-                document.getElementById('fuelAmountValue').textContent = fuelValue + ' l';
             }
 
             // In DOMContentLoaded hinzufügen:
@@ -904,6 +903,8 @@
                     secondComparePlaceRadiusLbl.textContent = SecondComparePlaceRadiusInput + ' km';
                 }
             }
+
+            updateFuel("@Model.FuelAmount");
             
         });
     document.addEventListener('input', function (e) {

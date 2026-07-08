@@ -8,7 +8,7 @@ using Moq;
 
 namespace FuelDistanceCalculatorTest.PageTests;
 
-public class PageTestBase
+public abstract class PageTestBase
 {
     protected HttpClient _client;
     protected WebApplicationFactory<Program> _factory;

@@ -21,7 +21,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
     private double ToDegrees(double radians) => radians * 180 / Math.PI;
 
-    private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;   
+    private double NormalizeAngle(double angle) => (angle % 360 + 360) % 360;
 
     public GeoLocationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IConnectionMultiplexer redis)
     {
@@ -39,7 +39,8 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         if (place == null || place.Trim().Equals(string.Empty)) return null;
         Console.WriteLine($"GetCoordinatesAsync called with place: {place}");
         place = NormalizeAddressKey(place);
-        if(IsPLZ(place)){
+        if (IsPLZ(place))
+        {
             place = place + ", Deutschland";
         }
 
@@ -148,10 +149,10 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         return fullAddress;
     }
 
-        public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
+    public async Task<List<GasStation>> CalculateDistanceFromAPI(double latitudeStart, double longitudeStart, List<GasStation> stations)
     {
         Console.WriteLine($"Calculating routing distances from {latitudeStart}, {longitudeStart}");
-        int alternater =0;
+        int alternater = 0;
         foreach (GasStation station in stations)
         {
             string responseString = string.Empty;
@@ -164,7 +165,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
             {
                 responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
             }
-            
+
 
             if (!string.IsNullOrEmpty(responseString))
             {
@@ -217,9 +218,9 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
     }
 
-    public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm,  double intervalKm)
+    public List<CoordinatesDTO> GetSearchPoints(List<CoordinatesDTO> route, double maxTotalDistanceKm, double intervalKm)
     {
-        if(maxTotalDistanceKm>15 || maxTotalDistanceKm / intervalKm > 5)
+        if (maxTotalDistanceKm > 15 || maxTotalDistanceKm / intervalKm > 5)
         {
             return new List<CoordinatesDTO>();
         }
@@ -256,7 +257,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
         return searchPoints;
     }
-    
+
     public string NormalizeAddressKey(string place)
     {
         if (string.IsNullOrWhiteSpace(place))
@@ -278,7 +279,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
         return normalized;
     }
-    
+
     public bool IsInForwardCone(CoordinatesDTO searchPoint, CoordinatesDTO nextRoutePoint, CoordinatesDTO checkPoint, double maxRadiusKm)
     {
         double distanceKm = CalculateDistance(searchPoint.Latitude, searchPoint.Longitude, checkPoint.Latitude, checkPoint.Longitude); ;
@@ -303,7 +304,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
         return (EarthRadiusMeters * c);
     }
-    
+
     private double CalculateBearing(CoordinatesDTO from, CoordinatesDTO to)
     {
         double lat1 = ToRadians(from.Latitude);
@@ -344,7 +345,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         return null;
     }
 
-    private async Task<string> GetRouteAndDistanceFromAPI(double latitudeStart, double longitudeStart, double latitudeEnd, double longitudeEnd, string jsonFile="Routing_Service_One_Station_response.json")
+    private async Task<string> GetRouteAndDistanceFromAPI(double latitudeStart, double longitudeStart, double latitudeEnd, double longitudeEnd, string jsonFile = "Routing_Service_One_Station_response.json")
     {
         string responseString = "";
         Console.WriteLine("Start Coordinates: " + latitudeStart + ", " + longitudeStart);
@@ -377,17 +378,17 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
     private async Task<string> AlternateResponse(double latitudeStart, double longitudeStart, int alternater, GasStation station)
     {
-            string responseString = string.Empty;
-            if (alternater % 2 == 0)
-            {
-                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng,"No_Routing");
-            }
-            else
-            {
-                responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
-            }
+        string responseString = string.Empty;
+        if (alternater % 2 == 0)
+        {
+            responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng, "No_Routing");
+        }
+        else
+        {
+            responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+        }
 
-            return responseString;
+        return responseString;
     }
 
     private bool IsPLZ(string input)

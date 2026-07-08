@@ -75,6 +75,7 @@ jobs:
     env:
       TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
       OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
     steps:
       - uses: actions/checkout@v5
       - run: dotnet test --configuration Release
@@ -117,6 +118,7 @@ jobs:
           SERVER_NAME=fuelgo.de www.fuelgo.de
           MODE_TYPE=Production
           REDIS_HOST=redis:6379
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           TANK_API_KEY=${{ secrets.TANKAPIKEY }}
           OPENROUTESERVICE_API_KEY=${{ secrets.OPENROUTESERVICEAPIKEY }}
           EOF

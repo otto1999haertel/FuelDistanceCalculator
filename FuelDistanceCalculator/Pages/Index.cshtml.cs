@@ -101,20 +101,20 @@ public class IndexModel : PageModel
 
     public bool SearchExecuted { get; private set; }
 
-    public decimal SavingsToNearestStation { get;  set; }
+    public decimal SavingsToNearestStation { get; set; }
 
     public decimal SavingsToCheapestStation { get; set; }
 
     [BindProperty]
-    public string StationBrand{get; set; }
+    public string StationBrand { get; set; }
 
     [BindProperty]
-    public string DiscountPercentOrAbsolute{get; set; }
+    public string DiscountPercentOrAbsolute { get; set; }
 
-    public string DataSourceDate{get;private set; }
+    public string DataSourceDate { get; private set; }
 
-    public OilPriceChange OilPriceChange {get; set; }   
-    
+    public OilPriceChange OilPriceChange { get; set; }
+
     public SortModeEnum SortMode { get; set; }
 
     private const string StationsSessionKey = "Stations"; // Neuer Schlüssel für vollständige GasStation-Objekte
@@ -182,7 +182,7 @@ public class IndexModel : PageModel
 
     public async Task OnPostSearch()
     {
-        CheapestResultStations = new List<GasStation>(); 
+        CheapestResultStations = new List<GasStation>();
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
@@ -204,12 +204,12 @@ public class IndexModel : PageModel
             {
                 gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
                 () => _geoLocationService.CalculateDistanceFromAPI(coordinates.Latitude, coordinates.Longitude, gasStations.Stations));
-                
+
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 //Prozentualer Rabatt
                 Console.WriteLine($"Discount input: {DiscountPercentOrAbsolute}, Fuel Amount: {FuelAmount}");
-                CheapestResultStations = TankCostService.GetCheapestStation(gasStations.Stations, PricePerKm, FuelAmount,fuelTypeForAPI,StationBrand ,DiscountPercentOrAbsolute);
-                
+                CheapestResultStations = TankCostService.GetCheapestStation(gasStations.Stations, PricePerKm, FuelAmount, fuelTypeForAPI, StationBrand, DiscountPercentOrAbsolute);
+
                 decimal savingsToNearestTemp = 0;
                 decimal savingsToCheapestTemp = 0;
                 TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);
@@ -323,7 +323,7 @@ public class IndexModel : PageModel
 
     public async Task OnPostCalculateAverageCost()
     {
-        CheapestResultStations = new List<GasStation>(); 
+        CheapestResultStations = new List<GasStation>();
         ThreadPool.SetMinThreads(10, 10);
         ThreadPool.GetAvailableThreads(out int workerThreads, out int completionPortThreads);
         Console.WriteLine($"[Calculation Post Thread {Thread.CurrentThread.ManagedThreadId}] Available Worker Threads: {workerThreads}, Completion Port Threads: {completionPortThreads} at {DateTime.Now:HH:mm:ss.fff}");
@@ -402,7 +402,7 @@ public class IndexModel : PageModel
                     SortMode = (string)null,
                     Discount = string.Empty
                 });
-            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService, _oilPriceService,_configuration)
+            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService, _oilPriceService, _configuration)
             {
                 CheapestResultStations = sortedStations,
                 FuelAmount = inputData?.FuelAmount ?? 0,
@@ -495,7 +495,7 @@ public class IndexModel : PageModel
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ADAC_car_data.json");
         Console.WriteLine("Combined Path: " + filePath);
         CarsAndRespectivePricePerkm = await CarDataParser.ParseCarData(filePath);
-        Dictionary<string, string> carsMetaData =  await CarDataParser.GetMetaData(filePath);
+        Dictionary<string, string> carsMetaData = await CarDataParser.GetMetaData(filePath);
         if (carsMetaData != null && carsMetaData.ContainsKey("generated_at"))
         {
             DataSourceDate = carsMetaData["source"];

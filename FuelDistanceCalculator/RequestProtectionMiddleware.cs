@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 
 namespace FuelDistanceCalculator;
@@ -26,7 +25,7 @@ public class RequestProtectionMiddleware : IRequestMiddleWare
         _logger.LogInformation("Client-IP: {IP}, X-Forwarded-For: {XFF}",
             context.Connection.RemoteIpAddress,
             context.Request.Headers["X-Forwarded-For"].FirstOrDefault());
-        
+
         var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         var now = DateTime.UtcNow;
         var timestamps = _ipLog.GetOrAdd(ip, _ => new List<DateTime>());

@@ -6,7 +6,7 @@ using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest;
 
-public class ServiceTestBase
+public abstract class ServiceTestBase
 {
     protected List<GasStation> _fakeGasStationList;
     protected IMarketFuelPriceService _marketFuelPriceService;
@@ -51,7 +51,7 @@ public class ServiceTestBase
         // Registriere IOilPriceService mit OilPriceService
         services.AddHttpClient<IOilPriceService, OilPriceService>();
 
-        services.AddMemoryCache(); 
+        services.AddMemoryCache();
 
         // Erstelle ServiceProvider
         var serviceProvider = services.BuildServiceProvider();

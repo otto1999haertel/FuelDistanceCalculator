@@ -10,7 +10,7 @@ public class ContactModel : PageModel
     public string Name => ContactInfo.Name;
 
     [BindProperty]
-    public bool  IsProduction { get; private set; }
+    public bool IsProduction { get; private set; }
 
     public ContactModel(ILogger<ContactModel> logger, IConfiguration configuration)
     {
@@ -22,7 +22,7 @@ public class ContactModel : PageModel
 
     public void OnGet()
     {
-            // Setzen des Namens in ViewData, damit er im Layout verfügbar ist
-            ViewData["ContactName"] = ContactInfo.Name;
+        // Setzen des Namens in ViewData, damit er im Layout verfügbar ist
+        ViewData["ContactName"] = ContactInfo.Name;
     }
 }

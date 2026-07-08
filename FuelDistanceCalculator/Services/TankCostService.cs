@@ -16,7 +16,7 @@ public static class TankCostService
         SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
     }
 
-    public static List<GasStation> GetCheapestStation(List<GasStation> gasStations,decimal pricePerKm, decimal fuelAmount, string fuelTypeForAPI, string stationBrand="", string discountPercentOrAbsolute="")
+    public static List<GasStation> GetCheapestStation(List<GasStation> gasStations, decimal pricePerKm, decimal fuelAmount, string fuelTypeForAPI, string stationBrand = "", string discountPercentOrAbsolute = "")
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
         if (string.IsNullOrEmpty(discountPercentOrAbsolute))

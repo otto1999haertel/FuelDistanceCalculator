@@ -2,7 +2,7 @@ namespace FuelDistanceCalculator.Model;
 
 public class OilPriceChange
 {
-    private static readonly System.Globalization.CultureInfo _de = 
+    private static readonly System.Globalization.CultureInfo _de =
     new System.Globalization.CultureInfo("de-DE");
     public double Day { get; private set; }
     public double Week { get; private set; }
@@ -45,11 +45,11 @@ public class OilPriceChange
     public string DisplayCurrentPriceWithCurrency()
     {
         string displayValue = CurrentPrice.ToString().Replace('.', ',');
-        if(displayValue.Split(',').Length == 1)
+        if (displayValue.Split(',').Length == 1)
         {
             displayValue += ",00";
         }
-        else if(displayValue.Split(',')[1].Length == 1)
+        else if (displayValue.Split(',')[1].Length == 1)
         {
             displayValue += "0";
         }

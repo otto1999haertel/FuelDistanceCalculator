@@ -16,8 +16,8 @@ builder.Services.AddSingleton<FuelPriceService>(provider =>
 builder.Services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
 
 var env = builder.Environment;
-string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")}";
-Console.WriteLine("Redis Connection String: " + redisConnectionString); 
+string redisConnectionString = $"{Environment.GetEnvironmentVariable("REDIS_HOST")},password={Environment.GetEnvironmentVariable("REDIS_PASSWORD")}";
+Console.WriteLine("Redis Connection String: " + redisConnectionString);
 
 // Registriere Redis für Distributed Caching
 builder.Services.AddStackExchangeRedisCache(options =>

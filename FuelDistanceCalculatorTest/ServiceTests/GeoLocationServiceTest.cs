@@ -205,7 +205,7 @@ public class GeoLocationServiceTest : ServiceTestBase
         await _redisDb.HashSetAsync(cacheKey, new[]
         {
                 new HashEntry("lat", 53.551.ToString("F3", CultureInfo.InvariantCulture)),
-                new HashEntry("lon", 9.993.ToString("F3", CultureInfo.InvariantCulture)) 
+                new HashEntry("lon", 9.993.ToString("F3", CultureInfo.InvariantCulture))
             });
 
         int requestCount = 0;
@@ -228,7 +228,7 @@ public class GeoLocationServiceTest : ServiceTestBase
         Assert.That(result.Longitude, Is.EqualTo(9.993).Within(0.000001));
         Assert.That(requestCount, Is.EqualTo(0), "API wurde aufgerufen trotz Cache!");
     }
-    
+
     [Test]
     public async Task GetDistanceTest()
     {

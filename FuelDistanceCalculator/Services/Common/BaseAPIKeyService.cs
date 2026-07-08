@@ -2,5 +2,5 @@ namespace FuelDistanceCalculator.Services.Common;
 
 public abstract class BaseAPIKeyService : BaseService
 {
-    protected string APIKey{get; set; }
+    protected string APIKey { get; set; }
 }

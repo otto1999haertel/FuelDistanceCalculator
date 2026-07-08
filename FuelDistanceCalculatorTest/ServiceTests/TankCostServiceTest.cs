@@ -16,7 +16,7 @@ public class TankCostServiceTest : ServiceTestBase
         //Act
         List<GasStation> result = TankCostService.GetCheapestStation(_fakeGasStationList, pricePerKilometer, fuelAmount, "diesel");
 
-        TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
+        TestContext.Out.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
         Assert.That(CheckOrderAscendingFuelAmountZero(result), Is.True);
         Assert.That(result.Count > 0);
     }
@@ -27,11 +27,11 @@ public class TankCostServiceTest : ServiceTestBase
         // Arrange
         decimal fuelAmount = 50m; // Beispiel: 50 Liter
         decimal pricePerKilometer = 0.25m; // Beispiel: 0,20 Euro pro Kilometer
-         int originalCount = _fakeGasStationList.Count;
+        int originalCount = _fakeGasStationList.Count;
         //Act
         List<GasStation> result = TankCostService.GetCheapestStation(_fakeGasStationList, fuelAmount, pricePerKilometer, "diesel");
 
-        TestContext.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
+        TestContext.Out.WriteLine("Test: Anzahl der zurückgegebenen Tankstellen: " + result.Count);
         Assert.That(result.Count.Equals(originalCount), Is.True);
         Assert.That(CheckOrderByTotalCost(result), Is.True);
     }
@@ -102,20 +102,20 @@ public class TankCostServiceTest : ServiceTestBase
                             .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
-                if (fuelAmount ==0 && !DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal))
+                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal))
                 {
                     Assert.That(station.FuelTypePrice.Equals(expectedPrice));
                 }
                 else if (decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
                 {
-                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m+ expectedPrice*fuelAmount - discountDecimal;
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
                     Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
                 else if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out discountDecimal))
                 {
                     expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
                     Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));
-                }                
+                }
                 Assert.That(station.DiscountApplied.Equals(validDiscount));
             }
             else

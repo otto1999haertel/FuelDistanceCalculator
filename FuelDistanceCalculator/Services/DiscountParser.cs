@@ -6,9 +6,9 @@ public static class DiscountParser
 {
     public static bool TryParseDiscountPercent(string input, out decimal discountValuePercent)
     {
-        discountValuePercent=0;
+        discountValuePercent = 0;
         if (string.IsNullOrWhiteSpace(input))
-        { 
+        {
             return false;
         }
 

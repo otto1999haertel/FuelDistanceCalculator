@@ -69,7 +69,7 @@ public class KeyTest
         Assert.That(!fakeKeyPrefixes.Any(prefix =>
             openrKey?.ToLower().Contains(prefix) ?? false),
             $"OpenRouteServiceApiKey appears to be a fake/test key in CI: '{openrKey}'");
-        
+
         Assert.That(!fakeKeyPrefixes.Any(prefix =>
             redisPassword?.ToLower().Contains(prefix) ?? false),
             $"REDIS_PASSWORD appears to be a fake/test password in CI: '{redisPassword}'");

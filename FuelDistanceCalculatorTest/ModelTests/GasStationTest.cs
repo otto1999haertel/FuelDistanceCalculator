@@ -111,8 +111,8 @@ public class GasStationTest : ServiceTestBase
     }
 
     [Test]
-    [TestCase(1,"+1,00 €")]
-    [TestCase(-1,"-1,00 €")]
+    [TestCase(1, "+1,00 €")]
+    [TestCase(-1, "-1,00 €")]
     [TestCase(1.2, "+1,20 €")]
     [TestCase(-1.2, "-1,20 €")]
     [TestCase(1.23, "+1,23 €")]

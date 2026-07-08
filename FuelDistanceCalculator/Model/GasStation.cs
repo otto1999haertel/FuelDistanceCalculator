@@ -79,11 +79,11 @@ public class GasStation
     [JsonProperty("updateAmount")]
     public decimal? UpdateAmount { get; set; }
 
-    public bool IsRoutingDistanceCalculated {get;set;} = false;
+    public bool IsRoutingDistanceCalculated { get; set; } = false;
 
-    public bool DiscountApplied {get; private set; } = false;
+    public bool DiscountApplied { get; private set; } = false;
 
-    public decimal CalculateTotalCostDoubleWayWithDiscountGreaterOne(decimal fuelAmount, decimal pricePerKm, string brand ="",decimal discountAmount = 0)
+    public decimal CalculateTotalCostDoubleWayWithDiscountGreaterOne(decimal fuelAmount, decimal pricePerKm, string brand = "", decimal discountAmount = 0)
     {
         if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
         {
@@ -93,7 +93,7 @@ public class GasStation
         decimal dist = (decimal)Dist.Value;
         decimal fuelCost = (_fuelPrice ?? 0) * fuelAmount;
         decimal travelCost = pricePerKm * dist * 2m;
-        if(discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
+        if (discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
         {
             TotalCalculatedCoast = fuelCost + travelCost - discountAmount;
             DiscountApplied = true;
@@ -121,9 +121,9 @@ public class GasStation
     public void SetPriceWithPercentageDiscount(string fuelType, string brand, decimal discountPercent)
     {
         SetPrice(fuelType);
-        if(Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discountPercent > 0)
+        if (Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) && FuelTypePrice.HasValue && discountPercent > 0)
         {
-            if(discountPercent >0 && discountPercent < 1)
+            if (discountPercent > 0 && discountPercent < 1)
             {
                 Console.WriteLine($"Applying discount of {discountPercent}% for brand {brand} on station {Name}");
                 decimal discountAmount = FuelTypePrice.Value * discountPercent;
@@ -153,7 +153,7 @@ public class GasStation
                      .FirstOrDefault();
     }
 
-    public void SetUpdateAmount (string fuelType)
+    public void SetUpdateAmount(string fuelType)
     {
         UpdateAmount = Fuels?.Where(x => x.Name.Equals(fuelType, StringComparison.OrdinalIgnoreCase))
                      .Select(x => (decimal?)x.LastChange?.Amount)
@@ -162,10 +162,10 @@ public class GasStation
 
     public string DisplayUpdateAmount()
     {
-        if(UpdateAmount.HasValue)
+        if (UpdateAmount.HasValue)
         {
-            string signValue=  UpdateAmount.Value > 0 ? $"+{UpdateAmount.Value:F2} €" : $"{UpdateAmount.Value:F2} €";
-            return signValue.Replace(".",",");
+            string signValue = UpdateAmount.Value > 0 ? $"+{UpdateAmount.Value:F2} €" : $"{UpdateAmount.Value:F2} €";
+            return signValue.Replace(".", ",");
         }
         else
         {

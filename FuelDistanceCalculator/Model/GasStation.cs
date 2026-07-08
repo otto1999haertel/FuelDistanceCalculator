@@ -106,7 +106,7 @@ public class GasStation
         TotalCalculatedCoast = Math.Round(TotalCalculatedCoast, 2, MidpointRounding.AwayFromZero);
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
-                          $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F0}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
+                          $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F1}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
 
         return TotalCalculatedCoast;
     }

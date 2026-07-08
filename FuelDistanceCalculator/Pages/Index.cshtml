@@ -114,16 +114,16 @@
                                         </div>
                                     </div>
 
-                                    <!-- Fahrzeugtyp & Kosten pro KM -->
+                                    <!-- Fahrzeug & Kosten pro KM -->
                                     <div class="row gx-3">
                                         <div class="col-md-6 mb-3 mb-md-0 position-relative">
                                             <label for="CarType" class="section-label">
-                                                Fahrzeugtyp
+                                                Fahrzeug
                                                 <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
                                                    target="_blank" class="small fw-normal">
                                                     (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
                                             </label>
-                                            <input type="text" class="form-control" id="CarType" placeholder="Fahrzeugtyp suchen..."
+                                            <input type="text" class="form-control" id="CarType" placeholder="Fahrzeug suchen..."
                                                    list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
                                             <div id="suggestions" class="suggestions-box"></div>
                                         </div>
@@ -131,7 +131,7 @@
                                             <label for="PricePerKm" class="section-label">
                                                 Kosten pro Kilometer (€)
                                                 <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
-                                                      title="Durchschnittliche Kosten pro Kilometer. Für Vorschläge nutze die Fahrzeugtypsuche.">ⓘ</span>
+                                                      title="Durchschnittliche Kosten pro Kilometer. Für Vorschläge nutze die Fahrzeugsuche.">ⓘ</span>
                                             </label>
                                             <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required
                                                    asp-for="PricePerKm" value="@Model.PricePerKm" step="any" min="0.01" />
@@ -563,7 +563,7 @@
     let locationIndex = @Model.NamePlaces.Count;
 
     function updateFuel(value) {
-        document.getElementById('fuelAmountValue').textContent = value + ' l';
+        document.getElementById('fuelAmountValue').textContent = String(value).replace('.', ',') + ' l';
     }
 
     function updateMax(value) {
@@ -731,7 +731,7 @@
                 }
             });
             //Radius Standort 1 Vergleich outputRadius0  RadiusPlace0Lbl
-            document.getElementById('RadiusPlace0')?.addEventListener('mouseup', function () {
+            document.getElementById('RadiusPlace0')?.addEventListener('change', function () {
                 localStorage.setItem("FirstComparePlaceRadius", this.value.trim());
             });
 
@@ -746,7 +746,7 @@
                 }
             });
             //Radius Standort 2 Vergleich outputRadius1  RadiusPlace1Lbl
-            document.getElementById('RadiusPlace1')?.addEventListener('mouseup', function () {
+            document.getElementById('RadiusPlace1')?.addEventListener('change', function () {
                 localStorage.setItem("SecondComparePlaceRadius", this.value.trim());
             });
 
@@ -836,7 +836,6 @@
             const fuelValue = @Model.FuelAmount;
             if (fuelRange) {
                 fuelRange.value = fuelValue;
-                document.getElementById('fuelAmountValue').textContent = fuelValue + ' l';
             }
 
             // In DOMContentLoaded hinzufügen:
@@ -904,6 +903,8 @@
                     secondComparePlaceRadiusLbl.textContent = SecondComparePlaceRadiusInput + ' km';
                 }
             }
+
+            updateFuel("@Model.FuelAmount");
             
         });
     document.addEventListener('input', function (e) {

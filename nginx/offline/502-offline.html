@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FuelGo - Kurze Pause</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Light Mode - Warme Paper-Farben (aus FuelGo Theme) */
+            --primary-color: #c77d58;
+            --accent-color: #d4a574;
+            --bg-color: #f8f5f0;
+            --text-color: #3d3328;
+            --navbar-bg: #fdfcf9;
+            --border-color: #e6dfd5;
+            --shadow-neumorphic:
+                0 2px 4px rgba(61, 51, 40, 0.06),
+                0 1px 2px rgba(61, 51, 40, 0.04);
+            --icon-bg: rgba(199, 125, 88, 0.10);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #d4a574;
+                --accent-color: #c77d58;
+                --bg-color: #2b2520;
+                --text-color: #e8dcc8;
+                --navbar-bg: #3d3328;
+                --border-color: #5c4f3f;
+                --shadow-neumorphic:
+                    0 2px 4px rgba(0, 0, 0, 0.3),
+                    0 1px 2px rgba(0, 0, 0, 0.2);
+                --icon-bg: rgba(212, 165, 116, 0.15);
+            }
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            background-color: var(--navbar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-neumorphic);
+            padding: 2.5rem 2rem;
+        }
+
+        .icon-wrap {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--icon-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 1.8rem;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
+            color: var(--text-color);
+        }
+
+        p {
+            color: var(--text-color);
+            opacity: 0.75;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        p + p {
+            margin-top: 0.6rem;
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.85rem 2rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .retry-btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            opacity: 0.55;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="brand">FuelGo</div>
+        <h1>Kurz mal Luft holen …</h1>
+        <p>Unser Server hat gerade technische Probleme und ist im Moment nicht erreichbar.</p>
+        <p>Entschuldige für die Unanehmlichkeiten.</p>
+        <button onclick="window.location.reload()" class="retry-btn">
+             Seite neu laden
+        </button>
+        <div class="footer-note">Danke für deine Geduld – wir sind gleich zurück.</div>
+    </div>
+</body>
+</html>

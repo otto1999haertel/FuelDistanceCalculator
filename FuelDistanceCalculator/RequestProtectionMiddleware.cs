@@ -22,6 +22,14 @@ public class RequestProtectionMiddleware : IRequestMiddleWare
 
     public async Task InvokeAsync(HttpContext context)
     {
+        var path = context.Request.Path.Value?.ToLower() ?? "";
+
+        if (path.Contains("/error"))
+        {
+            await _next(context);
+            return;
+        }
+
         _logger.LogInformation("Client-IP: {IP}, X-Forwarded-For: {XFF}",
             context.Connection.RemoteIpAddress,
             context.Request.Headers["X-Forwarded-For"].FirstOrDefault());
@@ -36,7 +44,9 @@ public class RequestProtectionMiddleware : IRequestMiddleWare
             if (timestamps.Count >= MAX_REQUESTS_PER_WINDOW)
             {
                 _logger.LogWarning("Rate limit exceeded: {IP} - {Count} requests in {Window}s", ip, timestamps.Count, TIME_WINDOW.TotalSeconds);
-                context.Response.StatusCode = 429;
+
+                // Status setzen
+                context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 context.Response.Headers["Retry-After"] = TIME_WINDOW.TotalSeconds.ToString();
                 return;
             }

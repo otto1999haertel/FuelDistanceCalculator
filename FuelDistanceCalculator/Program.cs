@@ -104,6 +104,8 @@ app.UseAntiforgery();
 
 app.UseSession();
 
+app.UseStatusCodePagesWithReExecute("/Error{0}");
+
 // Eigene Middleware für Rate Limiting
 app.UseMiddleware<RequestProtectionMiddleware>();
 

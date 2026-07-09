@@ -1,0 +1,30 @@
+@page
+@model ErrorModel
+@{
+ViewData["Title"] = "Fehler";
+}
+
+<div class="content">
+    <div class="hero-section text-center">
+        <h1 class="display-5" id="ErrorHeading">Etwas ist schiefgelaufen</h1>
+        <p>Unser Server hat ein Problem festgestellt. Keine Sorge – wir kümmern uns darum.</p>
+    </div>
+<div class="container" style="max-width: 720px;">
+    <div class="card main-card">
+        <div class="card-body text-center">
+            <h2 class="mb-3" id="ErrorExplenation">Interner Serverfehler</h2>
+            <p class="mb-4" style="opacity: 0.8;">
+                Fehler beim Verarbeiten der Anfrage.
+                Bitte versuche es später erneut.
+            <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/" class="btn btn-primary">
+                    Zur Startseite
+                </a>
+                <button onclick="location.reload()" class="btn btn-primary">
+                    Seite neu laden
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

@@ -1,3 +1,4 @@
+using FuelDistanceCalculator;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -56,6 +57,17 @@ public abstract class PageTestBase
             });
 
         _client = _factory.CreateClient();
+    }
+
+    [SetUp]
+    public void ResetRateLimiterBeforeEachTest()
+    {
+        var ipLogField = typeof(RequestProtectionMiddleware)
+            .GetField("_ipLog", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        var ipLog = (System.Collections.Concurrent.ConcurrentDictionary<string, List<DateTime>>)ipLogField?.GetValue(null);
+
+        ipLog?.Clear();
     }
 
     [TearDown]

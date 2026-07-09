@@ -1,0 +1,31 @@
+@page "/Error429"
+@model Error429Model
+@{
+ViewData["Title"] = "Fehler";
+HttpContext.Response.StatusCode = 429;
+}
+
+<div class="content">
+    <div class="hero-section text-center">
+        <h1 class="display-5" id="ErrorHeading">Etwas ist schiefgelaufen</h1>
+        <p>Unser Server hat ein Problem festgestellt.</p>
+    </div>
+<div class="container" style="max-width: 720px;">
+    <div class="card main-card">
+        <div class="card-body text-center">
+            <h2 class="mb-3" id="ErrorExplenation">Zu viele Anfragen</h2>
+            <p class="mb-4" style="opacity: 0.8;">
+                Zu viele Anfragen wurden in kurzer Zeit an unseren Server gesendet.
+                Bitte versuche es später erneut.
+            <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/" class="btn btn-primary">
+                    Zur Startseite
+                </a>
+                <button onclick="location.reload()" class="btn btn-primary">
+                    Seite neu laden
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

@@ -6,7 +6,6 @@ namespace FuelDistanceCalculatorE2ETest;
 
 [Parallelizable(ParallelScope.Self)]
 [TestFixture]
-[Ignore("E2E-Tests sind derzeit deaktiviert, da die Testumgebung nicht verfügbar ist.")]
 public class HomepageTests : PageTest
 {
     private static readonly string BaseUrl =
@@ -19,6 +18,22 @@ public class HomepageTests : PageTest
             IgnoreHTTPSErrors = true, // wegen self-signed Zertifikaten in der E2E-Umgebung
             BaseURL = BaseUrl
         };
+    }
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        await Page.GotoAsync("/");
+
+        var cookieButton = Page.GetByRole(AriaRole.Button, new()
+        {
+            Name = "Ablehnen"
+        });
+
+        if (await cookieButton.IsVisibleAsync())
+        {
+            await cookieButton.ClickAsync();
+        }
     }
 
     [Test]
@@ -50,19 +65,38 @@ public class HomepageTests : PageTest
     {
         await Page.GotoAsync("/");
 
-        await Page.Locator("label[for='mode_man']")
-            .ClickAsync();
+        var cookie = Page.GetByRole(AriaRole.Button, new()
+        {
+            Name = "Ablehnen"
+        });
+
+        if (await cookie.IsVisibleAsync())
+        {
+            await cookie.ClickAsync();
+        }
+
+
+        var manualTab = Page.Locator("label[for='mode_man']")
+            .First;
+
+        await Expect(manualTab)
+            .ToBeVisibleAsync();
+
+        await manualTab.ClickAsync();
+
+
+        await Expect(Page.Locator("#mode_man"))
+            .ToBeCheckedAsync();
+
 
         await Expect(Page.Locator("#manualInputFields"))
             .ToBeVisibleAsync();
 
-        await Expect(Page.Locator("#autoInputFields"))
-            .ToBeHiddenAsync();
 
-        await Expect(Page.Locator("#FirstComparePlace"))
+        await Expect(Page.GetByText("Standort 1"))
             .ToBeVisibleAsync();
 
-        await Expect(Page.Locator("#SecondComparePlace"))
+        await Expect(Page.GetByText("Standort 2"))
             .ToBeVisibleAsync();
     }
 
@@ -72,8 +106,8 @@ public class HomepageTests : PageTest
         await Page.GotoAsync("/");
 
         // Standort eingeben (reine Client-Interaktion, kein Backend-Call nötig)
-        await Page.Locator("#generalLocation").FillAsync("01067 Dresden");
-        await Expect(Page.Locator("#generalLocation")).ToHaveValueAsync("01067 Dresden");
+        await Page.Locator("#generalLocationInput").FillAsync("01067 Dresden");
+        await Expect(Page.Locator("#generalLocationInput")).ToHaveValueAsync("01067 Dresden");
 
         // Radius-Slider bewegen und prüfen, dass die Anzeige sich aktualisiert
         await Page.Locator("#generalRadius").FillAsync("20");

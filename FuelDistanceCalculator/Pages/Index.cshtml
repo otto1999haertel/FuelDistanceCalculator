@@ -220,7 +220,7 @@
                             <div class="mb-3">
                                 <label for="generalLocation" class="section-label">Standort</label>
                                 <div class="input-group">
-                                    <input type="text" id="generalLocation" class="form-control"
+                                    <input type="text" id="generalLocationInput" class="form-control"
                                            placeholder="PLZ, Straße oder Ort eingeben" asp-for="Place" value="@Model.Place">
                                     <button id="geoButton" class="btn btn-primary location-btn" type="button" title="Aktuellen Standort verwenden">
                                         <img src="location.png" alt="Standort">
@@ -710,7 +710,7 @@
             });
 
             //Standort
-            document.getElementById('generalLocation')?.addEventListener('blur', function () {
+            document.getElementById('generalLocationInput')?.addEventListener('blur', function () {
                 this.value = this.value.trim();
                 if(isPLZ(this.value)){
                     localStorage.setItem("generalLocation", this.value);
@@ -858,7 +858,7 @@
 
             const generalLocationInput = localStorage.getItem("generalLocation");
             if(generalLocationInput){
-                const generalLocationField = document.getElementById("generalLocation");
+                const generalLocationField = document.getElementById("generalLocationInput");
                 if(generalLocationField){
                     generalLocationField.value = generalLocationInput;
                 }
@@ -1016,8 +1016,8 @@
         if (response.ok) {
             const result = await response.json();
             if (result.success && result.address) {
-                if (document.getElementById("generalLocation")) {
-                    document.getElementById("generalLocation").value = result.address;
+                if (document.getElementById("generalLocationInput")) {
+                    document.getElementById("generalLocationInput").value = result.address;
                     localStorage.removeItem("generalLocation")
                 }
                 if (document.getElementById("GeoStandort")) {

@@ -27,28 +27,30 @@ jobs:
             -keyout e2e-certs/cert.key -out e2e-certs/cert.crt \
             -days 1 -subj "/CN=localhost"
 
-      - name: Start E2E stack
-        run: |
-          docker compose -f docker-compose.e2e.yml up -d --build db redis nginx fuelgo-webapp
-
-      - name: Wait for app to be ready
-        run: |
-          timeout 60 bash -c '
-            until curl -sk https://localhost --resolve localhost:443:127.0.0.1 -o /dev/null; do
-              echo "Waiting for app..."
-              sleep 2
-            done
-          '
-
       - name: Run E2E tests
-        run: docker compose -f docker-compose.e2e.yml run --rm e2e-tests
+        run: |
+          docker compose \
+            --env-file .env.e2e \
+            -f docker-compose.e2e.yml \
+            up \
+            --build \
+            --abort-on-container-exit \
+            --exit-code-from e2e-tests
 
-      - name: Upload test results
+      - name: Publish E2E Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          name: e2e-results
-          path: e2e-results/
+          files: |
+            **/*.trx
+
+      - name: Upload E2E artifacts
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: e2e-results
+            path: |
+              **/TestResults/*.trx
 
       - name: Show logs on failure
         if: failure()
@@ -56,3 +58,5 @@ jobs:
 
       - name: Teardown
         if: always()
+        run: |
+          docker compose -f docker-compose.e2e.yml down -v

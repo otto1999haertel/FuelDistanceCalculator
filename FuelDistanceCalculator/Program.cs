@@ -107,7 +107,11 @@ app.UseSession();
 app.UseStatusCodePagesWithReExecute("/Error{0}");
 
 // Eigene Middleware für Rate Limiting
-app.UseMiddleware<RequestProtectionMiddleware>();
+var isE2E = builder.Configuration["MODE_TYPE"] == "E2E";
+if (!isE2E)
+{
+    app.UseMiddleware<RequestProtectionMiddleware>();
+}
 
 app.UseAuthorization();
 

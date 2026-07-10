@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FuelDistanceCalculator", "F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuelDistanceCalculatorTests", "FuelDistanceCalculatorTest\FuelDistanceCalculatorTests.csproj", "{6D6B1020-8452-4C8D-86B7-59E50C19EAFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuelDistanceCalculatorE2ETest", "FuelDistanceCalculatorE2ETest\FuelDistanceCalculatorE2ETest.csproj", "{56F65F05-43D1-45A2-951C-766F1521A038}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

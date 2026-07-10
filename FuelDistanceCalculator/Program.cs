@@ -112,6 +112,10 @@ if (!isE2E)
 {
     app.UseMiddleware<RequestProtectionMiddleware>();
 }
+else
+{
+    Console.WriteLine("E2E-Umgebung erkannt: RequestProtectionMiddleware wird deaktiviert.");
+}
 
 app.UseAuthorization();
 

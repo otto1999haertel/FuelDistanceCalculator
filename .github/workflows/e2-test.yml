@@ -45,12 +45,12 @@ jobs:
             **/*.trx
 
       - name: Upload E2E artifacts
-          if: always()
-          uses: actions/upload-artifact@v4
-          with:
-            name: e2e-results
-            path: |
-              **/TestResults/*.trx
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            **/TestResults/*.trx
 
       - name: Show logs on failure
         if: failure()

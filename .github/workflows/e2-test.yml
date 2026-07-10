@@ -1,0 +1,56 @@
+name: E2E Tests
+
+on:
+  #pull_request:
+  #  branches:
+  #    - master
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      SERVER_NAME: localhost
+      MODE_TYPE: Testing
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Generate self-signed cert for E2E
+        run: |
+          mkdir -p e2e-certs
+          openssl req -x509 -newkey rsa:2048 -nodes \
+            -keyout e2e-certs/cert.key -out e2e-certs/cert.crt \
+            -days 1 -subj "/CN=localhost"
+
+      - name: Start E2E stack
+        run: |
+          docker compose -f docker-compose.e2e.yml up -d --build db redis nginx fuelgo-webapp
+
+      - name: Wait for app to be ready
+        run: |
+          timeout 60 bash -c '
+            until curl -sk https://localhost --resolve localhost:443:127.0.0.1 -o /dev/null; do
+              echo "Waiting for app..."
+              sleep 2
+            done
+          '
+
+      - name: Run E2E tests
+        run: docker compose -f docker-compose.e2e.yml run --rm e2e-tests
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: e2e-results/
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.e2e.yml logs
+
+      - name: Teardown
+        if: always()

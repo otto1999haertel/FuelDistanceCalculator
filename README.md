@@ -28,6 +28,15 @@ For a successfull connection to the gas station price service you have to create
 -  manual execuion: sudo docker compose --env-file .env.server up --build -d  
 - .env.server (with API Keys) need to be in FuelDistanceCalculator
 
+# E2E test execution  
+- docker compose \
+ --env-file .env.e2e \
+ -f docker-compose.e2e.yml \
+ up \
+ --build \
+ --abort-on-container-exit \
+ --exit-code-from e2e-tests
+
 # Update certificate with certbot automatically via deployment hook for certbot
 - specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  
 -- delete installer = nginx  

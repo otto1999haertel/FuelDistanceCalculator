@@ -141,10 +141,4 @@ public class HomepageTests : PageTest
             Assert.Inconclusive("Kein 'Super E10'-Label gefunden - Text in FuelTypeHelper.FuelTypeNames prüfen.");
         }
     }
-
-    [Test]
-    public async Task ShouldFailTest()
-    {
-        Assert.Fail("Dies ist ein absichtlich fehlschlagender Test, um die Testinfrastruktur zu überprüfen.");
-    }
 }

@@ -98,6 +98,9 @@ public class HomepageTests : PageTest
 
         await Expect(Page.GetByText("Standort 2"))
             .ToBeVisibleAsync();
+
+        await Expect(Page.GetByText("Tankmenge"))
+            .ToBeHiddenAsync();
     }
 
     [Test]

@@ -54,9 +54,8 @@ jobs:
 
       - name: Show logs on failure
         if: failure()
-        run: docker compose -f docker-compose.e2e.yml logs
+        run: docker compose --env-file .env.e2e -f docker-compose.e2e.yml logs
 
       - name: Teardown
         if: always()
-        run: |
-          docker compose -f docker-compose.e2e.yml down -v
+        run: docker compose --env-file .env.e2e -f docker-compose.e2e.yml down -v

@@ -36,7 +36,7 @@ services:
         MODE_TYPE: ${MODE_TYPE}
     environment:
       - MODE_TYPE=${MODE_TYPE}
-      - ASPNETCORE_ENVIRONMENT=${MODE_TYPE}
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Username=postgres;Password=example;Database=FuelDatabase
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PASSWORD=${REDIS_PASSWORD}

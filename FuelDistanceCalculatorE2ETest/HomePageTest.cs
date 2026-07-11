@@ -6,8 +6,36 @@ namespace FuelDistanceCalculatorE2ETest;
 
 [Parallelizable(ParallelScope.Self)]
 [TestFixture]
-public class HomepageTests : E2EBaseTest
+public class HomepageTests : PageTest
 {
+    private static readonly string BaseUrl =
+        Environment.GetEnvironmentVariable("BASE_URL") ?? "https://localhost";
+
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        return new BrowserNewContextOptions
+        {
+            IgnoreHTTPSErrors = true, // wegen self-signed Zertifikaten in der E2E-Umgebung
+            BaseURL = BaseUrl
+        };
+    }
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        await Page.GotoAsync("/");
+
+        var cookieButton = Page.GetByRole(AriaRole.Button, new()
+        {
+            Name = "Ablehnen"
+        });
+
+        if (await cookieButton.IsVisibleAsync())
+        {
+            await cookieButton.ClickAsync();
+        }
+    }
+
     [Test]
     public async Task Homepage_Should_Load_Successfully()
     {

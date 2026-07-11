@@ -144,4 +144,27 @@ public class HomepageTests : PageTest
             Assert.Inconclusive("Kein 'Super E10'-Label gefunden - Text in FuelTypeHelper.FuelTypeNames prüfen.");
         }
     }
+
+    [Test]
+    public async Task User_Can_Set_MaxFuelAmount_And_Change_Slider()
+    {
+        await Page.GotoAsync("/");
+
+        // 1. Maximale Tankmenge setzen
+        await Page.Locator("#MaximumFuelAmount").FillAsync("40");
+
+        // 2. Fokus verlassen, damit das 'blur'-Event greift
+        await Page.Locator("#MaximumFuelAmount").PressAsync("Tab");
+
+        // Sanity-Check: Slider-Maximum wurde tatsächlich übernommen
+        await Expect(Page.Locator("#FuelAmountRange")).ToHaveAttributeAsync("max", "40");
+
+        // 3. Slider auf die Hälfte des neuen Maximums (20) setzen.
+        await Page.Locator("#FuelAmountRange").EvaluateAsync(
+            "el => { el.value = '20'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+        );
+
+        // 4. Prüfen, dass das Label exakt die Hälfte anzeigt
+        await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("20 l");
+    }
 }

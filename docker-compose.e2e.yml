@@ -45,7 +45,7 @@ services:
     networks:
       - fuel-network
 
-  e2e-tests:
+  e2e-test-client:
     build:
       context: ./FuelDistanceCalculatorE2ETest
       dockerfile: Dockerfile

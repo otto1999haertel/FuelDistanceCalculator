@@ -35,7 +35,7 @@ jobs:
             up \
             --build \
             --abort-on-container-exit \
-            --exit-code-from e2e-tests
+            --exit-code-from e2e-test-client
 
       - name: Publish E2E Test Results
         if: always()

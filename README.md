@@ -35,7 +35,7 @@ For a successfull connection to the gas station price service you have to create
  up \
  --build \
  --abort-on-container-exit \
- --exit-code-from e2e-tests  
+ --exit-code-from e2e-test-client  
 - for local test execution of E2E tests, change certification path of .env.e2e to those of .env.local
 
 # Update certificate with certbot automatically via deployment hook for certbot

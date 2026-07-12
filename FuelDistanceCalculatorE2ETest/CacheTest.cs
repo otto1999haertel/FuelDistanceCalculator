@@ -65,4 +65,49 @@ public class CacheTest : E2EBaseTest
 
         await Expect(maxFuelInput).ToHaveValueAsync("40");
     }
+
+    [Test]
+    public async Task SettingUpCompareLoctionsShouldCachePLZandRadius_Test()
+    {
+        await Page.GotoAsync("/");
+
+        ClickCompareLocationsTab();
+
+        var standort1Input = Page.Locator("#FirstComparePlace");
+
+        var standort1Radius = Page.Locator("#RadiusPlace0");
+
+        await standort1Input.FillAsync("01067");
+
+        await standort1Radius.FillAsync("15");
+
+        var standort2Input = Page.Locator("#SecondComparePlace");
+
+        var standort2Radius = Page.Locator("#RadiusPlace1");
+
+        await standort2Input.FillAsync("01069");
+
+        await standort2Radius.FillAsync("20");
+
+        await Page.ReloadAsync();
+
+        ClickCompareLocationsTab();
+
+        await Expect(standort1Input).ToHaveValueAsync("01067");
+        await Expect(standort1Radius).ToHaveValueAsync("15");
+        await Expect(standort2Input).ToHaveValueAsync("01069");
+        await Expect(standort2Radius).ToHaveValueAsync("20");
+
+    }
+
+    private async Task ClickCompareLocationsTab()
+    {
+        var manualTab = Page.Locator("label[for='mode_man']")
+            .First;
+
+        await Expect(manualTab)
+            .ToBeVisibleAsync();
+
+        await manualTab.ClickAsync();
+    }
 }

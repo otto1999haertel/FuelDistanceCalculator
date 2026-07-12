@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace FuelDistanceCalculatorE2ETest;
 
-public class LocalStorageTest : E2EBaseTest
+public class CacheTest : E2EBaseTest
 {
     [Test]
     public async Task Fuel_Should_Be_Cached_Test()
@@ -48,5 +48,21 @@ public class LocalStorageTest : E2EBaseTest
         await expendingSettingsButton.ClickAsync();
 
         await Expect(priceInput).ToHaveValueAsync("1.25");
+    }
+
+    [Test]
+    public async Task MaxFuelAmount_Should_Be_Cached_After_Reload_Test()
+    {
+        await Page.GotoAsync("/");
+
+        var maxFuelInput = Page.Locator("#MaximumFuelAmount");
+
+        await maxFuelInput.FillAsync("40");
+
+        await maxFuelInput.PressAsync("Tab");
+
+        await Page.ReloadAsync();
+
+        await Expect(maxFuelInput).ToHaveValueAsync("40");
     }
 }

@@ -82,4 +82,6 @@ public class OptimalSearchTest : E2EBaseTest
         Assert.That(summaryText, Does.Match(regexPattern),
             $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{summaryText}'");
     }
+
+    //TODO Add test for displaying and checking details for station
 }

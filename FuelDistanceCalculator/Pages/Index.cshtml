@@ -427,13 +427,13 @@
                             <div class="text-center mt-3 mb-3">
                                 <button type="button" id="addStandort" class="btn btn-primary"
                                         @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
-                                    @(Model.NamePlaces.Count >= 4 ? "✓ Maximale Standorte erreicht" : "+ Standort hinzufügen")
+                                    @(Model.NamePlaces.Count >= 4 ? "Maximale Standorte erreicht" : "+ Standort hinzufügen")
                                 </button>
                             </div>
 
                             <!-- SUBMIT: PREISE VERGLEICHEN -->
                             <button type="submit" class="btn btn-primary submit-btn"
-                                    asp-page-handler="CalculateAverageCost">
+                                    asp-page-handler="CalculateAverageCost" id="compareLocations">
                                 Preise vergleichen
                                 <div class="loader" id="loader-compare"></div>
                             </button>
@@ -531,12 +531,14 @@
                     <div id="averageCost" class="card results-card mb-4">
                         <div class="card-body p-4 text-center">
                             <h3 class="h3-summary mb-3">Durchschnittspreise</h3>
+                            @{ int index = 0; }
                             @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
                             {
-                                <p class="mb-2">
+                                <p class="mb-2" id="compareLocationItem-@index">
                                     @place.Key:
                                     @(place.Value > 0 ? $"{Model.ToDisplay(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
                                 </p>
+                                index++;
                             }
                         </div>
                     </div>
@@ -1094,7 +1096,7 @@
             const button = document.getElementById("addStandort");
             button.disabled = true;
             button.classList.add("disabled");
-            button.textContent = "✓ Maximale Standorte erreicht";
+            button.textContent = "Maximale Standorte erreicht";
         }
     }
 

@@ -77,7 +77,7 @@ public class ErrorPagesTest : PageTestBase
 
         //hero-section text-center => Es ist etwas schiefgelaufen
         //<h2 class="mb-3">Interner Serverfehler</h2>
-        
+
         var headingElement = document.QuerySelector("#ErrorHeading");
         Assert.That(headingElement?.TextContent, Does.Contain("Etwas ist schiefgelaufen"));
 

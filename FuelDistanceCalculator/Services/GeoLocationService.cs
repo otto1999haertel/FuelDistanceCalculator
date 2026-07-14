@@ -156,7 +156,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         foreach (GasStation station in stations)
         {
             string responseString = string.Empty;
-            if (Mode == "Development" || Mode=="E2E")
+            if (Mode == "Development" || Mode == "E2E")
             {
                 responseString = await AlternateResponse(latitudeStart, longitudeStart, alternater, station);
                 alternater++;

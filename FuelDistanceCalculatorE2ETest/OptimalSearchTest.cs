@@ -28,4 +28,10 @@ public class OptimalSearchTest : E2EBaseTest
         Assert.That(summaryText, Does.Match(regexPattern),
             $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{summaryText}'");
     }
+
+    [Test]
+    public async Task OptimalSearch_With_Max_FuelAmount_Displays_PricePerLiter()
+    {
+        Assert.Fail("Test expüected to fail to test pipleine");
+    }
 }

@@ -50,6 +50,12 @@ public class OptimalSearchTest : E2EBaseTest
         // 4. Berechnung starten SearchBtn
         await Page.Locator("#SearchBtn").ClickAsync();
 
+        await Page.Locator("#savings-to-cheapest-station").WaitForAsync(new LocatorWaitForOptions
+            {
+                State = WaitForSelectorState.Visible
+            });
+
+
 
         string savingsText = await Page.Locator("#savings-to-cheapest-station").InnerTextAsync();
         Assert.That(savingsText, Does.StartWith("Ersparnis zum günstigsten Einzelpreis im Radius:"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{savingsText}'");

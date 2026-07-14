@@ -13,7 +13,7 @@ public class OptimalSearchTest : E2EBaseTest
         await Page.GotoAsync("/");
 
         // 3. Start- und Zielort setzen
-        await Page.Locator("#generalLocationInput").FillAsync("Dresdem");
+        await Page.Locator("#generalLocationInput").FillAsync("Dresden");
 
         // 4. Berechnung starten SearchBtn
         await Page.Locator("#SearchBtn").ClickAsync();

@@ -18,7 +18,8 @@ For a successfull connection to the gas station price service you have to create
 - then it does not matter whether the configuration is an .env-file or local test context
 
 # Building local
-- copy/ create localhost certificates (*.cert/ *.key) to nginx/certs
+- copy/ create localhost certificates (*.cert/ *.key) to nginx/certs with name corresponding to .env.local  
+- certificate must start with BEGIN CERTIFICATE and key with BEGIN PRIVATE KEY  
 - execute: docker compose --env-file .env.local up --build
 - test output will be stored in the container: fuelgo-webapp\app\test-output  
 - .env.local (with API Keys) need to be in FuelDistanceCalculator

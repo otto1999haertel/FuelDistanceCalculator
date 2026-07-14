@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace FuelDistanceCalculatorE2ETest;
 
-public class OptimalSerachTest : E2EBaseTest
+public class OptimalSearchTest : E2EBaseTest
 {
     [Test]
     [Ignore("Test is not implemented yet")]

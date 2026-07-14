@@ -39,13 +39,14 @@ public class OptimalSearchTest : E2EBaseTest
 
         // 1. Maximale Tankmenge setzen
         await Page.Locator("#MaximumFuelAmount").FillAsync("60");
-
-        // 2. Fokus verlassen, damit das 'blur'-Event greift
         await Page.Locator("#MaximumFuelAmount").PressAsync("Tab");
 
         await Page.Locator("#FuelAmountRange").EvaluateAsync(
             "el => { el.value = '30'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
         );
+
+        await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("30 l");
+
 
         // 4. Berechnung starten SearchBtn
         await Page.Locator("#SearchBtn").ClickAsync();

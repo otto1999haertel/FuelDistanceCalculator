@@ -19,9 +19,14 @@ public class OptimalSearchTest : E2EBaseTest
         await Page.Locator("#SearchBtn").ClickAsync();
 
         // 5. Warten auf die Anzeige der Ergebnisse
-        //TODO: Regex Einzelelement teste: * Einzelpreis pro Liter * : [0-9]+,[0-9]+ €
         string regexPattern = @".* Einzelpreis pro Liter .*: [0-9]+,[0-9]+ €";
 
+        var firstSummary = Page.Locator("#station-summary-item-0");
 
+        string summaryText = await firstSummary.InnerTextAsync();
+        summaryText = summaryText.Replace("\n", " ").Trim();
+
+        Assert.That(summaryText, Does.Match(regexPattern),
+            $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{summaryText}'");
     }
 }

@@ -26,10 +26,11 @@
         </div>
     }
     <ul class="station-list">
+        @{ int index = 0; }
         @foreach (GasStation station in Model.CheapestResultStations.Take(10))
         {
             <li class="station-item">
-                <div class="station-summary" id="station-summary-">
+                <div class="station-summary" id="station-summary-item-@index">
                     @if(!station.Brand.IsNullOrEmpty()){
                         <span>@station.Brand</span> 
                     }
@@ -46,7 +47,7 @@
                         <span>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: <span class="station-strong-price">@Model.ToDisplay(station.FuelTypePrice.ToString()) €</span></span>
                     }
                 </div>
-                <div class="station-details" style="display:none;" id="station-details">
+                <div class="station-details" style="display:none;" id="station-details-item">
                     @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
                         <p>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
@@ -83,6 +84,7 @@
                     }
                 </div>
             </li>
+            index++;
         }
     </ul>
 </div>

@@ -34,8 +34,18 @@ public class OptimalSearchTest : E2EBaseTest
     {
         await Page.GotoAsync("/");
 
+        var expendingSettingsButton = Page.Locator("#advancedToggleButton");
+
+        await expendingSettingsButton.ClickAsync();
+
+        var priceInput = Page.Locator("#PricePerKm");
+
+        await priceInput.FillAsync("0.23");
+
+        await priceInput.PressAsync("Tab");
+
         // 3. Start- und Zielort setzen
-        await Page.Locator("#generalLocationInput").FillAsync("Dresden");
+        await Page.Locator("#generalLocationInput").FillAsync("Berlin");
 
         // 1. Maximale Tankmenge setzen
         await Page.Locator("#MaximumFuelAmount").FillAsync("60");
@@ -51,11 +61,6 @@ public class OptimalSearchTest : E2EBaseTest
         // 4. Berechnung starten SearchBtn
         await Page.Locator("#SearchBtn").ClickAsync();
 
-        await Page.Locator("#savings-to-cheapest-station").WaitForAsync(new LocatorWaitForOptions
-            {
-                State = WaitForSelectorState.Visible
-            });
-
         string html = await Page.ContentAsync();
         Console.WriteLine("=== PAGE HTML ===");
         Console.WriteLine(html);
@@ -68,7 +73,7 @@ public class OptimalSearchTest : E2EBaseTest
         Assert.That(nearestSavingsText, Does.StartWith("Ersparnis zur Nächsten im Radius:"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{nearestSavingsText}'");
 
         // 5. Warten auf die Anzeige der Ergebnisse
-        string regexPattern = @".* Gesamtkosten .*: [0-9]+,[0-9]+ €";
+        string regexPattern = @".*Gesamtkosten:\s*\d+,\d+\s*€";
 
         var firstSummary = Page.Locator("#station-summary-item-0");
         string summaryText = await firstSummary.InnerTextAsync();

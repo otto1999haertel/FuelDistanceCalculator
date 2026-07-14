@@ -13,13 +13,13 @@
         <div class="d-flex flex-column gap-2 align-items-start fw-medium mb-3" style="color: #8A9A7B;">
         @if (Model.SavingsToCheapestStation > 0)
             {
-                <span>
+                <span id="savings-to-cheapest-station">
                     Ersparnis zum günstigsten Einzelpreis im Radius: <strong>@Model.SavingsToCheapestStation.ToString().Replace('.', ',') €</strong>
                 </span>
             }
             @if (Model.SavingsToNearestStation > 0)
             {
-                <span>
+                <span id="savings-to-nearest-station">
                     Ersparnis zur Nächsten im Radius: <strong>@Model.SavingsToNearestStation.ToString().Replace('.', ',') €</strong>
                 </span>
             }

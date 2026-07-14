@@ -56,7 +56,10 @@ public class OptimalSearchTest : E2EBaseTest
                 State = WaitForSelectorState.Visible
             });
 
-
+        string html = await Page.ContentAsync();
+        Console.WriteLine("=== PAGE HTML ===");
+        Console.WriteLine(html);
+        Console.WriteLine("=== END HTML ===");
 
         string savingsText = await Page.Locator("#savings-to-cheapest-station").InnerTextAsync();
         Assert.That(savingsText, Does.StartWith("Ersparnis zum günstigsten Einzelpreis im Radius:"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{savingsText}'");

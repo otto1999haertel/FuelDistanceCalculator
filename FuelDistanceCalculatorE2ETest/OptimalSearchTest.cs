@@ -7,7 +7,6 @@ namespace FuelDistanceCalculatorE2ETest;
 public class OptimalSearchTest : E2EBaseTest
 {
     [Test]
-    [Ignore("Test is not implemented yet")]
     public async Task OptimalSearch_Without_Max_FuelAmount_Displays_PricePerLiter()
     {
         await Page.GotoAsync("/");

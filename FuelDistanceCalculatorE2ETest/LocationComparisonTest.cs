@@ -154,7 +154,6 @@ public class LocationComparisonTest : E2EBaseTest
             Assert.That(comparePlacesAfterExecution[i].Equals(locationNames[i]));
             Assert.That(compareRadiusAfterExecution[i].Equals(locationRadius[i]));
         }
-
     }
 
     private async Task CheckResultView()
@@ -167,5 +166,4 @@ public class LocationComparisonTest : E2EBaseTest
             Assert.That(averageLocationText, Does.Match(expectedPattern), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{averageLocationText}'");
         }
     }
-
 }

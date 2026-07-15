@@ -47,7 +47,7 @@
                         <span>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: <span class="station-strong-price">@Model.ToDisplay(station.FuelTypePrice.ToString()) €</span></span>
                     }
                 </div>
-                <div class="station-details" style="display:none;" id="station-details-item">
+                <div class="station-details" style="display:none;" id="station-details-item-@index">
                     @if (Model.FuelAmount > 0 || station.TotalCalculatedCoast>0)
                     {
                         <p>Einzelpreis pro Liter @if(station.DiscountApplied){<text>(inkl. Rabatt)</text>} else {<text>(exkl. Rabatt)</text>}: @Model.ToDisplay(station.FuelTypePrice.ToString()) €</p>
@@ -55,7 +55,7 @@
                     @if (!string.IsNullOrEmpty(station.LastUpdate))
                     {
                         DateTimeOffset dto = DateTimeOffset.Parse(station.LastUpdate);
-                        <p>
+                        <p id="lastUpdateDisplay-@index">
                             Letzte Aktualisierung: @dto.ToString("HH:mm 'Uhr'", new CultureInfo("de-DE")) um 
                             <span style="color: @(station.UpdateAmount < 0 ? "#8A9A7B" : "#C85450")">
                                 @station.DisplayUpdateAmount()
@@ -73,7 +73,7 @@
                         }
                     </p>
                     <p>Ort:
-                        <a href="https://www.google.com/maps?q=@station.Place,@station.Street" target="_blank">
+                        <a id="gMapsLinkLocation-@index" href="https://www.google.com/maps?q=@station.Place,@station.Street" target="_blank">
                             @station.Place, @station.Street
                         </a>
                     </p>

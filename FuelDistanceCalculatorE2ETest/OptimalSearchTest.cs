@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 using NUnit.Framework;
@@ -7,7 +8,7 @@ namespace FuelDistanceCalculatorE2ETest;
 public class OptimalSearchTest : E2EBaseTest
 {
     [Test]
-    public async Task OptimalSearch_Without_Max_FuelAmount_Displays_PricePerLiter()
+    public async Task OptimalSearch_Without_Max_FuelAmount_Displays_PricePerLiter_And_Details()
     {
         await Page.GotoAsync("/");
 
@@ -27,10 +28,13 @@ public class OptimalSearchTest : E2EBaseTest
 
         Assert.That(summaryText, Does.Match(regexPattern),
             $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{summaryText}'");
+
+        CheckDetailsWithoutClosing(0);
+        CheckDetailsWithoutClosing(2);
     }
 
     [Test]
-    public async Task OptimalSearch_With_Max_FuelAmount_Displays_GesamtKosten_And_Ersparnis()
+    public async Task OptimalSearch_With_Max_FuelAmount_Displays_GesamtKosten_And_Ersparnis_And_Details()
     {
         await Page.GotoAsync("/");
 
@@ -81,7 +85,29 @@ public class OptimalSearchTest : E2EBaseTest
 
         Assert.That(summaryText, Does.Match(regexPattern),
             $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{summaryText}'");
+        
+        CheckDetailsWithoutClosing(0);
+        CheckDetailsWithoutClosing(2);
     }
 
-    //TODO Add test for displaying and checking details for station
+    private async Task CheckDetailsWithoutClosing(int itemIndex)
+    {
+        Console.WriteLine("Check Details without closing executed");
+        await Page.Locator($"#station-summary-item-{itemIndex}").ClickAsync();
+        //station-details-item
+        var stationDetails = Page.Locator($"#station-details-item-{itemIndex}");
+        string lastUpdate = await Page.Locator($"#lastUpdateDisplay-{itemIndex}").InnerTextAsync();
+        string lastUpdatePattern = @"Letzte Aktualisierung: [0-9]{2}:[0-9]{2} Uhr um * \s*\d+,\d+\s*€";
+        Assert.That(lastUpdate, Does.Match(lastUpdatePattern), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{lastUpdate}'");
+
+        var mapsLink = Page.Locator($"#gMapsLinkLocation-{itemIndex}");
+        await Expect(mapsLink).ToBeVisibleAsync();
+
+        var href = await mapsLink.GetAttributeAsync("href");
+        Assert.That(href, Does.StartWith("https://www.google.com/maps?q="));
+
+        await Expect(mapsLink).ToHaveAttributeAsync("target", "_blank");
+        await Expect(mapsLink).ToBeEnabledAsync();
+
+    }
 }

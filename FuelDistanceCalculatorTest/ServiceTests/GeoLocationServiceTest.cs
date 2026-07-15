@@ -250,10 +250,10 @@ public class GeoLocationServiceTest : ServiceTestBase
 
         //Act
         List<GasStation> result = await service.CalculateDistanceFromAPI(lon, lat, new List<GasStation>() { gasStation1, gasStation2 });
-        Assert.That(result[0].Dist.Equals((double)3));
-        Assert.That(result[0].IsRoutingDistanceCalculated.Equals(false));
-        Assert.That(result[1].Dist.Equals((double)7.68));
-        Assert.That(result[1].IsRoutingDistanceCalculated.Equals(true));
+        Assert.That(result[0].Dist.Equals((double)7.68));
+        Assert.That(result[0].IsRoutingDistanceCalculated.Equals(true));
+        Assert.That(result[1].Dist.Equals((double)4));
+        Assert.That(result[1].IsRoutingDistanceCalculated.Equals(false));
     }
 
     [Test]

@@ -156,7 +156,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
         foreach (GasStation station in stations)
         {
             string responseString = string.Empty;
-            if (Mode == "Development")
+            if (Mode == "Development" || Mode == "E2E")
             {
                 responseString = await AlternateResponse(latitudeStart, longitudeStart, alternater, station);
                 alternater++;
@@ -180,7 +180,7 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
                     .GetDouble();
                 station.Dist = Math.Round(totalDistance / 1000.0, 2); // in km
                 station.IsRoutingDistanceCalculated = true;
-                Console.WriteLine($"Calculated routing distance: {station.Dist} meters for Gas Station {station.Name}");
+                Console.WriteLine($"Calculated routing distance: {station.Dist} km for Gas Station {station.Name}");
             }
             else
             {
@@ -378,17 +378,15 @@ public class GeoLocationService : BaseAPIKeyService, IGeoLocationService
 
     private async Task<string> AlternateResponse(double latitudeStart, double longitudeStart, int alternater, GasStation station)
     {
-        string responseString = string.Empty;
+        Console.WriteLine("Alternating response entered");
         if (alternater % 2 == 0)
         {
-            responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng, "No_Routing");
+            return await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
         }
         else
         {
-            responseString = await GetRouteAndDistanceFromAPI(latitudeStart, longitudeStart, station.Coords.Lat, station.Coords.Lng);
+            return string.Empty;
         }
-
-        return responseString;
     }
 
     private bool IsPLZ(string input)

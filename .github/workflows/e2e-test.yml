@@ -1,0 +1,61 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
+      OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      SERVER_NAME: localhost
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Generate self-signed cert for E2E
+        run: |
+          mkdir -p e2e-certs
+          openssl req -x509 -newkey rsa:2048 -nodes \
+            -keyout e2e-certs/cert.key -out e2e-certs/cert.crt \
+            -days 1 -subj "/CN=localhost"
+
+      - name: Run E2E tests
+        run: |
+          docker compose \
+            --env-file .env.e2e \
+            -f docker-compose.e2e.yml \
+            up \
+            --build \
+            --abort-on-container-exit \
+            --exit-code-from e2e-test-client
+
+      - name: Publish E2E Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: |
+            **/*.trx
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            **/TestResults/*.trx
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose --env-file .env.e2e -f docker-compose.e2e.yml logs
+
+      - name: Teardown
+        if: always()
+        run: docker compose --env-file .env.e2e -f docker-compose.e2e.yml down -v

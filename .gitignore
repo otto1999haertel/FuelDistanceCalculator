@@ -6,3 +6,5 @@ FuelDistanceCalculator/appsettings.json
 nginx/certs/
 .DS_Store
 .sdfx/*
+e2e-certs/
+e2e-results/

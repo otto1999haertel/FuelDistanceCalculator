@@ -89,7 +89,8 @@
                             <button class="advanced-toggle" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#advancedOptions"
                                     aria-expanded="@(advancedHasValue ? "true" : "false")"
-                                    aria-controls="advancedOptions">
+                                    aria-controls="advancedOptions"
+                                    id="advancedToggleButton">
                                 <span>Erweiterte Einstellungen</span>
                                 <span class="arrow-indicator">▼</span>
                             </button>
@@ -220,7 +221,7 @@
                             <div class="mb-3">
                                 <label for="generalLocation" class="section-label">Standort</label>
                                 <div class="input-group">
-                                    <input type="text" id="generalLocation" class="form-control"
+                                    <input type="text" id="generalLocationInput" class="form-control"
                                            placeholder="PLZ, Straße oder Ort eingeben" asp-for="Place" value="@Model.Place">
                                     <button id="geoButton" class="btn btn-primary location-btn" type="button" title="Aktuellen Standort verwenden">
                                         <img src="location.png" alt="Standort">
@@ -389,6 +390,7 @@
                                                 <label class="section-label mb-1">Standort @(i+1)</label>
                                                 <input type="text"
                                                        name="NamePlaces[@i]"
+                                                       id="NamePlaces[@i]"
                                                        class="form-control"
                                                        value="@Model.NamePlaces[i]"
                                                        placeholder="Ort eingeben" />
@@ -426,13 +428,13 @@
                             <div class="text-center mt-3 mb-3">
                                 <button type="button" id="addStandort" class="btn btn-primary"
                                         @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
-                                    @(Model.NamePlaces.Count >= 4 ? "✓ Maximale Standorte erreicht" : "+ Standort hinzufügen")
+                                    @(Model.NamePlaces.Count >= 4 ? "Maximale Standorte erreicht" : "+ Standort hinzufügen")
                                 </button>
                             </div>
 
                             <!-- SUBMIT: PREISE VERGLEICHEN -->
                             <button type="submit" class="btn btn-primary submit-btn"
-                                    asp-page-handler="CalculateAverageCost">
+                                    asp-page-handler="CalculateAverageCost" id="compareLocations">
                                 Preise vergleichen
                                 <div class="loader" id="loader-compare"></div>
                             </button>
@@ -530,12 +532,14 @@
                     <div id="averageCost" class="card results-card mb-4">
                         <div class="card-body p-4 text-center">
                             <h3 class="h3-summary mb-3">Durchschnittspreise</h3>
+                            @{ int index = 0; }
                             @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
                             {
-                                <p class="mb-2">
+                                <p class="mb-2" id="compareLocationItem-@index">
                                     @place.Key:
                                     @(place.Value > 0 ? $"{Model.ToDisplay(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
                                 </p>
+                                index++;
                             }
                         </div>
                     </div>
@@ -710,7 +714,7 @@
             });
 
             //Standort
-            document.getElementById('generalLocation')?.addEventListener('blur', function () {
+            document.getElementById('generalLocationInput')?.addEventListener('blur', function () {
                 this.value = this.value.trim();
                 if(isPLZ(this.value)){
                     localStorage.setItem("generalLocation", this.value);
@@ -858,7 +862,7 @@
 
             const generalLocationInput = localStorage.getItem("generalLocation");
             if(generalLocationInput){
-                const generalLocationField = document.getElementById("generalLocation");
+                const generalLocationField = document.getElementById("generalLocationInput");
                 if(generalLocationField){
                     generalLocationField.value = generalLocationInput;
                 }
@@ -1016,8 +1020,8 @@
         if (response.ok) {
             const result = await response.json();
             if (result.success && result.address) {
-                if (document.getElementById("generalLocation")) {
-                    document.getElementById("generalLocation").value = result.address;
+                if (document.getElementById("generalLocationInput")) {
+                    document.getElementById("generalLocationInput").value = result.address;
                     localStorage.removeItem("generalLocation")
                 }
                 if (document.getElementById("GeoStandort")) {
@@ -1058,6 +1062,7 @@
                             <label class="section-label mb-1">Standort ${locationIndex + 1}</label>
                             <input type="text"
                                 name="NamePlaces[${locationIndex}]"
+                                id="NamePlaces[${locationIndex}]"
                                 class="form-control"
                                 placeholder="Ort eingeben" />
                         </div>
@@ -1093,7 +1098,7 @@
             const button = document.getElementById("addStandort");
             button.disabled = true;
             button.classList.add("disabled");
-            button.textContent = "✓ Maximale Standorte erreicht";
+            button.textContent = "Maximale Standorte erreicht";
         }
     }
 

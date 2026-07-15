@@ -18,7 +18,8 @@ For a successfull connection to the gas station price service you have to create
 - then it does not matter whether the configuration is an .env-file or local test context
 
 # Building local
-- copy/ create localhost certificates (*.cert/ *.key) to nginx/certs
+- copy/ create localhost certificates (*.cert/ *.key) to nginx/certs with name corresponding to .env.local  
+- certificate must start with BEGIN CERTIFICATE and key with BEGIN PRIVATE KEY  
 - execute: docker compose --env-file .env.local up --build
 - test output will be stored in the container: fuelgo-webapp\app\test-output  
 - .env.local (with API Keys) need to be in FuelDistanceCalculator
@@ -27,6 +28,16 @@ For a successfull connection to the gas station price service you have to create
 -  is triggered by github actions configured in deploy-nighty.yml
 -  manual execuion: sudo docker compose --env-file .env.server up --build -d  
 - .env.server (with API Keys) need to be in FuelDistanceCalculator
+
+# E2E test execution  
+- docker compose \
+ --env-file .env.e2e \
+ -f docker-compose.e2e.yml \
+ up \
+ --build \
+ --abort-on-container-exit \
+ --exit-code-from e2e-test-client  
+- for local test execution of E2E tests, change certification path of .env.e2e to those of .env.local
 
 # Update certificate with certbot automatically via deployment hook for certbot
 - specific certbot renew config under: sudo nano /etc/letsencrypt/renewal/[webpage]  

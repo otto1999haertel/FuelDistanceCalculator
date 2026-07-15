@@ -19,6 +19,7 @@ WORKDIR /src
 COPY ["FuelDistanceCalculator.sln", "."]
 COPY ["FuelDistanceCalculator/FuelDistanceCalculator.csproj", "FuelDistanceCalculator/"]
 COPY ["FuelDistanceCalculatorTest/FuelDistanceCalculatorTests.csproj", "FuelDistanceCalculatorTest/"]
+COPY ["FuelDistanceCalculatorE2ETest/FuelDistanceCalculatorE2ETest.csproj", "FuelDistanceCalculatorE2ETest/"]
 RUN dotnet restore "FuelDistanceCalculator.sln"
 
 # Kopiere restlichen Code und führe Publish aus

@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "โปรดระบุค่ามากกว่าหรือเท่ากับ {0}" )
 } );
 return $;
-}));
+}))

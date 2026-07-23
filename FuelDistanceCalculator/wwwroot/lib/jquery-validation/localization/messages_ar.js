@@ -61,4 +61,4 @@ $.extend( $.validator.messages, {
 	pattern: "التنسيق غير صالح"
 } );
 return $;
-}));
+}))

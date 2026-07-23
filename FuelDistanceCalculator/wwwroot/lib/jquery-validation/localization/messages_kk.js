@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "{0} көп немесе тең санын енгізуіңізді сұраймыз." )
 } );
 return $;
-}));
+}))

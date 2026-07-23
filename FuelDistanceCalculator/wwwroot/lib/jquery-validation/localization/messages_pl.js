@@ -35,4 +35,4 @@ $.extend( $.validator.messages, {
 	pattern: $.validator.format( "Pole zawiera niedozwolone znaki." )
 } );
 return $;
-}));
+}))

@@ -30,4 +30,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Sy&ouml;t&auml; arvo, joka on v&auml;hint&auml;&auml;n {0}." )
 } );
 return $;
-}));
+}))

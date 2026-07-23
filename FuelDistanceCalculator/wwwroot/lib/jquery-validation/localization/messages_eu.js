@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Mesedez, idatzi {0} edo handiagoa den balio bat." )
 } );
 return $;
-}));
+}))

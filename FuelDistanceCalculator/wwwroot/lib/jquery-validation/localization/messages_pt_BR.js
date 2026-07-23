@@ -88,4 +88,4 @@ $.extend( $.validator.messages, {
 	cnpjBR: "Por favor, forne&ccedil;a um CNPJ v&aacute;lido."
 } );
 return $;
-}));
+}))

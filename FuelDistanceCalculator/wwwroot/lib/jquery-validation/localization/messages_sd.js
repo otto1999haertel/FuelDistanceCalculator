@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
     min: $.validator.format( "گهٽ ۾ گهٽ {0} جي داخلا ڪرڻ ضروري آهي" )
 } );
 return $;
-}));
+}))

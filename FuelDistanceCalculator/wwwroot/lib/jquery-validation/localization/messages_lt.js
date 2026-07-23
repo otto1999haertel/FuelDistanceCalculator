@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Prašau įvesti reikšmę didesnę arba lygią {0}." )
 } );
 return $;
-}));
+}))

@@ -33,4 +33,4 @@ $.extend( $.validator.messages, {
 	step: $.validator.format( "Musí být násobkem čísla {0}." )
 } );
 return $;
-}));
+}))

@@ -33,4 +33,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "{0} 以上の値を入力してください。" )
 } );
 return $;
-}));
+}))

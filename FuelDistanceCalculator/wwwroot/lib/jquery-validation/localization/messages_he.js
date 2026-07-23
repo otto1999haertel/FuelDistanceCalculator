@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "נא למלא ערך גדול או שווה ל- {0}" )
 } );
 return $;
-}));
+}))

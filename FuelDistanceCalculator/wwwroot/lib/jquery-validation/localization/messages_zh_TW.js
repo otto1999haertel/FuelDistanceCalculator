@@ -34,4 +34,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "請輸入不小於 {0} 的數值" )
 } );
 return $;
-}));
+}))

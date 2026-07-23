@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Sila masukkan nilai yang lebih atau sama dengan {0}." )
 } );
 return $;
-}));
+}))

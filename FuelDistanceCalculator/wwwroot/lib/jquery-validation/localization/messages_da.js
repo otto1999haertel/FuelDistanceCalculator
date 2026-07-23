@@ -43,4 +43,4 @@ $.extend( $.validator.messages, {
 	integer: "Angiv et ikke-decimaltal, der er positivt eller negativt."
 } );
 return $;
-}));
+}))

@@ -36,4 +36,4 @@ $.extend( $.validator.messages, {
 	currency: "Inserisci una valuta valida."
 } );
 return $;
-}));
+}))

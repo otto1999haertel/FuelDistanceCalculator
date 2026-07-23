@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	pattern: "Ogiltigt format."
 } );
 return $;
-}));
+}))

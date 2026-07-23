@@ -79,4 +79,4 @@ $.extend( $.validator.messages, {
 	ziprange: "Ihre Postleitzahl muss im Bereich 902xx-xxxx bis 905xx-xxxx liegen."
 } );
 return $;
-}));
+}))

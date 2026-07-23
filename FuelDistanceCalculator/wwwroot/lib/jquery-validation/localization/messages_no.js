@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	creditcard: "Angi et gyldig kredittkortnummer."
 } );
 return $;
-}));
+}))

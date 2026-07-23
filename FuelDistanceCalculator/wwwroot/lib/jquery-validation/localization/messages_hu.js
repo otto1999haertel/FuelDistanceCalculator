@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	step: $.validator.format( "A {0} egyik többszörösét adja meg." )
 } );
 return $;
-}));
+}))

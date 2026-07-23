@@ -30,4 +30,4 @@ $.extend( $.validator.messages, {
 	creditcard: "Sláðu inn gilt greiðslukortanúmer."
 } );
 return $;
-}));
+}))

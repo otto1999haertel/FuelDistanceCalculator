@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "کم سے کم {0} کا اندراج کرنا ضروری ہے" )
 } );
 return $;
-}));
+}))

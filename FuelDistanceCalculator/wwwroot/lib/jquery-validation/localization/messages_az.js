@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Zəhmət olmasa, {0} və ondan böyük rəqəm daxil edin." )
 } );
 return $;
-}));
+}))

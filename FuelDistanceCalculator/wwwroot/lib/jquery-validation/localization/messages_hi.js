@@ -51,4 +51,4 @@ $.extend( $.validator.messages, {
 	require_from_group:"कृपया इनमें से कम से कम {0} को भरें।"
 } );
 return $;
-}));
+}))

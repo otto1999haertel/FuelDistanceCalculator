@@ -36,4 +36,4 @@ $.extend( $.validator.messages, {
 	cifES: "Por favor, escriba un CIF válido."
 } );
 return $;
-}));
+}))

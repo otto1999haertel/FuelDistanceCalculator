@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Si us plau, escriu un valor major o igual a {0}." )
 } );
 return $;
-}));
+}))

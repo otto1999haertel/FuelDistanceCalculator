@@ -18,4 +18,4 @@ $.extend( $.validator.methods, {
 	}
 } );
 return $;
-}));
+}))

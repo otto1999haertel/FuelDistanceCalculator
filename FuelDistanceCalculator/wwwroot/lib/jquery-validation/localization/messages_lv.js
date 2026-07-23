@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Lūdzu, ievadiet skaitli, kurš ir lielāks vai vienāds ar {0}." )
 } );
 return $;
-}));
+}))

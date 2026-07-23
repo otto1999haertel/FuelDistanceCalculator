@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "{0} 이상의 값을 입력하세요." )
 } );
 return $;
-}));
+}))

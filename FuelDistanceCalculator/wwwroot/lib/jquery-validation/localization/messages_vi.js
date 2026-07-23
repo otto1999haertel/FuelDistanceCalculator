@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Hãy nhập từ {0} trở lên." )
 } );
 return $;
-}));
+}))

@@ -21,4 +21,4 @@ $.extend( $.validator.methods, {
 	}
 } );
 return $;
-}));
+}))

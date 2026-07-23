@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "გთხოვთ შეიყვანოთ ციფრი რომელიც მეტია ან უდრის {0}-ს." )
 } );
 return $;
-}));
+}))

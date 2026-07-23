@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "გთხოვთ შეიყვანოთ მნიშვნელობა მეტი ან ტოლი {0} -ს." )
 } );
 return $;
-}));
+}))

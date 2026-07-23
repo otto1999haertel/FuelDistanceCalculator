@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Будь ласка, введіть число, більше або рівно {0}." )
 } );
 return $;
-}));
+}))

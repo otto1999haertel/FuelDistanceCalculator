@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Te rugăm să introduci o valoare egal sau mai mare decât {0}." )
 } );
 return $;
-}));
+}))

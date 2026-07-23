@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "Внесете вредност поголема или еднаква на {0}." )
 } );
 return $;
-}));
+}))

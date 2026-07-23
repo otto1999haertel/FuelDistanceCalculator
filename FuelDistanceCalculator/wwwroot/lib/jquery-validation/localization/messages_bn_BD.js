@@ -32,4 +32,4 @@ $.extend( $.validator.messages, {
 	min: $.validator.format( "অনুগ্রহ করে {0} বা তার চাইতে বেশি মান ব্যবহার করুন।" )
 } );
 return $;
-}));
+}))

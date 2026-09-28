@@ -96,7 +96,7 @@ public class GasStation
         if (discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
         {
             _totalCoast = fuelCost + travelCost - discountAmount;
-            if(_totalCoast < 0)
+            if (_totalCoast < 0)
             {
                 _totalCoast = 0;
             }

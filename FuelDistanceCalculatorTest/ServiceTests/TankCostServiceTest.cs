@@ -185,7 +185,7 @@ public class TankCostServiceTest : ServiceTestBase
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
                 expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - decimal.Parse(discountPercentOrAbsolute);
-                if(expectedPrice<0)
+                if (expectedPrice < 0)
                 {
                     expectedPrice = 0;
                 }
@@ -197,15 +197,15 @@ public class TankCostServiceTest : ServiceTestBase
                 Assert.That(station.DiscountApplied, Is.False);
             }
         }
-        IEnumerable<string> expected = new[] 
-        { 
-            "Aral Station 1", 
+        IEnumerable<string> expected = new[]
+        {
+            "Aral Station 1",
             "Aral Station 2",
             "Esso Station"
         };
         Assert.IsTrue(CheapestResultStations.Select(m => m.Name).SequenceEqual(expected));
     }
-    
+
     private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
     {
         for (int i = 0; i < stations.Count - 1; i++)

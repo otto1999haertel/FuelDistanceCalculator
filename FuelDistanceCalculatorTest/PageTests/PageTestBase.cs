@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using StackExchange.Redis;
 
 namespace FuelDistanceCalculatorTest.PageTests;
 
@@ -42,6 +43,16 @@ public abstract class PageTestBase
 
                 builder.ConfigureTestServices(services =>
                 {
+                    // Redis-Multiplexer mocken (früher in Program.cs)
+                    var mockDatabase = new Mock<IDatabase>();
+                    var mockMultiplexer = new Mock<IConnectionMultiplexer>();
+                    mockMultiplexer
+                        .Setup(c => c.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
+                        .Returns(mockDatabase.Object);
+
+                    services.RemoveAll<IConnectionMultiplexer>();
+                    services.AddSingleton<IConnectionMultiplexer>(mockMultiplexer.Object);
+
                     // DataProtection auf In-Memory umstellen – kein Filesystem nötig
                     services.AddDataProtection()
                         .UseEphemeralDataProtectionProvider();
@@ -57,17 +68,14 @@ public abstract class PageTestBase
             });
 
         _client = _factory.CreateClient();
-    }
 
-    [SetUp]
-    public void ResetRateLimiterBeforeEachTest()
-    {
         var ipLogField = typeof(RequestProtectionMiddleware)
             .GetField("_ipLog", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
 
         var ipLog = (System.Collections.Concurrent.ConcurrentDictionary<string, List<DateTime>>)ipLogField?.GetValue(null);
 
         ipLog?.Clear();
+
     }
 
     [TearDown]

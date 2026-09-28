@@ -138,11 +138,6 @@ app.UseRouting();
 if (!isE2E)
 {
     app.UseMiddleware<RequestProtectionMiddleware>();
-    Console.WriteLine("RequestProtectionMiddleware is enabled.");
-}
-else
-{
-    Console.WriteLine("E2E Mode: RequestProtectionMiddleware is disabled.");
 }
 
 app.UseSession();

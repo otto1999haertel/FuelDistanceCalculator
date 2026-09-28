@@ -141,20 +141,23 @@ public class TankCostServiceTest : ServiceTestBase
 
         foreach (var station in CheapestResultStations)
         {
-            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
-            {
-                expectedPrice = testData
+            expectedPrice = testData
                             .Where(s => s.Name.Equals(station.Name, StringComparison.OrdinalIgnoreCase))
                             .SelectMany(s => s.Fuels)
                             .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
+            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
+            {
+
                 expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - decimal.Parse(discountPercentOrAbsolute);
                 Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
                 Assert.That(station.DiscountApplied.Equals(true));
             }
             else
             {
+                expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount;
+                Assert.That(expectedPrice, Is.EqualTo(station.TotalCalculatedCoast).Within(0.001m));
                 Assert.That(station.DiscountApplied, Is.False);
             }
         }

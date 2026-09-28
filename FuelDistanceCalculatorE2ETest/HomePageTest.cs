@@ -17,7 +17,6 @@ public class HomepageTests : E2EBaseTest
         // Hero-Überschrift sollte sichtbar sein
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Willkommen bei FuelGo" }))
             .ToBeVisibleAsync();
-        Assert.Fail();
     }
 
     [Test]

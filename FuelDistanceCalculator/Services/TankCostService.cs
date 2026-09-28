@@ -130,6 +130,7 @@ public static class TankCostService
         // Sortiere nach TotalCalculatedCoast
         return stationCosts
             .OrderBy(sc => sc.TotalCost)
+            .ThenBy(sc=>sc.Station.Dist)
             .Select(sc => sc.Station)
             .ToList();
     }

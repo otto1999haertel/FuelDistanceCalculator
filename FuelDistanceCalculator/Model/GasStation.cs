@@ -95,7 +95,11 @@ public class GasStation
         decimal travelCost = pricePerKm * dist * 2m;
         if (discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
         {
-            TotalCalculatedCoast = fuelCost + travelCost - discountAmount;
+            _totalCoast = fuelCost + travelCost - discountAmount;
+            if(_totalCoast < 0)
+            {
+                _totalCoast = 0;
+            }
             DiscountApplied = true;
         }
         else

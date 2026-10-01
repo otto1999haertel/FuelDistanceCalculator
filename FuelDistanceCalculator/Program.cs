@@ -115,8 +115,7 @@ builder.WebHost.ConfigureKestrel(kestrel =>
     kestrel.AddServerHeader = false;
     kestrel.Limits.MaxRequestBodySize = 64 * 1024;
 });
-if (!isE2E)
-{
+
     builder.Services.AddRateLimiter(options =>
     {
         options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -173,7 +172,6 @@ if (!isE2E)
         }
         return ip.ToString();
     }
-}
 
 
 var app = builder.Build();
@@ -193,10 +191,9 @@ app.UseStatusCodePagesWithReExecute("/Error{0}");
 
 app.UseStaticFiles();
 app.UseRouting();
-if (!isE2E)
-{
-    app.UseRateLimiter();
-}
+
+app.UseRateLimiter();
+
 
 app.UseSession();
 app.UseAuthorization();

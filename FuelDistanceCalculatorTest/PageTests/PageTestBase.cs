@@ -1,5 +1,5 @@
-using FuelDistanceCalculator;
 using FuelDistanceCalculator.Services;
+using FuelDistanceCalculator.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -18,7 +18,6 @@ public abstract class PageTestBase
     [SetUp]
     public void Setup()
     {
-        // Set env to Testing
         Environment.SetEnvironmentVariable("MODE_TYPE", "Testing");
 
         _factory = new WebApplicationFactory<Program>()
@@ -27,23 +26,23 @@ public abstract class PageTestBase
                 builder.UseEnvironment("Testing");
                 builder.UseSolutionRelativeContentRoot("FuelDistanceCalculator");
 
-                // Override configuration BEFORE app build
                 builder.ConfigureAppConfiguration((context, config) =>
                 {
                     var dict = new Dictionary<string, string>
                     {
-                        // ensure test has values so GeoLocationService doesn’t throw
                         ["ApiSettings:TankApiKey"] = Environment.GetEnvironmentVariable("TANK_API_KEY") ?? "test",
                         ["ApiSettings:OpenRouteServiceApiKey"] = Environment.GetEnvironmentVariable("OPENROUTESERVICE_API_KEY") ?? "test",
                         ["ApiSettings:OilPriceApiKey"] = Environment.GetEnvironmentVariable("OIL_PRICE_API_KEY") ?? "test",
-                        ["Redis:Configuration"] = "" // avoid actual Redis config
+                        ["Redis:Configuration"] = "",
+                        // Hoch genug, damit normale Tests den Limiter nie auslösen
+                        ["RateLimit:PermitLimit"] = "1000",
+                        ["RateLimit:UpstreamPermitLimit"] = "1000"
                     };
                     config.AddInMemoryCollection(dict);
                 });
 
                 builder.ConfigureTestServices(services =>
                 {
-                    // Redis-Multiplexer mocken (früher in Program.cs)
                     var mockDatabase = new Mock<IDatabase>();
                     var mockMultiplexer = new Mock<IConnectionMultiplexer>();
                     mockMultiplexer
@@ -53,29 +52,19 @@ public abstract class PageTestBase
                     services.RemoveAll<IConnectionMultiplexer>();
                     services.AddSingleton<IConnectionMultiplexer>(mockMultiplexer.Object);
 
-                    // DataProtection auf In-Memory umstellen – kein Filesystem nötig
                     services.AddDataProtection()
                         .UseEphemeralDataProtectionProvider();
 
-                    // Mock RedisCache completely
                     services.RemoveAll(typeof(IDistributedCache));
                     services.AddSingleton<IDistributedCache>(_ => new Mock<IDistributedCache>().Object);
 
                     services.AddSingleton<FuelPriceService>(_ => new FuelPriceService());
-                    services.AddHttpClient<MarketFuelPriceService>();
-                    services.AddScoped<GeoLocationService, GeoLocationService>();
+                    services.AddHttpClient<IMarketFuelPriceService, MarketFuelPriceService>();
+                    services.AddScoped<IGeoLocationService, GeoLocationService>();
                 });
             });
 
         _client = _factory.CreateClient();
-
-        var ipLogField = typeof(RequestProtectionMiddleware)
-            .GetField("_ipLog", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-
-        var ipLog = (System.Collections.Concurrent.ConcurrentDictionary<string, List<DateTime>>)ipLogField?.GetValue(null);
-
-        ipLog?.Clear();
-
     }
 
     [TearDown]

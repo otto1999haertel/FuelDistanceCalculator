@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FuelDistanceCalculator.Pages;
 
@@ -30,17 +32,12 @@ public class IndexModel : PageModel
     public decimal PricePerKm { get; set; } // Preis pro Kilometer für beide Tankstellen
 
     [BindProperty]
-    public double Distance1 { get; set; }
-    [BindProperty]
     public double FuelPrice1 { get; set; }
 
-    [BindProperty]
+    [BindProperty, Range(1,25)]
     public double Distance2 { get; set; }
     [BindProperty]
     public double FuelPrice2 { get; set; }
-
-    [BindProperty]
-    public string NamePlace1 { get; set; }
 
     [BindProperty]
     public List<string> NamePlaces { get; set; }
@@ -60,25 +57,10 @@ public class IndexModel : PageModel
     public FuelType SelectedFuelType { get; set; }
 
     [BindProperty]
-    public double FuelAmountBreakEven { get; set; }
-
-    [BindProperty]
-    public string NameGasStationBreakEven { get; set; }
-
-    [BindProperty]
-    public bool BreakEvenAnalysisDeterministic { get; set; }
-
-
-    [BindProperty]
     public InputMode SelectInputMode { get; set; } = InputMode.auto;
 
-    [BindProperty]
-    public VolumeUnit VolumeUnit
-    {
-        get => VolumeUnit.Liter;
-    }
 
-    [BindProperty]
+    [BindProperty, Range(1, 25)]
     public int Radius { get; set; }
 
     [BindProperty]
@@ -161,7 +143,6 @@ public class IndexModel : PageModel
         FuelAmount = 0;
         PricePerKm = 0.25m;
         FuelPrice1 = 0;
-        Distance1 = 0;
         FuelPrice2 = 0;
         Distance2 = 0;
         Radius = 10;
@@ -180,8 +161,11 @@ public class IndexModel : PageModel
         await GetOilPriceChange();
     }
 
+    [EnableRateLimiting("upstream")]
+
     public async Task OnPostSearch()
     {
+
         CheapestResultStations = new List<GasStation>();
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
@@ -321,6 +305,7 @@ public class IndexModel : PageModel
         return new JsonResult(new { filteredCars });
     }
 
+    [EnableRateLimiting("upstream")]
     public async Task OnPostCalculateAverageCost()
     {
         CheapestResultStations = new List<GasStation>();

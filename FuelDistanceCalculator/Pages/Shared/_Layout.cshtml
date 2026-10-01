@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using FuelDistanceCalculator.Extensions
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
@@ -13,8 +14,8 @@
 
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
-    <!-- jQuery -->
+    
+        <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- Toastr JS -->
@@ -51,7 +52,7 @@
     </script>
 
     <!-- Google Analytics - DSGVO-konform: Consent default = denied -->
-    <script>
+    <script nonce="@Html.CspNonce()">
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
 
@@ -104,6 +105,8 @@
             }
             // Bei 'declined': nichts tun, kein Banner, kein Tracking
         });
+        document.getElementById('acceptCookuesBtn').addEventListener('click', acceptCookies);
+        document.getElementById('declineCookuesBtn').addEventListener('click', declineCookies);
     </script>
 
 </head>
@@ -131,7 +134,7 @@
                         </a>
                     </p>
                     <div class="d-flex gap-2 flex-shrink-0">
-                        <button onclick="declineCookies()"
+                        <button id="declineCookuesBtn"
                                 class="btn btn-sm"
                                 style="
                                     background: transparent;
@@ -141,7 +144,7 @@
                                     padding: 6px 16px;">
                             Ablehnen
                         </button>
-                        <button onclick="acceptCookies()"
+                        <button id="acceptCookuesBtn"
                                 class="btn btn-primary btn-sm"
                                 style="border-radius: 8px; padding: 6px 16px;">
                             Akzeptieren

@@ -1,4 +1,5 @@
 @page
+@using FuelDistanceCalculator.Extensions
 @model ContactModel
 @{
     ViewData["Title"] = "Impressum";
@@ -9,7 +10,7 @@
 {
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
 }
-<script>
+<script nonce="@Html.CspNonce()">
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
@@ -45,7 +46,7 @@
                     <h2>Impressum</h2>
                     <p class="mb-2"><strong>Otto Härtel</strong></p>
                     <p class="mb-0">
-                        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank" rel="noopener">
+                        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank" rel="noopener noreferrer">
                             🔗 GitHub Repository
                         </a>
                     </p>
@@ -134,7 +135,7 @@
                     <p>
                         Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie auf den untenstehenden
                         Button klicken. Weitere Informationen zur Datenverarbeitung durch Google finden Sie unter:
-                        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>
+                        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>
                     </p>
 
                     <!-- Widerruf-Button (nutzt jetzt Standard btn-Klassen statt Inline-Style) -->
@@ -221,7 +222,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Html.CspNonce()">
         // Aktuellen Status anzeigen
         const consent = localStorage.getItem('cookieConsent');
         const statusEl = document.getElementById('consentStatus');

@@ -22,9 +22,11 @@ public class IndexPageTest : PageTestBase
 
     // Test 1: Prüft ob der Cookie-Banner korrekt im HTML vorhanden ist
     [Test]
-    [TestCase("/Index")]
-    [TestCase("/Contact")]
-    public async Task CheckCookieBannerIsThereTest(string site)
+    [TestCase("/Index", true)]
+    [TestCase("/Contact", true)]
+    [TestCase("/Index", false)]
+    [TestCase("/Contact", false)]
+    public async Task CheckCookieBannerIsThereTest(string site, bool accept)
     {
         var response = await _client.GetAsync(site);
         Assert.That(response.IsSuccessStatusCode, Is.True,
@@ -45,14 +47,14 @@ public class IndexPageTest : PageTestBase
             "Cookie-Banner sollte initial display:none haben.");
 
         // 3. Akzeptieren-Button vorhanden
-        var acceptBtn = cookieBanner.QuerySelector("button[onclick='acceptCookies()']");
-        Assert.That(acceptBtn, Is.Not.Null,
-            "Akzeptieren-Button fehlt.");
+        var acceptBtn = cookieBanner.QuerySelector("#acceptCookuesBtn");
+            Assert.That(acceptBtn, Is.Not.Null,
+                "Akzeptieren-Button fehlt.");
 
         // 4. Ablehnen-Button vorhanden
-        var declineBtn = cookieBanner.QuerySelector("button[onclick='declineCookies()']");
-        Assert.That(declineBtn, Is.Not.Null,
-            "Ablehnen-Button fehlt.");
+        var declineBtn = cookieBanner.QuerySelector("#declineCookuesBtn");
+            Assert.That(declineBtn, Is.Not.Null,
+                "Ablehnen-Button fehlt.");
 
         // 5. Datenschutz-Link vorhanden
         var privacyLink = cookieBanner.QuerySelector("a[href='/Contact#datenschutz']");

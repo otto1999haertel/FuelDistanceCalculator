@@ -1,10 +1,11 @@
-using FuelDistanceCalculator;
 using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using StackExchange.Redis;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -114,6 +115,66 @@ builder.WebHost.ConfigureKestrel(kestrel =>
     kestrel.AddServerHeader = false;
     kestrel.Limits.MaxRequestBodySize = 64 * 1024;
 });
+if (!isE2E)
+{
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        options.OnRejected = (ctx, _) =>
+        {
+            ctx.HttpContext.Response.Headers.RetryAfter = "10";
+            return ValueTask.CompletedTask;
+        };
+
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+        {
+            if (ctx.Features.Get<IStatusCodeReExecuteFeature>() is not null ||
+                ctx.Request.Path.StartsWithSegments("/healthz"))
+                return RateLimitPartition.GetNoLimiter("skip");
+
+            var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
+            var limit = config.GetValue("RateLimit:PermitLimit", 20);
+
+            return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
+                new SlidingWindowRateLimiterOptions
+                {
+                    PermitLimit = limit,
+                    Window = TimeSpan.FromSeconds(10),
+                    SegmentsPerWindow = 5,
+                    QueueLimit = 0
+                });
+        });
+
+        options.AddPolicy("upstream", ctx =>
+        {
+            var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
+            var limit = config.GetValue("RateLimit:UpstreamPermitLimit", 10);
+            return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
+                new SlidingWindowRateLimiterOptions
+                {
+                    PermitLimit = limit,
+                    Window = TimeSpan.FromMinutes(1),
+                    SegmentsPerWindow = 6,
+                    QueueLimit = 0
+                });
+        });
+    });
+
+    static string ClientKey(HttpContext ctx)
+    {
+        var ip = ctx.Connection.RemoteIpAddress;
+        if (ip is null) return "unknown";
+        if (ip.IsIPv4MappedToIPv6) ip = ip.MapToIPv4();
+        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+        {
+            var bytes = ip.GetAddressBytes();
+            Array.Clear(bytes, 8, 8);
+            return new System.Net.IPAddress(bytes) + "/64";
+        }
+        return ip.ToString();
+    }
+}
+
 
 var app = builder.Build();
 
@@ -122,7 +183,6 @@ var app = builder.Build();
 // ---------------------------------------------------------------------------
 // Muss ganz vorne stehen, damit Scheme und Client-IP für alle folgenden Middlewares stimmen
 app.UseForwardedHeaders();
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -133,11 +193,9 @@ app.UseStatusCodePagesWithReExecute("/Error{0}");
 
 app.UseStaticFiles();
 app.UseRouting();
-
-// Eigene Middleware für Rate Limiting / Request-Schutz
 if (!isE2E)
 {
-    app.UseMiddleware<RequestProtectionMiddleware>();
+    app.UseRateLimiter();
 }
 
 app.UseSession();
@@ -145,6 +203,30 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapHealthChecks("/healthz");
+
+app.Use(async (ctx, next) =>
+{
+    var nonce = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(16));
+    ctx.Items["csp-nonce"] = nonce;
+
+    var csp =
+        "default-src 'self'; " +
+        $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://unpkg.com https://cdnjs.cloudflare.com; " +
+        "style-src 'self' https://unpkg.com https://cdnjs.cloudflare.com 'unsafe-inline'; " +
+        "img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org " +
+            "https://*.google-analytics.com https://*.googletagmanager.com; " +
+        "font-src 'self' https://cdnjs.cloudflare.com; " +
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
+        "object-src 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self'; " +
+        "frame-ancestors 'none'";
+
+    //Content-Security-Policy-Report-Only
+    ctx.Response.Headers["Content-Security-Policy-Report-Only"] = csp; // erst testen, dann auf Content-Security-Policy umstellen
+    await next();
+});
+
 app.MapRazorPages();
 
 // Port kommt aus ASPNETCORE_URLS (Dockerfile: http://+:8080)

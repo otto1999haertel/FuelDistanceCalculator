@@ -104,10 +104,10 @@
                 // Noch keine Entscheidung -> Banner anzeigen
                 document.getElementById('cookieBanner').style.display = 'block';
             }
-            // Bei 'declined': nichts tun, kein Banner, kein Tracking
+            // moved inside — buttons now exist by the time this runs
+            document.getElementById('acceptCookuesBtn')?.addEventListener('click', acceptCookies);
+            document.getElementById('declineCookuesBtn')?.addEventListener('click', declineCookies);
         });
-        document.getElementById('acceptCookuesBtn').addEventListener('click', acceptCookies);
-        document.getElementById('declineCookuesBtn').addEventListener('click', declineCookies);
     </script>
 
 </head>

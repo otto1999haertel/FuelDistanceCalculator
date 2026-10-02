@@ -207,20 +207,20 @@ app.Use(async (ctx, next) =>
     ctx.Items["csp-nonce"] = nonce;
 
     var csp =
-        "default-src 'self'; " +
-        $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://unpkg.com https://cdnjs.cloudflare.com; " +
-        "style-src 'self' https://unpkg.com https://cdnjs.cloudflare.com 'unsafe-inline'; " +
-        "img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org " +
-            "https://*.google-analytics.com https://*.googletagmanager.com; " +
-        "font-src 'self' https://cdnjs.cloudflare.com; " +
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
-        "object-src 'none'; " +
-        "base-uri 'self'; " +
-        "form-action 'self'; " +
-        "frame-ancestors 'none'";
+            "default-src 'self'; " +
+            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://unpkg.com https://cdnjs.cloudflare.com; " +
+            "style-src 'self' https://unpkg.com https://cdnjs.cloudflare.com 'unsafe-inline'; " +
+            "img-src 'self' data: https://unpkg.com https://*.tile.openstreetmap.org " +
+                "https://*.google-analytics.com https://*.googletagmanager.com; " +
+            "font-src 'self' https://cdnjs.cloudflare.com; " +
+            "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; " +
+            "object-src 'none'; " +
+            "base-uri 'self'; " +
+            "form-action 'self'; " +
+            "frame-ancestors 'none'";
 
     //Content-Security-Policy-Report-Only
-    ctx.Response.Headers["Content-Security-Policy-Report-Only"] = csp; // erst testen, dann auf Content-Security-Policy umstellen
+    ctx.Response.Headers["Content-Security-Policy"] = csp; // erst testen, dann auf Content-Security-Policy umstellen
     await next();
 });
 

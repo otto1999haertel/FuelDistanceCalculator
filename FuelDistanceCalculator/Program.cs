@@ -116,62 +116,62 @@ builder.WebHost.ConfigureKestrel(kestrel =>
     kestrel.Limits.MaxRequestBodySize = 64 * 1024;
 });
 
-    builder.Services.AddRateLimiter(options =>
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = (ctx, _) =>
     {
-        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-        options.OnRejected = (ctx, _) =>
-        {
-            ctx.HttpContext.Response.Headers.RetryAfter = "10";
-            return ValueTask.CompletedTask;
-        };
+        ctx.HttpContext.Response.Headers.RetryAfter = "10";
+        return ValueTask.CompletedTask;
+    };
 
-        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
-        {
-            if (ctx.Features.Get<IStatusCodeReExecuteFeature>() is not null ||
-                ctx.Request.Path.StartsWithSegments("/healthz"))
-                return RateLimitPartition.GetNoLimiter("skip");
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+    {
+        if (ctx.Features.Get<IStatusCodeReExecuteFeature>() is not null ||
+            ctx.Request.Path.StartsWithSegments("/healthz"))
+            return RateLimitPartition.GetNoLimiter("skip");
 
-            var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
-            var limit = config.GetValue("RateLimit:PermitLimit", 20);
+        var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
+        var limit = config.GetValue("RateLimit:PermitLimit", 20);
 
-            return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
-                new SlidingWindowRateLimiterOptions
-                {
-                    PermitLimit = limit,
-                    Window = TimeSpan.FromSeconds(10),
-                    SegmentsPerWindow = 5,
-                    QueueLimit = 0
-                });
-        });
-
-        options.AddPolicy("upstream", ctx =>
-        {
-            var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
-            var limit = config.GetValue("RateLimit:UpstreamPermitLimit", 10);
-            return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
-                new SlidingWindowRateLimiterOptions
-                {
-                    PermitLimit = limit,
-                    Window = TimeSpan.FromMinutes(1),
-                    SegmentsPerWindow = 6,
-                    QueueLimit = 0
-                });
-        });
+        return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
+            new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = limit,
+                Window = TimeSpan.FromSeconds(10),
+                SegmentsPerWindow = 5,
+                QueueLimit = 0
+            });
     });
 
-    static string ClientKey(HttpContext ctx)
+    options.AddPolicy("upstream", ctx =>
     {
-        var ip = ctx.Connection.RemoteIpAddress;
-        if (ip is null) return "unknown";
-        if (ip.IsIPv4MappedToIPv6) ip = ip.MapToIPv4();
-        if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
-        {
-            var bytes = ip.GetAddressBytes();
-            Array.Clear(bytes, 8, 8);
-            return new System.Net.IPAddress(bytes) + "/64";
-        }
-        return ip.ToString();
+        var config = ctx.RequestServices.GetRequiredService<IConfiguration>();
+        var limit = config.GetValue("RateLimit:UpstreamPermitLimit", 10);
+        return RateLimitPartition.GetSlidingWindowLimiter(ClientKey(ctx), _ =>
+            new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = limit,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 6,
+                QueueLimit = 0
+            });
+    });
+});
+
+static string ClientKey(HttpContext ctx)
+{
+    var ip = ctx.Connection.RemoteIpAddress;
+    if (ip is null) return "unknown";
+    if (ip.IsIPv4MappedToIPv6) ip = ip.MapToIPv4();
+    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+    {
+        var bytes = ip.GetAddressBytes();
+        Array.Clear(bytes, 8, 8);
+        return new System.Net.IPAddress(bytes) + "/64";
     }
+    return ip.ToString();
+}
 
 
 var app = builder.Build();

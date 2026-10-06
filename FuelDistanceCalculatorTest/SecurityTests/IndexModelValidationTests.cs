@@ -1,13 +1,8 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Pages;
 using FuelDistanceCalculator.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 
 namespace FuelDistanceCalculatorTest.SecurityTests;
 
@@ -35,7 +30,7 @@ public class IndexModelValidationUnitTests
             NamePlaces = new List<string> { "" },
             RadiusPlaces = new List<double> { 10 }
         };
-        model.Radius =1;
+        model.Radius = 1;
         model.Place = "TestPlace";
 
         return model;

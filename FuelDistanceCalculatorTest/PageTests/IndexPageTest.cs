@@ -48,13 +48,13 @@ public class IndexPageTest : PageTestBase
 
         // 3. Akzeptieren-Button vorhanden
         var acceptBtn = cookieBanner.QuerySelector("#acceptCookuesBtn");
-            Assert.That(acceptBtn, Is.Not.Null,
-                "Akzeptieren-Button fehlt.");
+        Assert.That(acceptBtn, Is.Not.Null,
+            "Akzeptieren-Button fehlt.");
 
         // 4. Ablehnen-Button vorhanden
         var declineBtn = cookieBanner.QuerySelector("#declineCookuesBtn");
-            Assert.That(declineBtn, Is.Not.Null,
-                "Ablehnen-Button fehlt.");
+        Assert.That(declineBtn, Is.Not.Null,
+            "Ablehnen-Button fehlt.");
 
         // 5. Datenschutz-Link vorhanden
         var privacyLink = cookieBanner.QuerySelector("a[href='/Contact#datenschutz']");

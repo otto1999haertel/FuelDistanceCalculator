@@ -103,11 +103,11 @@ public class IndexModel : PageModel
     private const int MaxCarTypeQueryLength = 100;
 
     public IndexModel(
-        ILogger<IndexModel> logger, 
-        FuelPriceService fuelPrice, 
-        IMarketFuelPriceService marketFuelPriceService, 
-        IGeoLocationService geoLocationService, 
-        IOilPriceService oilPriceService, 
+        ILogger<IndexModel> logger,
+        FuelPriceService fuelPrice,
+        IMarketFuelPriceService marketFuelPriceService,
+        IGeoLocationService geoLocationService,
+        IOilPriceService oilPriceService,
         IConfiguration configuration)
     {
         _logger = logger;
@@ -174,7 +174,7 @@ public class IndexModel : PageModel
         {
             var errors = ModelState
                 .Where(x => x.Value?.Errors.Count > 0)
-                .SelectMany(x => x.Value!.Errors.Select(e => 
+                .SelectMany(x => x.Value!.Errors.Select(e =>
                     $"{x.Key}: {(string.IsNullOrEmpty(e.ErrorMessage) ? e.Exception?.Message : e.ErrorMessage)}"))
                 .ToList();
 
@@ -327,11 +327,11 @@ public class IndexModel : PageModel
 
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
-         if (!TryValidateModel(this))
+        if (!TryValidateModel(this))
         {
             var errors = ModelState
                 .Where(x => x.Value?.Errors.Count > 0)
-                .SelectMany(x => x.Value!.Errors.Select(e => 
+                .SelectMany(x => x.Value!.Errors.Select(e =>
                     $"{x.Key}: {(string.IsNullOrEmpty(e.ErrorMessage) ? e.Exception?.Message : e.ErrorMessage)}"))
                 .ToList();
 

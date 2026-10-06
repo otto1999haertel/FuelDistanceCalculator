@@ -14,7 +14,7 @@ public class DiscountParserTest : ServiceTestBase
     [TestCase("-5%", 0, false)]
     [TestCase("101%", 0, false)]
     [TestCase(("abc%"), 0, false)]
-    [TestCase("abc0,1",0,false)]
+    [TestCase("abc0,1", 0, false)]
     public void ParseDiscountPercentage_ValidInput_ReturnsExpected(string input, decimal expected, bool parseable)
     {
         decimal discountValue;

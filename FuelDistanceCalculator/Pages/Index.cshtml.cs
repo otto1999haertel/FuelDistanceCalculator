@@ -85,7 +85,7 @@ public class IndexModel : PageModel
 
     // Als string? markiert (optionales Feld)
     [BindProperty, StringLength(50)]
-    [RegularExpression(@"^[\p{L}0-9\s.,\-\/]*$", ErrorMessage = "Ungültige Zeichen im Ortsnamen.")]
+    [RegularExpression(@"^[\p{L}0-9\s.,\-\/]*$", ErrorMessage = "Ungültige Zeichen imn Tankstellenmarke.")]
     public string? StationBrand { get; set; }
 
     // Als string? markiert (optionales Feld)

@@ -27,7 +27,8 @@ For a successfull connection to the gas station price service you have to create
 # Building on the server
 -  is triggered by github actions configured in deploy-nighty.yml
 -  manual execuion: sudo docker compose --env-file .env.server up --build -d  
-- .env.server (with API Keys) need to be in FuelDistanceCalculator
+- .env.server (with API Keys) need to be in FuelDistanceCalculator  
+- docker compose build --env-file .env.server up -d --pull --no-cache (building to get newest images)
 
 # E2E test execution  
 - docker compose \
@@ -68,4 +69,8 @@ git checkout -b [name]
 - pushing newly created local brnach upstream:  
 ```bash
 git push origin -u [name]
-```  
+```    
+
+# Check for updates  
+- dotnet list package --vulnerable --include-transitive  
+- dotnet list package --outdated  

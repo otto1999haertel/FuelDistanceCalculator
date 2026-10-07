@@ -1,7 +1,7 @@
 ﻿@page
 @using FuelDistanceCalculator.Constants
 @using System.Globalization
-@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using FuelDistanceCalculator.Extensions
 @model IndexModel
 @{
     ViewData["Title"] = "FuelGo";
@@ -14,19 +14,10 @@
         || !string.IsNullOrWhiteSpace(Model.SelectedCarType);
 }
 
-<!-- Google tag (gtag.js) -->
-@if (Model.IsProduction)
-{
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
-}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="..." crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="..." crossorigin=""></script>
-<script>
+<link rel="stylesheet" href="~/lib/leaflet/leaflet.css" />
+<script src="~/lib/leaflet/leaflet.js"></script>
+<script nonce="@Html.CspNonce()">
     window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-JEP2Q2QZMH');
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -121,7 +112,7 @@
                                             <label for="CarType" class="section-label">
                                                 Fahrzeug
                                                 <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
-                                                   target="_blank" class="small fw-normal">
+                                                   target="_blank" rel="noopener noreferrer" class="small fw-normal">
                                                     (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
                                             </label>
                                             <input type="text" class="form-control" id="CarType" placeholder="Fahrzeug suchen..."
@@ -203,7 +194,7 @@
                                             </span>
                                             <span>
                                                 <i class="ti ti-info-circle" aria-hidden="true"></i>
-                                                Datenquelle: <a href="https://finance.yahoo.com/quote/BZ=F/" target="_blank">Yahoo Finance Öl-Preis (Symb. BZ=F)</a>
+                                                Datenquelle: <a href="https://finance.yahoo.com/quote/BZ=F/" target="_blank" rel="noopener noreferrer">Yahoo Finance Öl-Preis (Symb. BZ=F)</a>
                                             </span>
                                         </div>
                                     </div>
@@ -564,7 +555,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="@Html.CspNonce()">
     let mapInitialized = false;
     let map;
     let Tiles;
@@ -970,8 +961,8 @@
             shadowSize: [41, 41]
         });
         const greenIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconUrl: 'marker-icon-green.png',
+            shadowUrl: 'lib/leaflet/images/marker-shadow.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             tooltipAnchor: [0, -32],
@@ -994,7 +985,7 @@
                     .bindTooltip(`@price €`, { permanent: true, direction: "top" })
                     .openTooltip()
                     .on('click', function () {
-                        window.open("https://www.google.com/maps?q=@lat,@lng", "_blank");
+                        window.open("https://www.google.com/maps?q=@lat,@lng", "_blank", "noopener,noreferrer");
                     });
             </text>
         }
@@ -1137,8 +1128,10 @@
                 container.innerHTML = html;
             })
             .catch(err => {
-                console.error('Fehler:', err);
-                container.innerHTML = '<p>Fehler: ' + err.message + '</p>';
+                console.error('Sortierfehler:', err);
+                const p = document.createElement('p');
+                p.textContent = 'Fehler: ' + err.message;
+                container.replaceChildren(p);
             });
     }
 

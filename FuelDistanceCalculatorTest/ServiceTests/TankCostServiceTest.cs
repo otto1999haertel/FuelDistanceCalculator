@@ -125,6 +125,90 @@ public class TankCostServiceTest : ServiceTestBase
         }
     }
 
+    [Test]
+    public void GetCheapestGasStationAbsoluteDiscountSmallerTotalCoastReturnsCheapestStationTest()
+    {
+        List<GasStation> CheapestResultStations = new List<GasStation>();
+        List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
+
+        string fuelTypeForAPI = "diesel";
+        string StationBrand = "Aral";
+        decimal pricePerKm = 0.25m;
+        decimal fuelAmount = 40m;
+        string discountPercentOrAbsolute = "20";
+        decimal expectedPrice = 0m;
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        foreach (var station in CheapestResultStations)
+        {
+            expectedPrice = testData
+                            .Where(s => s.Name.Equals(station.Name, StringComparison.OrdinalIgnoreCase))
+                            .SelectMany(s => s.Fuels)
+                            .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
+                            .Select(f => (decimal)f.Price)
+                            .FirstOrDefault();
+            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
+            {
+
+                expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - decimal.Parse(discountPercentOrAbsolute);
+                Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
+                Assert.That(station.DiscountApplied.Equals(true));
+            }
+            else
+            {
+                expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount;
+                Assert.That(expectedPrice, Is.EqualTo(station.TotalCalculatedCoast).Within(0.001m));
+                Assert.That(station.DiscountApplied, Is.False);
+            }
+        }
+    }
+
+    [Test]
+    public void GetCheapestGasStationAbsoluteDiscountBiggerTotalCoastReturnsNearestStationTest()
+    {
+        List<GasStation> CheapestResultStations = new List<GasStation>();
+        List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
+
+        string fuelTypeForAPI = "diesel";
+        string StationBrand = "Aral";
+        decimal pricePerKm = 0.25m;
+        decimal fuelAmount = 40m;
+        string discountPercentOrAbsolute = "100";
+        decimal expectedPrice = 0m;
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        foreach (var station in CheapestResultStations)
+        {
+            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
+            {
+                expectedPrice = testData
+                            .Where(s => s.Name.Equals(station.Name, StringComparison.OrdinalIgnoreCase))
+                            .SelectMany(s => s.Fuels)
+                            .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
+                            .Select(f => (decimal)f.Price)
+                            .FirstOrDefault();
+                expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - decimal.Parse(discountPercentOrAbsolute);
+                if (expectedPrice < 0)
+                {
+                    expectedPrice = 0;
+                }
+                Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
+                Assert.That(station.DiscountApplied.Equals(true));
+            }
+            else
+            {
+                Assert.That(station.DiscountApplied, Is.False);
+            }
+        }
+        IEnumerable<string> expected = new[]
+        {
+            "Aral Station 1",
+            "Aral Station 2",
+            "Esso Station"
+        };
+        Assert.IsTrue(CheapestResultStations.Select(m => m.Name).SequenceEqual(expected));
+    }
+
     private bool CheckOrderAscendingFuelAmountZero(List<GasStation> stations)
     {
         for (int i = 0; i < stations.Count - 1; i++)
@@ -193,17 +277,17 @@ public class TankCostServiceTest : ServiceTestBase
                             new GasStation
                             {
                                 Brand = "Aral",
-                                Name="Aral Station 1",
+                                Name = "Aral Station 2",
                                 Fuels = new List<Fuel>
                                 {
-                                    new Fuel { Name = "Diesel", Price = 2.00 },
-                                    new Fuel { Name = "Super E5", Price = 1.80 },
-                                    new Fuel { Name = "Super E10", Price = 1.90 }
+                                    new Fuel { Name = "Diesel", Price = 1.90 },
+                                    new Fuel { Name = "Super E5", Price = 1.70 },
+                                    new Fuel { Name = "Super E10", Price = 1.80 }
 
                                 },
-                                IsOpen = true,
-                                //TotalCalculatedCoast = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
-                                Dist = 5.0
+                                 IsOpen = true,
+                                //TotalCalculatedCoast = 76.25m,  // insgesamt günstigste Gesamtkosten
+                                Dist = 7.0
                             },
                             new GasStation
                             {
@@ -223,17 +307,17 @@ public class TankCostServiceTest : ServiceTestBase
                             new GasStation
                             {
                                 Brand = "Aral",
-                                Name = "Aral Station 2",
+                                Name="Aral Station 1",
                                 Fuels = new List<Fuel>
                                 {
-                                    new Fuel { Name = "Diesel", Price = 1.90 },
-                                    new Fuel { Name = "Super E5", Price = 1.70 },
-                                    new Fuel { Name = "Super E10", Price = 1.80 }
+                                    new Fuel { Name = "Diesel", Price = 2.00 },
+                                    new Fuel { Name = "Super E5", Price = 1.80 },
+                                    new Fuel { Name = "Super E10", Price = 1.90 }
 
                                 },
-                                 IsOpen = true,
-                                //TotalCalculatedCoast = 76.25m,  // insgesamt günstigste Gesamtkosten
-                                Dist = 7.0
+                                IsOpen = true,
+                                //TotalCalculatedCoast = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
+                                Dist = 5.0
                             }
                     };
     }

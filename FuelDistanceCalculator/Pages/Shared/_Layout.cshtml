@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using FuelDistanceCalculator.Extensions
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
@@ -12,13 +13,14 @@
     <script src="~/js/darkmode.js"></script>
 
     <!-- Toastr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        
+    <script src="~/lib/jquery/jquery.min.js"></script>
 
     <!-- Toastr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
 
     <!-- SEO -->
     <meta name="description"
@@ -36,7 +38,7 @@
     <meta property="og:locale" content="de_DE" />
 
     <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
+    <script type="application/ld+json" nonce="@Html.CspNonce()">
     {
         "@@context": "https://schema.org",
         "@@type": "WebApplication",
@@ -51,16 +53,17 @@
     </script>
 
     <!-- Google Analytics - DSGVO-konform: Consent default = denied -->
-    <script>
+    <script nonce="@Html.CspNonce()">
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
-
-        // Standardmäßig alles ablehnen bis Nutzer zustimmt
-        gtag('consent', 'default', {
-            'analytics_storage': 'denied',
-            'ad_storage': 'denied',
-            'wait_for_update': 500
-        });
+            gtag('js', new Date());
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'wait_for_update': 500
+            });
 
         // GA dynamisch laden - nur nach Zustimmung aufrufen
         function loadGoogleAnalytics() {
@@ -102,7 +105,9 @@
                 // Noch keine Entscheidung -> Banner anzeigen
                 document.getElementById('cookieBanner').style.display = 'block';
             }
-            // Bei 'declined': nichts tun, kein Banner, kein Tracking
+            // moved inside — buttons now exist by the time this runs
+            document.getElementById('acceptCookuesBtn')?.addEventListener('click', acceptCookies);
+            document.getElementById('declineCookuesBtn')?.addEventListener('click', declineCookies);
         });
     </script>
 
@@ -131,7 +136,7 @@
                         </a>
                     </p>
                     <div class="d-flex gap-2 flex-shrink-0">
-                        <button onclick="declineCookies()"
+                        <button id="declineCookuesBtn"
                                 class="btn btn-sm"
                                 style="
                                     background: transparent;
@@ -141,7 +146,7 @@
                                     padding: 6px 16px;">
                             Ablehnen
                         </button>
-                        <button onclick="acceptCookies()"
+                        <button id="acceptCookuesBtn"
                                 class="btn btn-primary btn-sm"
                                 style="border-radius: 8px; padding: 6px 16px;">
                             Akzeptieren

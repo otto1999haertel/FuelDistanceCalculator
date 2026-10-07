@@ -1,4 +1,5 @@
 @page
+@using FuelDistanceCalculator.Extensions
 @model ErrorModel
 @{
 ViewData["Title"] = "Fehler";
@@ -20,7 +21,7 @@ ViewData["Title"] = "Fehler";
                 <a href="/" class="btn btn-primary">
                     Zur Startseite
                 </a>
-                <button onclick="location.reload()" class="btn btn-primary">
+                <button id="reloadBtn" class="btn btn-primary">
                     Seite neu laden
                 </button>
             </div>
@@ -28,3 +29,7 @@ ViewData["Title"] = "Fehler";
     </div>
 </div>
 </div>
+
+<script nonce="@Html.CspNonce()">
+    document.getElementById('reloadBtn')?.addEventListener('click', () => location.reload());
+</script>

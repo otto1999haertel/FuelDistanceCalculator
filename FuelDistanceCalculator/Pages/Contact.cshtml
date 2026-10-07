@@ -1,20 +1,10 @@
 @page
+@using FuelDistanceCalculator.Extensions
 @model ContactModel
 @{
     ViewData["Title"] = "Impressum";
 }
 
-<!-- Google tag (gtag.js) -->
-@if (Model.IsProduction)
-{
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JEP2Q2QZMH"></script>
-}
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-JEP2Q2QZMH');
-</script>
 
 <!-- HERO -->
 <div class="hero-section text-center">
@@ -45,7 +35,7 @@
                     <h2>Impressum</h2>
                     <p class="mb-2"><strong>Otto Härtel</strong></p>
                     <p class="mb-0">
-                        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank" rel="noopener">
+                        <a href="https://github.com/otto1999haertel/FuelDistanceClaulator" target="_blank" rel="noopener noreferrer">
                             🔗 GitHub Repository
                         </a>
                     </p>
@@ -117,6 +107,8 @@
                         <li id="jquery">jQuery 4.0.0 – <a href="https://jquery.com/" target="_blank" rel="noopener">jquery.com</a> – Lizenz: MIT</li>
                         <li id="jquery-validation">jQuery-Validation 1.22.1 – <a href="https://github.com/jquery-validation/jquery-validation" target="_blank" rel="noopener">jquery-validation</a> – Lizenz: MIT</li>
                         <li id="jquery-validation-unobtrusive">jQuery-Validation-Unobtrusive 4.0.0 – <a href="https://github.com/aspnet/jquery-validation-unobtrusive" target="_blank" rel="noopener">GitHub</a> – Lizenz: MIT</li>
+                        <li id ="leaflet">Leaflet 1.9.4 – <a href="https://leafletjs.com/" target="_blank" rel="noopener">leafletjs.com</a> – Lizenz: BSD-2-Clause</li>
+                        <li id = "toastr.js">Toastr 2.1.4 – <a href="https://github.com/CodeSeven/toastr" target="_blank" rel="noopener">GitHub</a> – Lizenz: MIT</li>
                     </ul>
 
                     <h3>3. Google Analytics</h3>
@@ -134,12 +126,12 @@
                     <p>
                         Sie können Ihre Einwilligung jederzeit widerrufen, indem Sie auf den untenstehenden
                         Button klicken. Weitere Informationen zur Datenverarbeitung durch Google finden Sie unter:
-                        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>
+                        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>
                     </p>
 
                     <!-- Widerruf-Button (nutzt jetzt Standard btn-Klassen statt Inline-Style) -->
                     <div class="d-flex align-items-center gap-3 flex-wrap mt-3">
-                        <button onclick="revokeConsent()" type="button" class="btn btn-primary">
+                        <button id="revokeConsentBtn"  type="button" class="btn btn-primary">
                             🍪 Cookie-Einwilligung widerrufen
                         </button>
                         <span id="consentStatus" class="value-output" style="font-size: 0.9rem;"></span>
@@ -221,7 +213,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Html.CspNonce()">
         // Aktuellen Status anzeigen
         const consent = localStorage.getItem('cookieConsent');
         const statusEl = document.getElementById('consentStatus');
@@ -241,5 +233,6 @@
             statusEl.textContent = '✅ Widerrufen – Banner erscheint beim nächsten Besuch';
             statusEl.style.opacity = '1';
         }
+        document.getElementById('revokeConsentBtn')?.addEventListener('click', revokeConsent);
     </script>
 }

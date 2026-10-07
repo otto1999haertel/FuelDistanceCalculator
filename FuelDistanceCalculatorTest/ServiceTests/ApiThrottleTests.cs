@@ -112,7 +112,7 @@ public class ApiThrottleTests
         Func<Task<string>> apiCall = () => Task.FromResult("TestResult");
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle(null, apiCall));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle(null, apiCall));
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class ApiThrottleTests
         Func<Task<string>> apiCall = () => Task.FromResult("TestResult");
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle("", apiCall));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle("", apiCall));
     }
 
     [Test]
@@ -134,7 +134,7 @@ public class ApiThrottleTests
         Func<Task<string>> apiCall = () => Task.FromResult("TestResult");
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle(" ", apiCall));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await throttle.ExecuteWithThrottle(" ", apiCall));
     }
 
     [Test]
@@ -190,8 +190,8 @@ public class ApiThrottleTests
         Func<Task<string>> failingApiCall2 = () => throw new TaskCanceledException("API canceled");
 
         // Act & Assert
-        Assert.ThrowsAsync<InvalidOperationException>(async () => await throttle.ExecuteWithThrottle(apiKey, failingApiCall1));
-        Assert.ThrowsAsync<TaskCanceledException>(async () => await throttle.ExecuteWithThrottle(apiKey, failingApiCall2));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await throttle.ExecuteWithThrottle(apiKey, failingApiCall1));
+        await Assert.ThrowsAsync<TaskCanceledException>(async () => await throttle.ExecuteWithThrottle(apiKey, failingApiCall2));
 
         // Prüfe, ob Semaphore freigegeben wurde
         var successfulCall = await throttle.ExecuteWithThrottle(apiKey, () => Task.FromResult("Success"));

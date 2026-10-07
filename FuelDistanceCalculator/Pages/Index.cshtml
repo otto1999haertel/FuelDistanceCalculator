@@ -1136,8 +1136,10 @@
                 container.innerHTML = html;
             })
             .catch(err => {
-                console.error('Fehler:', err);
-                container.innerHTML = '<p>Fehler: ' + err.message + '</p>';
+                console.error('Sortierfehler:', err);
+                const p = document.createElement('p');
+                p.textContent = 'Fehler: ' + err.message;
+                container.replaceChildren(p);
             });
     }
 

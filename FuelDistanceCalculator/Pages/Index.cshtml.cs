@@ -85,7 +85,7 @@ public class IndexModel : PageModel
 
     // Als string? markiert (optionales Feld)
     [BindProperty, StringLength(50)]
-    [RegularExpression(@"^[\p{L}0-9\s.,\-\/]*$", ErrorMessage = "Ungültige Zeichen imn Tankstellenmarke.")]
+    [RegularExpression(@"^[\p{L}0-9\s.,\-\/]*$", ErrorMessage = "Ungültige Zeichen in Tankstellenmarke.")]
     public string? StationBrand { get; set; }
 
     // Als string? markiert (optionales Feld)
@@ -170,16 +170,9 @@ public class IndexModel : PageModel
         }
 
         // 2. Das gesamte Modell nach dem Setzen von nullable Typen validieren
-        if (!TryValidateModel(this))
+        bool flowControl = ValidateModel();
+        if (!flowControl)
         {
-            var errors = ModelState
-                .Where(x => x.Value?.Errors.Count > 0)
-                .SelectMany(x => x.Value!.Errors.Select(e =>
-                    $"{x.Key}: {(string.IsNullOrEmpty(e.ErrorMessage) ? e.Exception?.Message : e.ErrorMessage)}"))
-                .ToList();
-
-            TempData["ToastType"] = "error";
-            TempData["ToastMessage"] = "Validierungsfehler: " + string.Join(" | ", errors);
             return;
         }
 
@@ -327,16 +320,9 @@ public class IndexModel : PageModel
 
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
-        if (!TryValidateModel(this))
+        bool flowControl = ValidateModel();
+        if (!flowControl)
         {
-            var errors = ModelState
-                .Where(x => x.Value?.Errors.Count > 0)
-                .SelectMany(x => x.Value!.Errors.Select(e =>
-                    $"{x.Key}: {(string.IsNullOrEmpty(e.ErrorMessage) ? e.Exception?.Message : e.ErrorMessage)}"))
-                .ToList();
-
-            TempData["ToastType"] = "error";
-            TempData["ToastMessage"] = "Validierungsfehler: " + string.Join(" | ", errors);
             return;
         }
 
@@ -525,4 +511,22 @@ public class IndexModel : PageModel
             _ => string.Empty
         };
     }
+
+    private bool ValidateModel()
+    {
+        if (!TryValidateModel(this))
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors.Select(e =>
+                    $"{x.Key}: {(string.IsNullOrEmpty(e.ErrorMessage) ? e.Exception?.Message : e.ErrorMessage)}"))
+                .ToList();
+
+            TempData["ToastType"] = "error";
+            TempData["ToastMessage"] = "Validierungsfehler: " + string.Join(" | ", errors);
+            return false;
+        }
+        return true;
+    }
+    
 }

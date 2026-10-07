@@ -56,13 +56,14 @@
     <script nonce="@Html.CspNonce()">
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
-
-        // Standardmäßig alles ablehnen bis Nutzer zustimmt
-        gtag('consent', 'default', {
-            'analytics_storage': 'denied',
-            'ad_storage': 'denied',
-            'wait_for_update': 500
-        });
+            gtag('js', new Date());
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'wait_for_update': 500
+            });
 
         // GA dynamisch laden - nur nach Zustimmung aufrufen
         function loadGoogleAnalytics() {

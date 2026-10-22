@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
 using Microsoft.Extensions.Caching.Memory;
@@ -14,18 +15,18 @@ public class OilPriceServiceTest : ServiceTestBase
     public async Task GetOilPriceChangeAsync_ReturnsSuccessResult()
     {
         // Arrange
-        var expectedLastUpdated = new DateTimeOffset(2026, 6, 19, 9, 37, 51, TimeSpan.FromHours(2));
+        var expectedLastUpdated = new DateTimeOffset(2026, 10, 22, 10, 31, 17, TimeSpan.FromHours(2));
 
         // Act
         OilPriceResult result = await _oilPriceService.GetOilPriceChangeAsync();
 
         // Assert
-        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.IsSuccess, Is.True, result.ErrorMessage);
         Assert.That(result.PriceChange, Is.Not.Null);
-        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(80.12).Within(0.01));
-        Assert.That(result.PriceChange.Day, Is.EqualTo(0.34).Within(0.01));
-        Assert.That(result.PriceChange.Week, Is.EqualTo(-8.26).Within(0.01));
-        Assert.That(result.PriceChange.Month, Is.EqualTo(-28.00).Within(0.01));
+        Assert.That(result.PriceChange.CurrentPrice, Is.EqualTo(112.17).Within(0.01));
+        Assert.That(result.PriceChange.Day, Is.EqualTo(3.11).Within(0.01));
+        Assert.That(result.PriceChange.Week, Is.EqualTo(5.90).Within(0.01));
+        Assert.That(result.PriceChange.Month, Is.EqualTo(13.02).Within(0.01));
         Assert.That(result.PriceChange.LastUpdated, Is.EqualTo(expectedLastUpdated));
     }
 
@@ -106,5 +107,31 @@ public class OilPriceServiceTest : ServiceTestBase
 
         // Assert
         Assert.That(display, Is.EqualTo(expectedDisplay));
+    }
+
+    [Test]
+    public async Task GetOilPriceChangeAsync_CloseArrayContainsNull_NullIsSkipped()
+    {
+        // Guard: Die Fixture muss tatsächlich ein null im close-Array enthalten
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Oil_price_API_response.json");
+        using var doc = JsonDocument.Parse(await File.ReadAllTextAsync(path));
+
+        var hasNullClose = doc.RootElement
+            .GetProperty("chart").GetProperty("result")[0]
+            .GetProperty("indicators").GetProperty("quote")[0]
+            .GetProperty("close").EnumerateArray()
+            .Any(x => x.ValueKind == JsonValueKind.Null);
+
+        Assert.That(hasNullClose, Is.True,
+            "Die Test-JSON muss ein null im close-Array enthalten, sonst prüft dieser Test nichts.");
+
+        // Act
+        OilPriceResult result = await _oilPriceService.GetOilPriceChangeAsync();
+
+        // Assert: Ohne den Null-Filter würde GetDecimal() eine Exception werfen -> IsSuccess = false
+        Assert.That(result.IsSuccess, Is.True, result.ErrorMessage);
+
+        // "Gestern" muss der letzte gültige Handelstag (20.10., 108.79) sein, nicht der null-Tag
+        Assert.That(result.PriceChange.Day, Is.EqualTo(3.11).Within(0.01));
     }
 }

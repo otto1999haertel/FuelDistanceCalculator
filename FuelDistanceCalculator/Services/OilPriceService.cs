@@ -85,56 +85,65 @@ public class OilPriceService : BaseService, IOilPriceService
         {
             using var doc = JsonDocument.Parse(responseContent);
 
-            // Navigiere zu close-Array
-            var closes = doc.RootElement
-                .GetProperty("chart")
-                .GetProperty("result")[0]
-                .GetProperty("indicators")
+            var result = doc.RootElement.GetProperty("chart").GetProperty("result")[0];
+            var meta = result.GetProperty("meta");
+
+            var currentPrice = meta.GetProperty("regularMarketPrice").GetDecimal();
+            var marketTime = meta.GetProperty("regularMarketTime").GetInt64();
+            var gmtOffset = TimeSpan.FromSeconds(meta.GetProperty("gmtoffset").GetInt32());
+
+            var utcTime = DateTimeOffset.FromUnixTimeSeconds(marketTime);
+            var marketDate = utcTime.ToOffset(gmtOffset).Date;   // aktueller Handelstag (Börsenzeit)
+
+            // Zeitstempel und Schlusskurse paarweise lesen, null-Werte verwerfen
+            var timestamps = result.GetProperty("timestamp").EnumerateArray()
+                .Select(x => x.GetInt64())
+                .ToList();
+
+            var closeValues = result.GetProperty("indicators")
                 .GetProperty("quote")[0]
                 .GetProperty("close")
                 .EnumerateArray()
-                .Select(x => x.GetDecimal())
                 .ToList();
 
-            // Aktueller Preis direkt aus meta
-            var currentPrice = doc.RootElement
-                .GetProperty("chart")
-                .GetProperty("result")[0]
-                .GetProperty("meta")
-                .GetProperty("regularMarketPrice")
-                .GetDecimal();
+            var points = timestamps
+                .Zip(closeValues, (t, c) => (Time: DateTimeOffset.FromUnixTimeSeconds(t), Value: c))
+                .Where(p => p.Value.ValueKind == JsonValueKind.Number)
+                .Select(p => (p.Time, Close: p.Value.GetDecimal()))
+                .ToList();
 
-            if (closes.Count < 8)
+            // Historie = nur abgeschlossene Handelstage (ohne den heutigen, noch laufenden Balken)
+            var history = points
+                .Where(p => p.Time.ToOffset(gmtOffset).Date < marketDate)
+                .ToList();
+
+            if (history.Count < 7)
                 return new OilPriceResult
                 {
                     IsSuccess = false,
                     ErrorMessage = "Nicht genügend Datenpunkte für Berechnung."
                 };
 
-            var today = closes[^1];   // aktuellster Wert
-            var yesterday = closes[^2];   // gestern
-            var lastWeek = closes[^6];   // vor 5 Handelstagen ~1 Woche
-            var lastMonth = closes[0];    // ältester Wert ~1 Monat
+            var today = currentPrice;                       // Live-Preis aus meta
+            var yesterday = history[^1].Close;              // letzter abgeschlossener Handelstag
 
-            var marketTime = doc.RootElement
-                .GetProperty("chart")
-                .GetProperty("result")[0]
-                .GetProperty("meta")
-                .GetProperty("regularMarketTime")
-                .GetInt64();
+            // Letzter Handelstag, der mindestens 7 Kalendertage zurückliegt
+            var lastWeek = history
+                .LastOrDefault(p => p.Time <= utcTime.AddDays(-7))
+                .Close;
+            if (lastWeek == 0) lastWeek = history[0].Close; // Fallback: ältester Wert
 
-            var utcTime = DateTimeOffset.FromUnixTimeSeconds(marketTime);
+            var lastMonth = history[0].Close;               // ältester Wert im 1mo-Bereich
 
             var germanTimeZone = GetGermanTimeZone();
-
             var lastUpdated = TimeZoneInfo.ConvertTime(utcTime, germanTimeZone);
 
             var priceChange = new OilPriceChange(
                 day: CalculateChangePct(today, yesterday),
                 week: CalculateChangePct(today, lastWeek),
                 month: CalculateChangePct(today, lastMonth),
-                currentPrice: (double)currentPrice
-                , lastUpdated: lastUpdated
+                currentPrice: (double)currentPrice,
+                lastUpdated: lastUpdated
             );
 
             return new OilPriceResult

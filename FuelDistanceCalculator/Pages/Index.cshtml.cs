@@ -213,7 +213,7 @@ public class IndexModel : PageModel
                 {
                     foreach (var station in CheapestResultStations)
                     {
-                        Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCalculatedCoast}, LastUpdate: {station.LastUpdate}");
+                        Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCombinedCosts}, LastUpdate: {station.LastUpdate}");
                     }
 
                     HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(CheapestResultStations));
@@ -288,7 +288,7 @@ public class IndexModel : PageModel
         return new JsonResult(new { pricePerKm = PricePerKm });
     }
 
-    public string ToDisplay(string obj)
+    public string ToDisplayFloatingPoint(string obj)
     {
         return obj?.Replace(".", ",") ?? string.Empty;
     }

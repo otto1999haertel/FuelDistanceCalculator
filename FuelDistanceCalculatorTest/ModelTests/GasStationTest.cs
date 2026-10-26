@@ -19,11 +19,11 @@ public class GasStationTest : ServiceTestBase
         {
             Id = "123",
             Name = "Test Station",
-            Dist = 10.0, // 10 km,
+            Dist = 8.65, // 10 km,
             Brand = "TestBrand",
             Fuels = new List<Fuel>
                     {
-                        new Fuel { Name = "Diesel", Price = 1.50 }
+                        new Fuel { Name = "Diesel", Price = 1.479 }
                     }
         };
         gasStation.SetPrice("Diesel"); // Setzt _fuelprice auf 1.50
@@ -37,8 +37,45 @@ public class GasStationTest : ServiceTestBase
         // Assert
         decimal expectedFuelCost = fuelAmount * (decimal)gasStation.Fuels[0].Price; // 30.00 €
         decimal expectedTravelCost = pricePerKm * (decimal)gasStation.Dist * 2; // Faktor 2: hin und zurück
-        decimal expectedTotal = Math.Round(expectedFuelCost + expectedTravelCost, 2, MidpointRounding.AwayFromZero); // 32.00 €
+        decimal expectedTotal = Math.Round(expectedFuelCost + expectedTravelCost, 3, MidpointRounding.AwayFromZero); // 32.00 €
         Assert.That(expectedTotal.Equals(result));
+    }
+
+    [Test]
+    [TestCase(30)]
+    [TestCase(0)]
+    public void CalculateTotalCostsDifferentiatesSingleCostsTest(decimal fuelAmount)
+    {
+        var gasStation = new GasStation
+        {
+            Id = "123",
+            Name = "Test Station",
+            Dist = 8.65, // 10 km,
+            Brand = "TestBrand",
+            Fuels = new List<Fuel>
+                    {
+                        new Fuel { Name = "Diesel", Price = 1.479 }
+                    }
+        };
+        gasStation.SetPrice("Diesel"); // Setzt _fuelprice auf 1.50
+
+        decimal pricePerKm = 0.25m; // 0.10 € pro km
+
+        // Act
+       gasStation.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, pricePerKm);
+       var expectedTravelCost = Math.Round(pricePerKm * (decimal)gasStation.Dist * 2,3,MidpointRounding.AwayFromZero); // Faktor 2: hin und zurück
+        // Assert
+        Assert.AreEqual(gasStation.TotalTravelCost, expectedTravelCost);
+        if (fuelAmount > 0)
+        {
+            var expectedFuelCost = fuelAmount * 1.479m;
+            Assert.AreEqual(gasStation.TotalFuelCost, expectedFuelCost);
+        }
+        else
+        {
+            Assert.AreEqual(gasStation.TotalFuelCost, 0);
+        }
+
     }
 
     [TestCase("Aral", "Aral", 0.05, 1.425, true)]  // ✓ Korrekt: 1.50 - 5% = 1.425

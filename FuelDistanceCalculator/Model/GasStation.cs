@@ -81,6 +81,8 @@ public class GasStation
 
     public bool IsRoutingDistanceCalculated { get; set; } = false;
 
+    [JsonProperty("discountApplied")]
+
     public bool DiscountApplied { get; private set; } = false;
 
     [JsonProperty("totalFuelCost")]

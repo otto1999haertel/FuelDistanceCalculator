@@ -164,6 +164,36 @@ public class TankCostServiceTest : ServiceTestBase
     }
 
     [Test]
+
+    public void SortCheapestGasStationDiscountAppliedKeepsBooleanDiscountValue( [Values] SortModeEnum sortMode)
+    {
+        List<GasStation> CheapestResultStations = new List<GasStation>();
+        List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
+
+        string fuelTypeForAPI = "diesel";
+        string StationBrand = "Aral";
+        decimal pricePerKm = 0.25m;
+        decimal fuelAmount = 40m;
+        string discountPercentOrAbsolute = "20";
+        decimal expectedPrice = 0m;
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        var sortedStations = SortService.SortStations(CheapestResultStations, sortMode);
+
+        foreach (var station in sortedStations)
+        {
+            if (station.Brand.Equals(StationBrand, StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.That(station.DiscountApplied.Equals(true));
+            }
+            else
+            {
+                Assert.That(station.DiscountApplied, Is.False);
+            }
+        }
+    }
+
+    [Test]
     public void GetCheapestGasStationAbsoluteDiscountBiggerTotalCoastReturnsNearestStationTest()
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();

@@ -19,10 +19,29 @@ public class DiscountParserTest : ServiceTestBase
     {
         decimal discountValue;
         // Act
-        Assert.That(DiscountParser.TryParseDiscountPercent(input, out discountValue).Equals(parseable));
+        Assert.That(DiscountParser.TryParseDiscountOnTotalAmount(input, out discountValue).Equals(parseable));
         if (parseable)
         {
             Assert.That(discountValue, Is.EqualTo(expected));
+        }
+    }
+
+    [Test]
+    [TestCase("10ct", 10, true)]
+    [TestCase("0ct", 0, true)]
+    [TestCase("15.5ct", 15.5, true)]
+    [TestCase("10", 0, false)]
+    [TestCase("5", 0, false)]
+    [TestCase("-5ct", 0, false)]
+    [TestCase("abcct", 0, false)]
+    public void ParseDiscountOnUnit_ValidInput_ReturnsExpected(string input, decimal expected, bool parseable)
+    {
+        decimal discountValue;
+        // Act
+        Assert.That(DiscountParser.TryParseDiscountOnUnit(input, out discountValue).Equals(parseable));
+        if (parseable)
+        {
+            Assert.That(discountValue, Is.EqualTo(expected));       
         }
     }
 }

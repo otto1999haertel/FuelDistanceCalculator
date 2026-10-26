@@ -22,11 +22,11 @@ public class DiscountFormatAttribute : ValidationAttribute
 
         // Delegate validation directly to DiscountParser
         Console.WriteLine($"Validating discount input: '{input}'");
-        bool validPercent = DiscountParser.TryParseDiscountPercent(input, out _);
+        bool validPercent = DiscountParser.TryParseDiscountOnTotalAmount(input, out _);
         Console.WriteLine($"Is valid percent: {validPercent}");
         bool validDecimal = decimal.TryParse(input, out decimal _);
         Console.WriteLine($"Is valid decimal: {validDecimal}");
-        if (DiscountParser.TryParseDiscountPercent(input, out _) || decimal.TryParse(input, out decimal _))
+        if (DiscountParser.TryParseDiscountOnTotalAmount(input, out _) || decimal.TryParse(input, out decimal _))
         {
             return ValidationResult.Success;
         }

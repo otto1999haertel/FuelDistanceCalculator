@@ -102,7 +102,7 @@ public class TankCostServiceTest : ServiceTestBase
                             .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
-                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal))
+                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out decimal discountDecimal))
                 {
                     Assert.That(station.FuelTypePrice.Equals(expectedPrice));
                 }
@@ -111,7 +111,7 @@ public class TankCostServiceTest : ServiceTestBase
                     expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
                     Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
-                else if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out discountDecimal))
+                else if (DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out discountDecimal))
                 {
                     expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
                     Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));

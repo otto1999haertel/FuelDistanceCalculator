@@ -23,7 +23,7 @@ public static class TankCostService
         {
             discountPercentOrAbsolute = "0";
         }
-        if (fuelAmount <= 0 && DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discouuntValue))
+        if (fuelAmount <= 0 && DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out decimal discouuntValue))
         {
             Console.WriteLine($"Parsed discount value: {discouuntValue}");
             CheapestResultStations = GetCheapestStationDiscountPerCent(gasStations, fuelTypeForAPI, stationBrand, discouuntValue);
@@ -31,7 +31,7 @@ public static class TankCostService
         //Prozentuale Rabatt oder Absoluter Rabatt
         else if (fuelAmount > 0)
         {
-            if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
+            if (DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out decimal discountDecimal) || decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
             {
                 Console.WriteLine($"Parsed discount value: {discountDecimal}");
                 CheapestResultStations = GetCheapestStationsTotalCostDiscountRelAbs(gasStations, fuelAmount, pricePerKm, fuelTypeForAPI, stationBrand, discountDecimal);

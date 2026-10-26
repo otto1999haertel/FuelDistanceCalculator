@@ -4,7 +4,7 @@ namespace FuelDistanceCalculator.Services;
 
 public static class DiscountParser
 {
-    public static bool TryParseDiscountPercent(string input, out decimal discountValuePercent)
+    public static bool TryParseDiscountOnTotalAmount(string input, out decimal discountValuePercent)
     {
         discountValuePercent = 0;
         if (string.IsNullOrWhiteSpace(input))
@@ -34,5 +34,34 @@ public static class DiscountParser
         {
             return false; // Parsing failed
         }
+    }
+
+    public static bool TryParseDiscountOnUnit(string input, out decimal discountValueOnUnit)
+    {
+        discountValueOnUnit = 0;
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return false;
+        }
+        input = input.Trim();
+        bool isPerUnit = input.EndsWith("ct");
+        if(!isPerUnit)
+        {
+            return false; // Not a per-unit discount
+        }
+        string numericPart = input.Substring(0, input.Length - 2); // Remove "ct"
+        if (decimal.TryParse(numericPart, NumberStyles.Any, CultureInfo.InvariantCulture, out discountValueOnUnit))
+        {
+            if (discountValueOnUnit < 0)
+            {
+                return false; // Negative discounts are not valid
+            }
+             return true;
+        }
+        else
+        {
+            return false; // Parsing failed
+        }
+
     }
 }

@@ -64,10 +64,10 @@
                         <div class="station-details" style="display:none;" id="station-details-item-@index">
                             @if (Model.FuelAmount > 0 || station.TotalCombinedCosts > 0)
                             {
-                                <div class="detailed-cost-container">
+                                <div id= "detailed-costs-@index" class="detailed-cost-container">
                                     <p class="detailed-cost-paragraph">Einzelpreis pro Liter:
                                         @Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString()) €</p>
-                                        <p class="detailed-cost-paragraph">Kraftsoffkosten 
+                                        <p class="detailed-cost-paragraph">Kraftstoffkosten 
                                             @Model.ToDisplayFloatingPoint(@station.TotalFuelCost.ToString()) €</p>
                                             <p class="detailed-cost-paragraph">Reisekosten:
                                                 @Model.ToDisplayFloatingPoint(@station.TotalTravelCost.ToString()) €</p>

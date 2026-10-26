@@ -36,31 +36,7 @@ public class OptimalSearchTest : E2EBaseTest
     [Test]
     public async Task OptimalSearch_With_Max_FuelAmount_Displays_GesamtKosten_And_Ersparnis_And_Details()
     {
-        await Page.GotoAsync("/");
-
-        var expendingSettingsButton = Page.Locator("#advancedToggleButton");
-
-        await expendingSettingsButton.ClickAsync();
-
-        var priceInput = Page.Locator("#PricePerKm");
-
-        await priceInput.FillAsync("0.23");
-
-        await priceInput.PressAsync("Tab");
-
-        // 3. Start- und Zielort setzen
-        await Page.Locator("#generalLocationInput").FillAsync("Berlin");
-
-        // 1. Maximale Tankmenge setzen
-        await Page.Locator("#MaximumFuelAmount").FillAsync("60");
-        await Page.Locator("#MaximumFuelAmount").PressAsync("Tab");
-
-        await Page.Locator("#FuelAmountRange").EvaluateAsync(
-            "el => { el.value = '30'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
-        );
-
-        await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("30 l");
-
+        await SetUpParameters();
 
         // 4. Berechnung starten SearchBtn
         await Page.Locator("#SearchBtn").ClickAsync();
@@ -90,12 +66,19 @@ public class OptimalSearchTest : E2EBaseTest
         CheckDetailsWithoutClosing(2);
     }
 
+
     private async Task CheckDetailsWithoutClosing(int itemIndex)
     {
         Console.WriteLine("Check Details without closing executed");
         await Page.Locator($"#station-summary-item-{itemIndex}").ClickAsync();
         //station-details-item
         var stationDetails = Page.Locator($"#station-details-item-{itemIndex}");
+
+        var detailedCosts = await Page.Locator($"#detailed-costs-{itemIndex}").InnerTextAsync();
+        Assert.That(detailedCosts, Does.Contain("Einzelpreis pro Liter"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
+        Assert.That(detailedCosts, Does.Contain("Kraftstoffkosten"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
+        Assert.That(detailedCosts, Does.Contain("Reisekosten"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
+
         string lastUpdate = await Page.Locator($"#lastUpdateDisplay-{itemIndex}").InnerTextAsync();
         string lastUpdatePattern = @"Letzte Aktualisierung: [0-9]{2}:[0-9]{2} Uhr um * \s*\d+,\d+\s*€";
         Assert.That(lastUpdate, Does.Match(lastUpdatePattern), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{lastUpdate}'");
@@ -109,5 +92,33 @@ public class OptimalSearchTest : E2EBaseTest
         await Expect(mapsLink).ToHaveAttributeAsync("target", "_blank");
         await Expect(mapsLink).ToBeEnabledAsync();
 
+    }
+
+    private async Task SetUpParameters()
+    {
+        await Page.GotoAsync("/");
+
+        var expendingSettingsButton = Page.Locator("#advancedToggleButton");
+
+        await expendingSettingsButton.ClickAsync();
+
+        var priceInput = Page.Locator("#PricePerKm");
+
+        await priceInput.FillAsync("0.23");
+
+        await priceInput.PressAsync("Tab");
+
+        // 3. Start- und Zielort setzen
+        await Page.Locator("#generalLocationInput").FillAsync("Berlin");
+
+        // 1. Maximale Tankmenge setzen
+        await Page.Locator("#MaximumFuelAmount").FillAsync("60");
+        await Page.Locator("#MaximumFuelAmount").PressAsync("Tab");
+
+        await Page.Locator("#FuelAmountRange").EvaluateAsync(
+            "el => { el.value = '30'; el.dispatchEvent(new Event('input', { bubbles: true })); }"
+        );
+
+        await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("30 l");
     }
 }

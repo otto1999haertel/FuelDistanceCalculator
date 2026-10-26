@@ -69,7 +69,12 @@ git checkout -b [name]
 - pushing newly created local brnach upstream:  
 ```bash
 git push origin -u [name]
-```    
+```      
+- rebasing local commits on master for linear history  
+```bash
+git rebase origin/master  
+git push --force-with-lease
+```     
 
 # Check for updates  
 - dotnet list package --vulnerable --include-transitive  

@@ -4,6 +4,23 @@ namespace FuelDistanceCalculatorTest.ServiceTests;
 
 public class DiscountParserTest : ServiceTestBase
 {
+
+    [Test]
+    [TestCase("10", 10, true)]
+    [TestCase("-10", 0, false)]
+    [TestCase("0", 0, true)]
+    [TestCase("15.5", 15.5, true)]
+    [TestCase("abc", 0, false)]
+    public void ParseDiscountTotalAbsolute_ValidInput_ReturnsExpected(string input, decimal expected, bool parseable)
+    {
+        decimal discountValue;
+        // Act
+        Assert.That(DiscountParser.TryParseDiscountOnTotalAbsolut(input, out discountValue).Equals(parseable));
+        if (parseable)
+        {
+            Assert.That(discountValue, Is.EqualTo(expected));
+        }
+    }
     [Test]
     [TestCase("10%", 0.1, true)]
     [TestCase("0%", 0.0, true)]
@@ -19,7 +36,7 @@ public class DiscountParserTest : ServiceTestBase
     {
         decimal discountValue;
         // Act
-        Assert.That(DiscountParser.TryParseDiscountOnTotalAmount(input, out discountValue).Equals(parseable));
+        Assert.That(DiscountParser.TryParseDiscountOnUnitPercentage(input, out discountValue).Equals(parseable));
         if (parseable)
         {
             Assert.That(discountValue, Is.EqualTo(expected));
@@ -38,7 +55,7 @@ public class DiscountParserTest : ServiceTestBase
     {
         decimal discountValue;
         // Act
-        Assert.That(DiscountParser.TryParseDiscountOnUnit(input, out discountValue).Equals(parseable));
+        Assert.That(DiscountParser.TryParseDiscountOnUnitAbsolut(input, out discountValue).Equals(parseable));
         if (parseable)
         {
             Assert.That(discountValue, Is.EqualTo(expected));       

@@ -71,9 +71,10 @@ public class IndexModelValidationUnitTests
         Assert.That(results, Is.Empty);
     }
 
-    [TestCase("10 %")]
+    [TestCase("10%")]
     [TestCase("5")]
-    [TestCase("12.5 %")]
+    [TestCase("12.5%")]
+    [TestCase("1 ct")]
     public void Discount_WithValidFormat_PassesValidation(string? validDiscount)
     {
         var model = CreateIndexModel();

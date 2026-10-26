@@ -1,6 +1,7 @@
 using NUnit.Framework.Internal;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
+using FuelDistanceCalculator.Services.Discount;
 
 namespace FuelDistanceCalculatorTest.ServiceTests;
 
@@ -78,7 +79,6 @@ public class TankCostServiceTest : ServiceTestBase
 
     [Test]
     [TestCase(0, "20%", true)]
-    [TestCase(0, "20", false)]
     [TestCase(40, "15%", true)]
     [TestCase(40, "20", true)]
     public void GetCheapestGasStationPerceantageDiscountTest(decimal fuelAmount, string discountPercentOrAbsolute, bool validDiscount)
@@ -90,7 +90,9 @@ public class TankCostServiceTest : ServiceTestBase
         string StationBrand = "Aral";
         decimal pricePerKm = 0.25m;
         decimal expectedPrice = 0m;
-        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         foreach (var station in CheapestResultStations)
         {
@@ -102,7 +104,7 @@ public class TankCostServiceTest : ServiceTestBase
                             .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
-                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out decimal discountDecimal))
+                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountOnUnitPercentage(discountPercentOrAbsolute, out decimal discountDecimal))
                 {
                     Assert.That(station.FuelTypePrice.Equals(expectedPrice));
                 }
@@ -111,7 +113,7 @@ public class TankCostServiceTest : ServiceTestBase
                     expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
                     Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
-                else if (DiscountParser.TryParseDiscountOnTotalAmount(discountPercentOrAbsolute, out discountDecimal))
+                else if (DiscountParser.TryParseDiscountOnTotalAbsolut(discountPercentOrAbsolute, out discountDecimal))
                 {
                     expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
                     Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));
@@ -137,7 +139,9 @@ public class TankCostServiceTest : ServiceTestBase
         decimal fuelAmount = 40m;
         string discountPercentOrAbsolute = "20";
         decimal expectedPrice = 0m;
-        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         foreach (var station in CheapestResultStations)
         {
@@ -176,7 +180,10 @@ public class TankCostServiceTest : ServiceTestBase
         decimal fuelAmount = 40m;
         string discountPercentOrAbsolute = "20";
         decimal expectedPrice = 0m;
-        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
+
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         var sortedStations = SortService.SortStations(CheapestResultStations, sortMode);
 
@@ -205,7 +212,10 @@ public class TankCostServiceTest : ServiceTestBase
         decimal fuelAmount = 40m;
         string discountPercentOrAbsolute = "100";
         decimal expectedPrice = 0m;
-        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountPercentOrAbsolute);
+
+        DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
+
+        CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         foreach (var station in CheapestResultStations)
         {

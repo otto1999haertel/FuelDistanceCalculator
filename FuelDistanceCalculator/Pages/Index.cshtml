@@ -25,7 +25,7 @@
 <!-- HERO -->
 <div class="hero-section text-center">
     <h1 class="display-5">Willkommen bei FuelGo</h1>
-    <p class="lead">Finde die optimale Tankstelle oder vergleiche Spritpreise zwischen Orten</p>
+    <p class="lead">Finde die optimale Tankstelle oder vergleiche Kraftstoffpreise zwischen Orten</p>
 </div>
 
 <div class="container">
@@ -62,7 +62,7 @@
 
                         <!-- SPRITART -->
                         <div class="mb-4">
-                            <label class="section-label">Spritart</label>
+                            <label class="section-label">Kraftstoffart</label>
                             <div class="fuel-type-buttons">
                                 @foreach (var kvp in FuelTypeHelper.FuelTypeNames)
                                 {
@@ -190,7 +190,7 @@
                                             </span>
                                             <span>
                                                 <i class="ti ti-info-circle" aria-hidden="true"></i>
-                                                Spritpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Trend ist nur eine Schätzung, zur Orientierung, kein Kaufsignal. Alle Angaben bzgl. Verlauf und Preis sind ohne Gewähr.
+                                                Kraftstoffpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Trend ist nur eine Schätzung, zur Orientierung, kein Kaufsignal. Alle Angaben bzgl. Verlauf und Preis sind ohne Gewähr.
                                             </span>
                                             <span>
                                                 <i class="ti ti-info-circle" aria-hidden="true"></i>
@@ -249,7 +249,7 @@
                                         Tankmenge
                                     </label>
                                     <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
-                                          title="Nutze das Textfeld für die maximale Tankmenge und den Slider für die aktuelle Tankmenge. Bei 0 wird nach Spritpreisen sortiert.">
+                                          title="Nutze das Textfeld für die maximale Tankmenge und den Slider für die aktuelle Tankmenge. Bei 0 wird nach Kraftstoffpreisen sortiert.">
                                         ⓘ
                                     </span>
                                     <div class="flex-grow-1 text-center">
@@ -532,7 +532,7 @@
                             {
                                 <p class="mb-2" id="compareLocationItem-@index">
                                     @place.Key:
-                                    @(place.Value > 0 ? $"{Model.ToDisplay(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
+                                    @(place.Value > 0 ? $"{Model.ToDisplayFloatingPoint(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
                                 </p>
                                 index++;
                             }
@@ -974,8 +974,8 @@
             var lat = station.Coords.Lat.ToString().Replace(",", ".");
             var lng = station.Coords.Lng.ToString().Replace(",", ".");
             var price = Model.FuelAmount > 0
-                ? Model.ToDisplay(station.TotalCalculatedCoast.ToString())
-                : Model.ToDisplay(station.FuelTypePrice.ToString());
+                ? Model.ToDisplayFloatingPoint(station.TotalCombinedCosts.ToString())
+                : Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString());
 
             var isCheapest = station == Model.CheapestResultStations.First();
 

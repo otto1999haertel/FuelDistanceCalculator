@@ -109,7 +109,7 @@ public class TankCostServiceTest : ServiceTestBase
                 else if (decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
                 {
                     expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
-                    Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
+                    Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
                 else if (DiscountParser.TryParseDiscountPercent(discountPercentOrAbsolute, out discountDecimal))
                 {
@@ -151,13 +151,13 @@ public class TankCostServiceTest : ServiceTestBase
             {
 
                 expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - decimal.Parse(discountPercentOrAbsolute);
-                Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
+                Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 Assert.That(station.DiscountApplied.Equals(true));
             }
             else
             {
                 expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount;
-                Assert.That(expectedPrice, Is.EqualTo(station.TotalCalculatedCoast).Within(0.001m));
+                Assert.That(expectedPrice, Is.EqualTo(station.TotalCombinedCosts).Within(0.001m));
                 Assert.That(station.DiscountApplied, Is.False);
             }
         }
@@ -192,7 +192,7 @@ public class TankCostServiceTest : ServiceTestBase
                 {
                     expectedPrice = 0;
                 }
-                Assert.That(station.TotalCalculatedCoast, Is.EqualTo(expectedPrice).Within(0.001m));
+                Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 Assert.That(station.DiscountApplied.Equals(true));
             }
             else
@@ -225,7 +225,7 @@ public class TankCostServiceTest : ServiceTestBase
     {
         for (int i = 0; i < stations.Count - 1; i++)
         {
-            if (stations[i].TotalCalculatedCoast > stations[i + 1].TotalCalculatedCoast)
+            if (stations[i].TotalCombinedCosts > stations[i + 1].TotalCombinedCosts)
             {
                 return false; // Nicht aufsteigend
             }
@@ -248,21 +248,21 @@ public class TankCostServiceTest : ServiceTestBase
                             {
                                 Name = "Station A",
                                 FuelTypePrice = 1.60m,
-                                TotalCalculatedCoast = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
+                                TotalCombinedCosts = 85.00m,  // 50L * 1.60 + 10km * 0.25 = 80 + 2.5 = 82.5 → aber wir setzen direkt
                                 Dist = 5.0
                             },
                             new GasStation
                             {
                                 Name = "Station B",
                                 FuelTypePrice = 1.50m,
-                                TotalCalculatedCoast = 78.00m,  // günstigster Literpreis, aber weiter weg
+                                TotalCombinedCosts = 78.00m,  // günstigster Literpreis, aber weiter weg
                                 Dist = 15.0
                             },
                             new GasStation
                             {
                                 Name = "Station C",
                                 FuelTypePrice = 1.55m,
-                                TotalCalculatedCoast = 76.25m,  // insgesamt günstigste Gesamtkosten
+                                TotalCombinedCosts = 76.25m,  // insgesamt günstigste Gesamtkosten
                                 Dist = 7.0
                             }
                     }

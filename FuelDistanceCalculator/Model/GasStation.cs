@@ -44,19 +44,19 @@ public class GasStation
     public int Volatility { get; set; }
 
     [JsonProperty("totalCalculatedCoast")]
-    public decimal TotalCalculatedCoast
+    public decimal TotalCombinedCosts
     {
-        get => _totalCoast;
+        get => _totalCost;
         set
         {
             if (value < 0)
             {
                 throw new ArgumentOutOfRangeException("TotalCalculatedCoast cannot be negative.");
             }
-            _totalCoast = value;
+            _totalCost = value;
         }
     }
-    private decimal _totalCoast;
+    private decimal _totalCost;
 
     [JsonProperty("fuelTypePrice")]
     public decimal? FuelTypePrice
@@ -83,36 +83,45 @@ public class GasStation
 
     public bool DiscountApplied { get; private set; } = false;
 
+    [JsonProperty("totalFuelCost")]
+    public decimal TotalFuelCost {get; private set;}
+
+    [JsonProperty("totalTravelCost")]
+    public decimal TotalTravelCost {get; private set;}
+
+
     public decimal CalculateTotalCostDoubleWayWithDiscountGreaterOne(decimal fuelAmount, decimal pricePerKm, string brand = "", decimal discountAmount = 0)
     {
-        if (fuelAmount <= 0 || pricePerKm < 0 || Dist == null || Dist < 0)
+        if (fuelAmount < 0 || pricePerKm < 0 || Dist == null || Dist < 0)
         {
             throw new ArgumentException("Ungültige Eingabewerte: FuelAmount muss positiv sein, PricePerKm nicht negativ, Dist vorhanden und nicht negativ.");
         }
 
         decimal dist = (decimal)Dist.Value;
         decimal fuelCost = (_fuelPrice ?? 0) * fuelAmount;
+        TotalFuelCost = fuelCost>0 ? Math.Round(fuelCost,3,MidpointRounding.AwayFromZero) : 0;
         decimal travelCost = pricePerKm * dist * 2m;
+        TotalTravelCost = travelCost>0 ? Math.Round(travelCost,3,MidpointRounding.AwayFromZero) : 0;
         if (discountAmount > 1 && Brand.Equals(brand, StringComparison.OrdinalIgnoreCase))
         {
-            _totalCoast = fuelCost + travelCost - discountAmount;
-            if (_totalCoast < 0)
+            _totalCost = fuelCost + travelCost - discountAmount;
+            if (_totalCost < 0)
             {
-                _totalCoast = 0;
+                _totalCost = 0;
             }
             DiscountApplied = true;
         }
         else
         {
-            TotalCalculatedCoast = fuelCost + travelCost;
+            TotalCombinedCosts = fuelCost + travelCost;
             DiscountApplied &= DiscountApplied;
         }
-        TotalCalculatedCoast = Math.Round(TotalCalculatedCoast, 2, MidpointRounding.AwayFromZero);
-        Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCoast:F2} € " +
+        TotalCombinedCosts = Math.Round(TotalCombinedCosts, 3, MidpointRounding.AwayFromZero);
+        Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCost:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
                           $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F1}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
 
-        return TotalCalculatedCoast;
+        return TotalCombinedCosts;
     }
 
     public void SetPrice(string fuelType)
@@ -192,6 +201,6 @@ public class GasStation
                $"- Closes At: {ClosesAt}\n" +
                $"- Last Update: {LastUpdate}\n" +
                $"- FuelTypePrice: {FuelTypePrice}\n" +
-               $"- TotalCalculatedCoast: {TotalCalculatedCoast}";
+               $"- TotalCalculatedCoast: {TotalCombinedCosts}";
     }
 }

@@ -14,7 +14,7 @@ public class SortServiceTests : ServiceTestBase
                     Id = "1",
                     Name = "Station A",
                     FuelTypePrice = 1.50m,
-                    TotalCalculatedCoast = 10.00m,
+                    TotalCombinedCosts = 10.00m,
                     Dist = 5.0,
                     Fuels = new List<Fuel>
                     {
@@ -36,7 +36,7 @@ public class SortServiceTests : ServiceTestBase
                     Id = "2",
                     Name = "Station B",
                     FuelTypePrice = 1.40m,
-                    TotalCalculatedCoast = 12.00m,
+                    TotalCombinedCosts = 12.00m,
                     Dist = 3.0,
                     Fuels = new List<Fuel>
                     {
@@ -58,7 +58,7 @@ public class SortServiceTests : ServiceTestBase
                     Id = "3",
                     Name = "Station C",
                     FuelTypePrice = 1.60m,
-                    TotalCalculatedCoast = 8.00m,
+                    TotalCombinedCosts = 8.00m,
                     Dist = 7.0,
                     Fuels = new List<Fuel>
                     {
@@ -99,7 +99,7 @@ public class SortServiceTests : ServiceTestBase
 
         // Assert
         Assert.That(result.Count, Is.EqualTo(3));
-        Assert.ByVal(result.Select(s => s.TotalCalculatedCoast), Is.Ordered);
+        Assert.ByVal(result.Select(s => s.TotalCombinedCosts), Is.Ordered);
         Assert.That(result[0].Name.Equals("Station C"), Is.True); // FuelTypePrice: 1.40
         Assert.That(result[1].Name.Equals("Station A"), Is.True); // FuelTypePrice: 1.50
         Assert.That(result[2].Name.Equals("Station B"), Is.True); // FuelTypePrice: 1.60

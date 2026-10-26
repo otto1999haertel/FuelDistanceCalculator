@@ -9,11 +9,11 @@ public static class TankCostService
     {
         if (stations.IsNullOrEmpty()) return;
         Console.WriteLine($"Calculating savings from {stations.Count} Stations");
-        GasStation cheapestStationTotalCost = stations.OrderBy(x => x.TotalCalculatedCoast).FirstOrDefault();
+        GasStation cheapestStationTotalCost = stations.OrderBy(x => x.TotalCombinedCosts).FirstOrDefault();
         GasStation nearestStation = stations.OrderBy(x => x.Dist).FirstOrDefault();
         GasStation cheapestFuelCost = stations.OrderBy(x => x.FuelTypePrice).FirstOrDefault();
-        SavingsToCheapestStation = cheapestFuelCost.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
-        SavingsToNearestStation = nearestStation.TotalCalculatedCoast - cheapestStationTotalCost.TotalCalculatedCoast;
+        SavingsToCheapestStation = cheapestFuelCost.TotalCombinedCosts - cheapestStationTotalCost.TotalCombinedCosts;
+        SavingsToNearestStation = nearestStation.TotalCombinedCosts - cheapestStationTotalCost.TotalCombinedCosts;
     }
 
     public static List<GasStation> GetCheapestStation(List<GasStation> gasStations, decimal pricePerKm, decimal fuelAmount, string fuelTypeForAPI, string stationBrand = "", string discountPercentOrAbsolute = "")
@@ -124,7 +124,7 @@ public static class TankCostService
         // Debugging: Protokolliere die berechneten Werte
         foreach (var sc in stationCosts)
         {
-            Console.WriteLine($"Station: {sc.Station.Name}, FuelTypePrice: {sc.Station.FuelTypePrice}, TotalCalculatedCoast: {sc.Station.TotalCalculatedCoast}, LastUpdate: {sc.Station.LastUpdate}");
+            Console.WriteLine($"Station: {sc.Station.Name}, FuelTypePrice: {sc.Station.FuelTypePrice}, TotalCalculatedCoast: {sc.Station.TotalCombinedCosts}, LastUpdate: {sc.Station.LastUpdate}");
         }
 
         // Sortiere nach TotalCalculatedCoast

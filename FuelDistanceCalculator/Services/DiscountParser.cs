@@ -77,6 +77,7 @@ public static class DiscountParser
             {
                 return false; // Negative discounts are not valid
             }
+            discountValueOnUnit /= 100; // Convert cents to euros
              return true;
         }
         else

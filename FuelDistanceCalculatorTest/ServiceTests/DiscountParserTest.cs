@@ -44,9 +44,9 @@ public class DiscountParserTest : ServiceTestBase
     }
 
     [Test]
-    [TestCase("10ct", 10, true)]
+    [TestCase("10ct", 0.10, true)]
     [TestCase("0ct", 0, true)]
-    [TestCase("15.5ct", 15.5, true)]
+    [TestCase("15.5ct", 0.155, true)]
     [TestCase("10", 0, false)]
     [TestCase("5", 0, false)]
     [TestCase("-5ct", 0, false)]

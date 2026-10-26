@@ -78,10 +78,12 @@ public class TankCostServiceTest : ServiceTestBase
     }
 
     [Test]
-    [TestCase(0, "20%", true)]
-    [TestCase(40, "15%", true)]
-    [TestCase(40, "20", true)]
-    public void GetCheapestGasStationPerceantageDiscountTest(decimal fuelAmount, string discountPercentOrAbsolute, bool validDiscount)
+    [TestCase(0, "20%")]
+    [TestCase(40, "15%")]
+    [TestCase(40, "20")]
+    [TestCase(0,"5ct")]
+    [TestCase(40, "5ct")]
+    public void GetCheapestGasStationPerceantageDiscountTest(decimal fuelAmount, string discountPercentOrAbsolute)
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
         List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
@@ -104,21 +106,41 @@ public class TankCostServiceTest : ServiceTestBase
                             .Where(f => f.Name.Equals(fuelTypeForAPI, StringComparison.OrdinalIgnoreCase))
                             .Select(f => (decimal)f.Price)
                             .FirstOrDefault();
-                if (fuelAmount == 0 && !DiscountParser.TryParseDiscountOnUnitPercentage(discountPercentOrAbsolute, out decimal discountDecimal))
+                if (fuelAmount == 0 && DiscountParser.TryParseDiscountOnUnitPercentage(discountPercentOrAbsolute, out decimal discountDecimal))
                 {
+                    expectedPrice = expectedPrice * (1 - discountDecimal);
                     Assert.That(station.FuelTypePrice.Equals(expectedPrice));
+                }
+                else if (fuelAmount == 0 && DiscountParser.TryParseDiscountOnUnitAbsolut(discountPercentOrAbsolute, out discountDecimal))
+                {
+                    expectedPrice = expectedPrice - discountDecimal;
+                    Assert.That(station.FuelTypePrice.Equals(expectedPrice));
+                }
+                else if (DiscountParser.TryParseDiscountOnTotalAbsolut(discountPercentOrAbsolute, out discountDecimal))
+                {
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
+                    Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
+                }
+                else if (DiscountParser.TryParseDiscountOnUnitPercentage(discountPercentOrAbsolute, out discountDecimal))
+                {
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount * (1 - discountDecimal);
+                    Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
+                }
+                else if (DiscountParser.TryParseDiscountOnUnitAbsolut(discountPercentOrAbsolute, out discountDecimal))
+                {
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + (expectedPrice - discountDecimal) * fuelAmount ;
+                    Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
                 else if (decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
                 {
                     expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
                     Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
-                else if (DiscountParser.TryParseDiscountOnTotalAbsolut(discountPercentOrAbsolute, out discountDecimal))
+                else
                 {
-                    expectedPrice = Math.Round(expectedPrice * (1 - discountDecimal), 3, MidpointRounding.AwayFromZero);
-                    Assert.That(station.FuelTypePrice, Is.EqualTo(expectedPrice).Within(0.001m));
+                    Assert.Fail("Invalid discount format");
                 }
-                Assert.That(station.DiscountApplied.Equals(validDiscount));
+                Assert.That(station.DiscountApplied, Is.True);
             }
             else
             {

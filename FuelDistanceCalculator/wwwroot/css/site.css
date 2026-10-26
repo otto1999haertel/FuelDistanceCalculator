@@ -1213,6 +1213,14 @@ html.dark-mode .oil-trend-value.is-up   { color: #F09595; }
     border-top: 1px solid var(--border-color);
 }
 
+.detailed-cost-container{
+  margin-bottom: var(--spacing-sm);
+}
+
+.detailed-cost-paragraph{
+  margin: 0px;
+}
+
 
 /* ---------- Mobile ---------- */
 @media (max-width: 576px) {

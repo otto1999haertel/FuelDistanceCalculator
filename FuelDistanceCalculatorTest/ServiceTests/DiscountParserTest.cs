@@ -50,6 +50,8 @@ public class DiscountParserTest : ServiceTestBase
     [TestCase("10", 0, false)]
     [TestCase("5", 0, false)]
     [TestCase("-5ct", 0, false)]
+    [TestCase("100ct", 1, true)]
+    [TestCase("101ct", 1.01, true)]
     [TestCase("abcct", 0, false)]
     public void ParseDiscountOnUnit_ValidInput_ReturnsExpected(string input, decimal expected, bool parseable)
     {

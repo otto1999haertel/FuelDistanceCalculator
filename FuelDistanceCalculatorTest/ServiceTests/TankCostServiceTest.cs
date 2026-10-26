@@ -131,11 +131,6 @@ public class TankCostServiceTest : ServiceTestBase
                     expectedPrice = pricePerKm * (decimal)station.Dist * 2m + (expectedPrice - discountDecimal) * fuelAmount ;
                     Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
-                else if (decimal.TryParse(discountPercentOrAbsolute, out discountDecimal))
-                {
-                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + expectedPrice * fuelAmount - discountDecimal;
-                    Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
-                }
                 else
                 {
                     Assert.Fail("Invalid discount format");

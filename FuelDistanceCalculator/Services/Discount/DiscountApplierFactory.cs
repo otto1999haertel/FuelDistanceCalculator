@@ -24,7 +24,7 @@ public static class DiscountApplierFactory
         }
         else
         {
-            throw new ArgumentException("Invalid discount format.", nameof(discountAmount));
+            return null;
         }
     }
 }

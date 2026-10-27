@@ -47,19 +47,22 @@
 
                     @if (Model.FuelAmount > 0 || station.TotalCombinedCosts > 0)
                     {
-                        <span>Gesamtkosten @if(station.DiscountApplied){
-                                        <text>(inkl.
-                                            Rabatt)</text>
-                                        }: <span
-                            class="station-strong-price">@Model.ToDisplayFloatingPoint(station.TotalCombinedCosts.ToString())
-                            €</span></span>
-                        }
+                        <span>
+                            Gesamtkosten@(station.DiscountApplied ? " (inkl. Rabatt)" : ""):
+                            <span class="station-strong-price">
+                                @Model.ToDisplayFloatingPoint(station.TotalCombinedCosts.ToString()) €
+                            </span>
+                        </span>
+                    }
                     else
-                        {
-                            <span>Einzelpreis pro Liter: <span
-                                class="station-strong-price">@Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString())
-                                €</span></span>
-                            }
+                    {
+                        <span>
+                            Einzelpreis pro Liter@(station.DiscountApplied ? " (inkl. Rabatt)" : ""):
+                            <span class="station-strong-price">
+                                @Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString()) €
+                            </span>
+                        </span>
+                    }
                         </div>
                         <div class="station-details" style="display:none;" id="station-details-item-@index">
                             @if (Model.FuelAmount > 0 || station.TotalCombinedCosts > 0)

@@ -53,7 +53,7 @@ public class OptimalSearchTest : E2EBaseTest
         Assert.That(nearestSavingsText, Does.StartWith("Ersparnis zur Nächsten im Radius:"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{nearestSavingsText}'");
 
         // 5. Warten auf die Anzeige der Ergebnisse
-        string regexPattern = @".*Gesamtkosten :\s*\d+,\d+\s*€";
+        string regexPattern = @".*Gesamtkosten: \s*\d+,\d+\s*€";
 
         var firstSummary = Page.Locator("#station-summary-item-0");
         string summaryText = await firstSummary.InnerTextAsync();

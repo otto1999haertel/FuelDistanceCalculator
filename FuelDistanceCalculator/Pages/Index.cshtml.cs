@@ -4,6 +4,7 @@ using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
+using FuelDistanceCalculator.Services.Discount;
 using FuelDistanceCalculator.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -200,8 +201,9 @@ public class IndexModel : PageModel
                 Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
                 Console.WriteLine($"Discount input: {DiscountPercentOrAbsolute}, Fuel Amount: {FuelAmount}");
 
+                DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, DiscountPercentOrAbsolute, FuelAmount);
                 CheapestResultStations = TankCostService.GetCheapestStation(
-                    gasStations.Stations, PricePerKm, FuelAmount, fuelTypeForAPI, StationBrand ?? string.Empty, DiscountPercentOrAbsolute ?? string.Empty);
+                    gasStations.Stations, PricePerKm, FuelAmount, fuelTypeForAPI, StationBrand ?? string.Empty, discountApplier);
 
                 decimal savingsToNearestTemp = 0;
                 decimal savingsToCheapestTemp = 0;

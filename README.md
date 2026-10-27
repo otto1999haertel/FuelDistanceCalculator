@@ -69,8 +69,27 @@ git checkout -b [name]
 - pushing newly created local brnach upstream:  
 ```bash
 git push origin -u [name]
-```    
+```      
+- rebasing local commits on master for linear history  
+```bash
+git rebase origin/master  
+git push --force-with-lease
+```       
+- squash commits via rebase  
+```bash  
+git rebase -i HEAD~10  
+``` 
+pick A # Dieser bleibt  
+squash B # wird an A angefügt  
+squash C # wird auch an A angefügt  
+pick D # neuer eigenstädndiger Commit   
+
+Danach:  
+```bash  
+git push --force-with-lease  
+``` 
 
 # Check for updates  
 - dotnet list package --vulnerable --include-transitive  
 - dotnet list package --outdated  
+- dotnet list package --deprecated

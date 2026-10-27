@@ -45,6 +45,7 @@ jobs:
       - uses: actions/checkout@v5
       - run: dotnet build --configuration Release
 
+  
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -52,6 +53,37 @@ jobs:
       TANK_API_KEY: ${{ secrets.TANKAPIKEY }}
       OPENROUTESERVICE_API_KEY: ${{ secrets.OPENROUTESERVICEAPIKEY }}
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v5
-      - run: dotnet test --configuration Release
+
+      - name: Run tests with coverage
+        run: >
+          dotnet test
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults
+
+      - name: Install ReportGenerator
+        if: always()
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report
+        if: always()
+        run: |
+          reportgenerator \
+            "-reports:TestResults/**/coverage.cobertura.xml" \
+            "-targetdir:coveragereport" \
+            "-reporttypes:Html;Cobertura;MarkdownSummaryGithub"
+
+      - name: Add coverage summary to GitHub Actions
+        if: always()
+        run: cat coveragereport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: coveragereport/
+          retention-days: 14

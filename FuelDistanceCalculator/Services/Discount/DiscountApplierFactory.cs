@@ -20,7 +20,7 @@ public static class DiscountApplierFactory
         }
         else if (DiscountParser.TryParseDiscountOnUnitPercentage(discountAmount, out parsedPercentage))
         {
-            return new UnitPercentage(brand, parsedPercentage);
+            return new UnitPercentageDiscount(brand, parsedPercentage);
         }
         else
         {

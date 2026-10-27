@@ -185,7 +185,6 @@ public class TankCostServiceTest : ServiceTestBase
     }
 
     [Test]
-
     public void SortCheapestGasStationDiscountAppliedKeepsBooleanDiscountValue( [Values] SortModeEnum sortMode)
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
@@ -231,7 +230,7 @@ public class TankCostServiceTest : ServiceTestBase
         decimal expectedPrice = 0m;
 
         DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
-
+        
         CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         foreach (var station in CheapestResultStations)

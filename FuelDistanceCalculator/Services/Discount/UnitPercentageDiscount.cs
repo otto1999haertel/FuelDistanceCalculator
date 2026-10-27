@@ -1,19 +1,15 @@
 using FuelDistanceCalculator.Model;
 namespace FuelDistanceCalculator.Services.Discount;
 
-public class UnitPercentage : DiscountApplier
+public class UnitPercentageDiscount : DiscountApplier
 {
-    public UnitPercentage(string brand, decimal discountAmount) : base(brand, discountAmount)
+    public UnitPercentageDiscount(string brand, decimal discountAmount) : base(brand, discountAmount)
     {
     }
 
     public override void ApplyDiscount(GasStation station)
     {
-        if (station == null)
-        {
-            throw new ArgumentNullException(nameof(station));
-        }
-
+        base.ApplyDiscount(station);
         if (!string.Equals(station.Brand, _brand, StringComparison.OrdinalIgnoreCase))
         {
             station.DiscountApplied = false;

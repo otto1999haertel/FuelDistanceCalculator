@@ -67,7 +67,7 @@
                                 <div id= "detailed-costs-@index" class="detailed-cost-container">
                                     <p class="detailed-cost-paragraph">Einzelpreis pro Liter:
                                         @Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString()) €</p>
-                                        <p class="detailed-cost-paragraph">Kraftstoffkosten 
+                                        <p class="detailed-cost-paragraph">Kraftstoffkosten: 
                                             @Model.ToDisplayFloatingPoint(@station.TotalFuelCost.ToString()) €</p>
                                             <p class="detailed-cost-paragraph">Fahrtkosten:
                                                 @Model.ToDisplayFloatingPoint(@station.TotalTravelCost.ToString()) €</p>

@@ -16,5 +16,15 @@ public abstract class DiscountApplier
         _discountAmount = discountAmount;
         _brand = brand;
     }
-    public abstract void ApplyDiscount(GasStation station);
+    public virtual void ApplyDiscount(GasStation station)
+    {
+        if (station == null)
+        {
+            throw new ArgumentNullException(nameof(station));
+        }
+        if (station.DiscountApplied)
+        {
+            return; // Discount already applied, skip further processing
+        }
+    }
 }

@@ -11,10 +11,7 @@ public class TotalAbsolutDiscount : DiscountApplier
 
     public override void ApplyDiscount(GasStation station)
     {
-        if (station == null)
-        {
-            throw new ArgumentNullException(nameof(station));
-        }
+        base.ApplyDiscount(station);
         if (!string.Equals(station.Brand, _brand, StringComparison.OrdinalIgnoreCase))
         {
             station.DiscountApplied = false;

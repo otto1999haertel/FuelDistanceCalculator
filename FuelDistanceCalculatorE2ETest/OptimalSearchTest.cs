@@ -77,7 +77,7 @@ public class OptimalSearchTest : E2EBaseTest
         var detailedCosts = await Page.Locator($"#detailed-costs-{itemIndex}").InnerTextAsync();
         Assert.That(detailedCosts, Does.Contain("Einzelpreis pro Liter"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
         Assert.That(detailedCosts, Does.Contain("Kraftstoffkosten"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
-        Assert.That(detailedCosts, Does.Contain("Reisekosten"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
+        Assert.That(detailedCosts, Does.Contain("Fahrtkosten"), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{detailedCosts}'");
 
         string lastUpdate = await Page.Locator($"#lastUpdateDisplay-{itemIndex}").InnerTextAsync();
         string lastUpdatePattern = @"Letzte Aktualisierung: [0-9]{2}:[0-9]{2} Uhr um * \s*\d+,\d+\s*€";

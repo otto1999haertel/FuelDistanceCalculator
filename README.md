@@ -77,7 +77,7 @@ git push --force-with-lease
 ```       
 - squash commits via rebase  
 ```bash  
-git rebase -i  
+git rebase -i HEAD~10  
 ``` 
 pick A # Dieser bleibt  
 squash B # wird an A angefügt  
@@ -92,3 +92,4 @@ git push --force-with-lease
 # Check for updates  
 - dotnet list package --vulnerable --include-transitive  
 - dotnet list package --outdated  
+- dotnet list package --deprecated

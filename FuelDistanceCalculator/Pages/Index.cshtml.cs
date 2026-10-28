@@ -13,11 +13,16 @@ using Newtonsoft.Json;
 
 namespace FuelDistanceCalculator.Pages;
 
+/// <summary>
+/// PageModel for the Index page handling fuel distance calculator functionality
+/// Modularized to separate UI logic from business logic
+/// </summary>
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
-    private FuelPriceService _fuelPriceService;
-    private readonly IMarketFuelPriceService _MarketfuelPriceService;
+    private readonly FuelPriceService _fuelPriceService;
+    private readonly TankStationSearchService _tankStationSearchService;
+    private readonly IMarketFuelPriceService _marketFuelPriceService;
     private readonly IGeoLocationService _geoLocationService;
     private readonly IOilPriceService _oilPriceService;
     private readonly ConcurrentBag<(string Type, string Message)> _toastMessages = new();
@@ -46,7 +51,10 @@ public class IndexModel : PageModel
     [BindProperty, RadiusList(1, 25)]
     public List<double> RadiusPlaces { get; set; } = new();
 
-    public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; set; } = new();
+    /// <summary>
+    /// Stores calculated average costs for each location in comparison mode
+    /// </summary>
+    public ConcurrentDictionary<string, decimal> CalculatedAverageCosts { get; private set; } = new();
 
     public double AverageCostPlace1 { get; private set; }
     public double AverageCostPlace2 { get; private set; }
@@ -68,10 +76,13 @@ public class IndexModel : PageModel
     [BindProperty, Range(-90, 90, ErrorMessage = "Ungültiger Breitengrad.")]
     public double LongitudePlace { get; set; }
 
-    [BindProperty, Range(-180, 180, ErrorMessage = "Ungültiger Längengrad.")]
+    [BindProperty, Range(-180, 180, ErrorMessage = "Ungültiger Längengrad.")] 
     public double LatitudePlace { get; set; }
 
-    public List<GasStation> CheapestResultStations { get; set; } = new();
+    /// <summary>
+    /// Contains the list of cheapest stations found by search
+    /// </summary>
+    public List<GasStation> CheapestResultStations { get; private set; } = new();
 
     public Dictionary<string, decimal> CarsAndRespectivePricePerkm { get; private set; } = new();
 
@@ -80,9 +91,12 @@ public class IndexModel : PageModel
     public string? SelectedCarType { get; set; }
 
     public bool IsProduction { get; private set; }
+    /// <summary>
+    /// Indicates whether a search has been executed
+    /// </summary>
     public bool SearchExecuted { get; private set; }
-    public decimal SavingsToNearestStation { get; set; }
-    public decimal SavingsToCheapestStation { get; set; }
+    public decimal SavingsToNearestStation { get; private set; }
+    public decimal SavingsToCheapestStation { get; private set; }
 
     // Als string? markiert (optionales Feld)
     [BindProperty, StringLength(50)]
@@ -96,24 +110,37 @@ public class IndexModel : PageModel
     public string? DiscountPercentOrAbsolute { get; set; }
 
     public string? DataSourceDate { get; private set; }
-    public OilPriceChange? OilPriceChange { get; set; }
-    public SortModeEnum SortMode { get; set; }
+    public OilPriceChange? OilPriceChange { get; private set; }
+    public SortModeEnum SortMode { get; private set; }
+
+    /// <summary>
+    /// Indicates whether advanced options have values and should be expanded by default
+    /// </summary>
+    public bool AdvancedHasValue =>
+        !string.IsNullOrWhiteSpace(StationBrand)
+        || !string.IsNullOrWhiteSpace(DiscountPercentOrAbsolute)
+        || !string.IsNullOrWhiteSpace(SelectedCarType);
 
     private const string StationsSessionKey = "Stations";
     private const string InputDataSessionKey = "InputData";
     private const int MaxCarTypeQueryLength = 100;
 
+    /// <summary>
+    /// Constructor that injects all required dependencies for modular architecture
+    /// </summary>
     public IndexModel(
         ILogger<IndexModel> logger,
-        FuelPriceService fuelPrice,
+        FuelPriceService fuelPriceService,
+        TankStationSearchService tankStationSearchService,
         IMarketFuelPriceService marketFuelPriceService,
         IGeoLocationService geoLocationService,
         IOilPriceService oilPriceService,
         IConfiguration configuration)
     {
         _logger = logger;
-        _fuelPriceService = fuelPrice;
-        _MarketfuelPriceService = marketFuelPriceService;
+        _fuelPriceService = fuelPriceService;
+        _tankStationSearchService = tankStationSearchService;
+        _marketFuelPriceService = marketFuelPriceService;
         _geoLocationService = geoLocationService;
         _oilPriceService = oilPriceService;
         _configuration = configuration;
@@ -123,54 +150,69 @@ public class IndexModel : PageModel
         SortMode = SortModeEnum.totalCost;
     }
 
+    /// <summary>
+    /// GET handler for the Index page. Initializes the model with default values and loads necessary data.
+    /// </summary>
     public async Task OnGetAsync()
     {
         Console.WriteLine("get was executed and overwrite of values");
+        
+        // Initialize view data
         ViewData["ContactName"] = ContactInfo.Name;
 
+        // Initialize form defaults for comparison mode
         NamePlaces = new List<string> { "", "" };
         RadiusPlaces = new List<double> { 10, 10 };
 
+        // Set default fuel type and input mode
         SelectedFuelType = FuelType.Diesel;
         SelectInputMode = InputMode.auto;
 
+        // Set default calculation parameters
         FuelAmount = 0;
         PricePerKm = 0.25m;
         FuelPrice1 = 0;
         FuelPrice2 = 0;
         Distance2 = 0;
         Radius = 10;
-        AverageCostPlace1 = 0;
-        AverageCostPlace2 = 0;
         Place = "";
 
+        // Initialize results collection
         CheapestResultStations = new List<GasStation>();
+        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
 
+        // Restore average costs from TempData if available
         if (TempData["AverageCostPlace1"] != null && TempData["AverageCostPlace2"] != null)
         {
             AverageCostPlace1 = Convert.ToDouble(TempData["AverageCostPlace1"]);
             AverageCostPlace2 = Convert.ToDouble(TempData["AverageCostPlace2"]);
         }
 
+        // Load car data and oil price information
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
     }
 
+    /// <summary>
+    /// POST handler for searching tank stations. Validates input and delegates to TankStationSearchService.
+    /// </summary>
     [EnableRateLimiting("upstream")]
     public async Task OnPostSearch()
     {
+        // Initialize results collection
         CheapestResultStations = new List<GasStation>();
 
+        // Load necessary data
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
 
-        // 1. Manuelle Prüfung für den Pflichtparameter Place
+        // Validate Place parameter
         if (string.IsNullOrWhiteSpace(Place))
         {
             ModelState.AddModelError(nameof(Place), "Bitte einen Standort eingeben.");
         }
 
-        // 2. Das gesamte Modell nach dem Setzen von nullable Typen validieren
+        // Validate entire model
         bool flowControl = ValidateModel();
         if (!flowControl)
         {
@@ -178,67 +220,48 @@ public class IndexModel : PageModel
         }
 
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
-        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
-        string fuelTypeForAPI = GetFuelTypeForAPI();
+        
+        // Delegate to TankStationSearchService for search logic
+        var searchResult = await _tankStationSearchService.ExecuteSearchAsync(
+            Place!,
+            Radius,
+            SelectedFuelType,
+            PricePerKm,
+            FuelAmount,
+            StationBrand,
+            DiscountPercentOrAbsolute);
 
-        ApiThrottle fuelThrottle = new ApiThrottle();
+        // Center the map on the geocoded location (restored behavior the map depends on).
+        LatitudePlace = searchResult.Latitude;
+        LongitudePlace = searchResult.Longitude;
 
-        var coordinates = await _geoLocationService.GetCoordinatesAsync(Place!);
-        LongitudePlace = coordinates?.Longitude ?? 0;
-        LatitudePlace = coordinates?.Latitude ?? 0;
-        Console.WriteLine($"Coordinates from API: {coordinates}");
-
-        if (coordinates != null)
+        if (searchResult.Success && searchResult.Stations != null)
         {
-            var gasStations = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                () => _MarketfuelPriceService.GetGasStationsAsync(coordinates.Latitude, coordinates.Longitude, Radius, fuelTypeForAPI));
+            CheapestResultStations = searchResult.Stations;
+            SavingsToNearestStation = searchResult.SavingsToNearestStation;
+            SavingsToCheapestStation = searchResult.SavingsToCheapestStation;
 
-            if (gasStations.IsSuccess)
+            // Log found stations
+            foreach (var station in CheapestResultStations)
             {
-                gasStations.Stations = await fuelThrottle.ExecuteWithThrottle("DistanceCalculation",
-                    () => _geoLocationService.CalculateDistanceFromAPI(coordinates.Latitude, coordinates.Longitude, gasStations.Stations));
-
-                Console.WriteLine($"Response in Index, List length: {gasStations.Stations.Count}");
-                Console.WriteLine($"Discount input: {DiscountPercentOrAbsolute}, Fuel Amount: {FuelAmount}");
-
-                DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, DiscountPercentOrAbsolute, FuelAmount);
-                CheapestResultStations = TankCostService.GetCheapestStation(
-                    gasStations.Stations, PricePerKm, FuelAmount, fuelTypeForAPI, StationBrand ?? string.Empty, discountApplier);
-
-                decimal savingsToNearestTemp = 0;
-                decimal savingsToCheapestTemp = 0;
-                TankCostService.CaluclateSavings(gasStations.Stations, ref savingsToNearestTemp, ref savingsToCheapestTemp);
-                SavingsToNearestStation = savingsToNearestTemp;
-                SavingsToCheapestStation = savingsToCheapestTemp;
-
-                if (CheapestResultStations != null && CheapestResultStations.Any())
-                {
-                    foreach (var station in CheapestResultStations)
-                    {
-                        Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCombinedCosts}, LastUpdate: {station.LastUpdate}");
-                    }
-
-                    HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(CheapestResultStations));
-                }
+                Console.WriteLine($"Station: {station.Name}, FuelTypePrice: {station.FuelTypePrice}, TotalCalculatedCoast: {station.TotalCombinedCosts}, LastUpdate: {station.LastUpdate}");
             }
-            else
-            {
-                Console.WriteLine($"Error in Tanker-API Request: {gasStations.ErrorMessage}");
-                TempData["ToastType"] = "error";
-                TempData["ToastMessage"] = "Fehler bei Tankstellenabfrage";
-            }
+
+            // Save to session
+            HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(CheapestResultStations));
         }
         else
         {
             TempData["ToastType"] = "error";
-            TempData["ToastMessage"] = "Fehler bei der Koordinatenabfrage";
+            TempData["ToastMessage"] = $"Fehler bei Suche: {searchResult.ErrorMessage}";
         }
 
+        // Store input data in session for sorting
         var inputData = new
         {
             FuelAmount,
             PricePerKm,
-            fuelTypeForAPI,
+            fuelTypeForAPI = GetFuelTypeForAPI(),
             SelectedCarType,
             SavingsToCheapestStation,
             SavingsToNearestStation,
@@ -315,46 +338,67 @@ public class IndexModel : PageModel
         return new JsonResult(new { filteredCars });
     }
 
+    /// <summary>
+    /// POST handler for calculating average costs across multiple locations. Delegates to TankStationSearchService.
+    /// </summary>
     [EnableRateLimiting("upstream")]
     public async Task OnPostCalculateAverageCost()
     {
         CheapestResultStations = new List<GasStation>();
 
+        // Load necessary data
         await GetCarsAndRespectivePricePerkm();
         await GetOilPriceChange();
+
+        // Validate model
         bool flowControl = ValidateModel();
         if (!flowControl)
         {
             return;
         }
 
-        ThreadPool.SetMinThreads(10, 10);
-        CalculatedAverageCosts = new ConcurrentDictionary<string, decimal>();
-        ApiThrottle fuelThrottle = new ApiThrottle(maxConcurrentCalls: 1);
+        // Delegate to TankStationSearchService for parallel calculation
+        var result = await _tankStationSearchService.CalculateAverageCostsAsync(
+            NamePlaces, 
+            RadiusPlaces, 
+            SelectedFuelType);
 
+        // Store results in CalculatedAverageCosts dictionary
+        foreach (var location in result.Locations)
+        {
+            CalculatedAverageCosts[location.Name] = location.AverageCost;
+        }
 
-        _fuelPriceService = new FuelPriceService();
-        string fuelTypeForAPI = GetFuelTypeForAPI();
-        object lockObj = new object();
+        // Update average cost fields for view (convert decimal to double)
+        if (CalculatedAverageCosts.Count > 0)
+        {
+            AverageCostPlace1 = (double)CalculatedAverageCosts.Values.ElementAtOrDefault(0);
+            AverageCostPlace2 = (double)CalculatedAverageCosts.Values.ElementAtOrDefault(1);
+        }
 
-        List<Task> tasks = NamePlaces
-            .Select((name, index) => (Name: name, Index: index))
-            .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .Select(x => Task.Run(() => CalculateAverageCost(lockObj, x.Index, fuelThrottle, fuelTypeForAPI)))
-            .ToList();
-
-        await Task.WhenAll(tasks);
-
+        // Handle toast messages from service
         foreach (var (type, message) in _toastMessages)
         {
             TempData["ToastType"] = type;
             TempData["ToastMessage"] = message;
         }
+
+        if (!result.Success)
+        {
+            TempData["ToastType"] = "error";
+            TempData["ToastMessage"] = result.ErrorMessage;
+        }
     }
 
+    /// <summary>
+    /// POST handler for sorting tank stations. Delegates to SortService and returns partial view.
+    /// </summary>
     public async Task<IActionResult> OnPostSort(SortModeEnum sortMode)
     {
-        if (!ModelState.IsValid) return new JsonResult(new { success = false, message = "Invalid model state" });
+        if (!ModelState.IsValid)
+        {
+            return new JsonResult(new { success = false, message = "Invalid model state" });
+        }
 
         if (!Enum.IsDefined(typeof(SortModeEnum), sortMode))
         {
@@ -365,6 +409,7 @@ public class IndexModel : PageModel
         {
             SortMode = sortMode;
 
+            // Get and sort stations from session
             var stationsJson = HttpContext.Session.GetString(StationsSessionKey);
             if (string.IsNullOrEmpty(stationsJson))
             {
@@ -377,8 +422,10 @@ public class IndexModel : PageModel
                 return Content("<p>Keine Tankstellen verfügbar</p>");
             }
 
+            // Sort stations using SortService
             var sortedStations = SortService.SortStations(stations, sortMode);
 
+            // Get input data from session
             var inputJson = HttpContext.Session.GetString(InputDataSessionKey);
             var inputData = string.IsNullOrEmpty(inputJson)
                 ? null
@@ -394,34 +441,37 @@ public class IndexModel : PageModel
                     DiscountPercentOrAbsolute = string.Empty
                 });
 
-            var model = new IndexModel(_logger, _fuelPriceService, _MarketfuelPriceService, _geoLocationService, _oilPriceService, _configuration)
-            {
-                CheapestResultStations = sortedStations,
-                FuelAmount = inputData?.FuelAmount ?? 0,
-                PricePerKm = inputData?.PricePerKm ?? 0,
-                SelectedFuelType = inputData?.SelectedFuelType ?? FuelType.Diesel,
-                SelectedCarType = inputData?.SelectedCarType ?? "",
-                SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0,
-                SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0,
-                SortMode = sortMode,
-                DiscountPercentOrAbsolute = inputData?.DiscountPercentOrAbsolute ?? ""
-            };
+            // Restore the persisted search context onto this model so the re-rendered
+            // list keeps its display state. Without this the partial (rendered with
+            // `this` since the nodularization refactor) sees FuelAmount/savings = 0 and
+            // hides the Ersparnis even when switching back to "Gesamtkosten" sorting.
+            FuelAmount = inputData?.FuelAmount ?? 0;
+            PricePerKm = inputData?.PricePerKm ?? 0;
+            SelectedFuelType = inputData?.SelectedFuelType ?? FuelType.Diesel;
+            SelectedCarType = inputData?.SelectedCarType ?? "";
+            SavingsToCheapestStation = inputData?.SavingsToCheapestStation ?? 0;
+            SavingsToNearestStation = inputData?.SavingsToNearestStation ?? 0;
+            DiscountPercentOrAbsolute = inputData?.DiscountPercentOrAbsolute ?? "";
 
+            // Update model with sorted stations
+            CheapestResultStations = sortedStations;
+
+            // Persist the updated context back to the session
             var updatedInputData = new
             {
-                FuelAmount = model.FuelAmount,
-                PricePerKm = model.PricePerKm,
-                SelectedFuelType = model.SelectedFuelType,
-                SelectedCarType = model.SelectedCarType,
-                SavingsToCheapestStation = model.SavingsToCheapestStation,
-                SavingsToNearestStation = model.SavingsToNearestStation,
+                FuelAmount,
+                PricePerKm,
+                SelectedFuelType,
+                SelectedCarType,
+                SavingsToCheapestStation,
+                SavingsToNearestStation,
                 SortMode = sortMode,
-                DiscountPercentOrAbsolute = model.DiscountPercentOrAbsolute
+                DiscountPercentOrAbsolute
             };
             HttpContext.Session.SetString(InputDataSessionKey, JsonConvert.SerializeObject(updatedInputData));
             HttpContext.Session.SetString(StationsSessionKey, JsonConvert.SerializeObject(sortedStations));
 
-            return Partial("_StationListPartial", model);
+            return Partial("_StationListPartial", this);
         }
         catch (Exception ex)
         {
@@ -430,46 +480,9 @@ public class IndexModel : PageModel
         }
     }
 
-    private async Task CalculateAverageCost(object lockObj, int i, ApiThrottle fuelThrottle, string fuelTypeForAPI)
-    {
-        try
-        {
-            var coordinatesPlace = await _geoLocationService.GetCoordinatesAsync(NamePlaces[i]);
-
-            if (coordinatesPlace != null)
-            {
-                double radiusPlace = (i >= RadiusPlaces.Count) ? 10 : RadiusPlaces.ElementAt(i);
-                lock (lockObj)
-                {
-                    RadiusPlaces[i] = radiusPlace;
-                }
-                var gasStationsPlace1 = await fuelThrottle.ExecuteWithThrottle("FuelPrice",
-                    () => _MarketfuelPriceService.GetGasStationsAsync(coordinatesPlace.Latitude, coordinatesPlace.Longitude, radiusPlace, fuelTypeForAPI));
-
-                if (gasStationsPlace1.IsSuccess)
-                {
-                    CalculatedAverageCosts[NamePlaces[i]] = _fuelPriceService.CalculateAverageCost(gasStationsPlace1.Stations) ?? 0.0m;
-                }
-                else
-                {
-                    CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
-                    _toastMessages.Add(("error", "Fehler bei Tankstellenabfrage"));
-                }
-            }
-            else
-            {
-                CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
-                _toastMessages.Add(("error", "Fehler bei Koordinatenabfrage"));
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Fehler bei der Verarbeitung von {Place}", NamePlaces[i]);
-            CalculatedAverageCosts[NamePlaces[i]] = 0.0m;
-            _toastMessages.Add(("error", $"Fehler bei der Verarbeitung von {NamePlaces[i]}"));
-        }
-    }
-
+    /// <summary>
+    /// Loads car data and fuel prices from ADAC JSON file. Results are cached after first load.
+    /// </summary>
     private async Task GetCarsAndRespectivePricePerkm()
     {
         if (CarsAndRespectivePricePerkm.Count > 0)
@@ -485,6 +498,9 @@ public class IndexModel : PageModel
         }
     }
 
+    /// <summary>
+    /// Fetches oil price change data from the oil price service. Returns default values on failure.
+    /// </summary>
     private async Task GetOilPriceChange()
     {
         ApiThrottle oilPriceThrottle = new ApiThrottle();
@@ -503,6 +519,9 @@ public class IndexModel : PageModel
         }
     }
 
+    /// <summary>
+    /// Converts FuelType enum to API-compatible string.
+    /// </summary>
     private string GetFuelTypeForAPI()
     {
         return SelectedFuelType switch
@@ -514,6 +533,9 @@ public class IndexModel : PageModel
         };
     }
 
+    /// <summary>
+    /// Validates the model and returns a list of validation errors if any.
+    /// </summary>
     private bool ValidateModel()
     {
         if (!TryValidateModel(this))

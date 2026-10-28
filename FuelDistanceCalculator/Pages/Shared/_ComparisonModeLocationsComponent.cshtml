@@ -1,0 +1,149 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- ==================================================
+     MODE-DIV: STANDORTVERGLEICH (enthält Submit)
+     ================================================== -->
+<div id="manualInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.man ? "block" : "none")">
+
+    @if ((bool)Model.NamePlaces?.Any() || string.IsNullOrWhiteSpace(Model.NamePlaces[0]))
+    {
+        <!-- Standort 1 -->
+        <div class="location-row">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <label class="section-label mb-1">Standort 1</label>
+                    <div class="input-group">
+                        <input type="text"
+                               name="NamePlaces[0]"
+                               class="form-control"
+                               id="FirstComparePlace"
+                               value="@(Model.NamePlaces.Count > 0 ? Model.NamePlaces[0] : "")"
+                               placeholder="Ort eingeben" />
+                        <button id="geoButton2" class="btn btn-primary location-btn" type="button">
+                            <img src="location.png" alt="Standort">
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-1">
+                        <label for="RadiusPlace0" class="section-label mb-0">Radius</label>
+                        <div class="flex-grow-1 text-center" id="RadiusPlace0Lbl">
+                            <output id="outputRadius0" class="value-output">
+                                @(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10) km
+                            </output>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted ms-1">1</small>
+                        <div class="flex-grow-1">
+                            <input type="range"
+                                   name="RadiusPlaces[0]"
+                                   class="form-range"
+                                   min="1" max="25" step="1"
+                                   value="@(Model.RadiusPlaces.Count > 0 ? Model.RadiusPlaces[0] : 10)"
+                                   id="RadiusPlace0">
+                        </div>
+                        <small class="text-muted ms-1">25</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Standort 2 -->
+        <div class="location-row">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <label class="section-label mb-1">Standort 2</label>
+                    <input type="text"
+                           name="NamePlaces[1]"
+                           class="form-control"
+                           value="@(Model.NamePlaces.Count > 1 ? Model.NamePlaces[1] : "")"
+                           placeholder="Ort eingeben" 
+                           id ="SecondComparePlace"/>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-1">
+                        <label for="RadiusPlace1" class="section-label mb-0">Radius</label>
+                        <div class="flex-grow-1 text-center" id="RadiusPlace1Lbl">
+                            <output id="outputRadius1" class="value-output">
+                                @(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10) km
+                            </output>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted ms-1">1</small>
+                        <div class="flex-grow-1">
+                            <input type="range"
+                                   name="RadiusPlaces[1]"
+                                   class="form-range"
+                                   min="1" max="25" step="1"
+                                   value="@(Model.RadiusPlaces.Count > 1 ? Model.RadiusPlaces[1] : 10)"
+                                   id="RadiusPlace1">
+                        </div>
+                        <small class="text-muted ms-1">25</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.NamePlaces.Count > 2)
+    {
+        @for (int i = 2; i < Model.NamePlaces.Count; i++)
+        {
+            <div class="location-row">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6">
+                        <label class="section-label mb-1">Standort @(i+1)</label>
+                        <input type="text"
+                               name="NamePlaces[@i]"
+                               id="NamePlaces[@i]"
+                               class="form-control"
+                               value="@Model.NamePlaces[i]"
+                               placeholder="Ort eingeben" />
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-1">
+                            <label class="section-label mb-0">Radius</label>
+                            <div class="flex-grow-1 text-center">
+                                <output id="outputRadius@(i)" class="value-output">
+                                    @(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10) km
+                                </output>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="text-muted ms-1">1</small>
+                            <div class="flex-grow-1">
+                                <input type="range"
+                                       name="RadiusPlaces[@i]"
+                                       class="form-range"
+                                       min="1" max="25" step="1"
+                                       value="@(Model.RadiusPlaces.Count > i ? Model.RadiusPlaces[i] : 10)"
+                                       id="RadiusPlace@(i)"
+                                       data-output-id="outputRadius@(i)">
+                            </div>
+                            <small class="text-muted ms-1">25</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <div id="dynamicLocations"></div>
+
+    <div class="text-center mt-3 mb-3">
+        <button type="button" id="addStandort" class="btn btn-primary"
+                @(Model.NamePlaces.Count >= 4 ? "disabled" : "")>
+            @(Model.NamePlaces.Count >= 4 ? "Maximale Standorte erreicht" : "+ Standort hinzufügen")
+        </button>
+    </div>
+
+    <!-- SUBMIT: PREISE VERGLEICHEN -->
+    <button type="submit" class="btn btn-primary submit-btn"
+            asp-page-handler="CalculateAverageCost" id="compareLocations">
+        Preise vergleichen
+        <div class="loader" id="loader-compare"></div>
+    </button>
+</div>

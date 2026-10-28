@@ -1,0 +1,83 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- ==================================================
+     MODE-DIV: OPTIMALE SUCHE (enthält Tankmenge + Submit)
+     ================================================== -->
+<div id="autoInputFields" class="modeStyle" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+
+    <!-- Standort -->
+    <div class="mb-3">
+        <label for="generalLocation" class="section-label">Standort</label>
+        <div class="input-group">
+            <input type="text" id="generalLocationInput" class="form-control"
+                   placeholder="PLZ, Straße oder Ort eingeben" asp-for="Place" value="@Model.Place">
+            <button id="geoButton" class="btn btn-primary location-btn" type="button" title="Aktuellen Standort verwenden">
+                <img src="location.png" alt="Standort">
+            </button>
+        </div>
+    </div>
+
+    <!-- Radius -->
+    <div class="mb-3">
+        <div class="d-flex align-items-center mb-1">
+            <label class="section-label mb-0">Suchradius</label>
+            <div class="flex-grow-1 text-center">
+                <output id="radiusValue" class="value-output">10 km</output>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <small class="text-muted ms-1">1</small>
+            <div class="slider-container flex-grow-1 d-flex align-items-center">
+                <input type="range" id="generalRadius" class="form-range custom-range"
+                       min="1" max="25" step="1" asp-for="Radius" />
+            </div>
+            <small class="text-muted ms-1">25 km</small>
+        </div>
+    </div>
+
+    <!-- TANKMENGE (nur für Optimale Suche) -->
+    <div class="mb-3">
+        <div class="d-flex align-items-center mb-1">
+            <label for="fuelAmount" class="section-label mb-0">
+                Tankmenge
+            </label>
+            <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                  title="Nutze das Textfeld für die maximale Tankmenge und den Slider für die aktuelle Tankmenge. Bei 0 wird nach Kraftstoffpreisen sortiert.">
+                ⓘ
+            </span>
+            <div class="flex-grow-1 text-center">
+                <span class="value-output" id="fuelAmountValue">@Model.FuelAmount + "l"</span>
+            </div>
+        </div>
+        <div class="fuel-slider-wrap">
+            <div class="flex-grow-1 position-relative" style="min-width: 0;">
+                <div style="position: relative; height: 16px;">
+                    <small style="position: absolute; left: 10px; transform: translateX(-50%); color: var(--text-color); opacity: 0.5;">0</small>
+                    <small style="position: absolute; left: calc(25% - 2.5px); transform: translateX(-50%); color: var(--text-color); opacity: 0.5;">¼</small>
+                    <small style="position: absolute; left: calc(50%); transform: translateX(-50%); color: var(--text-color); opacity: 0.5;">½</small>
+                    <small style="position: absolute; left: calc(75% + 2.5px); transform: translateX(-50%); color: var(--text-color); opacity: 0.5;">¾</small>
+                    <small style="position: absolute; left: calc(100% - 10px); transform: translateX(-50%); color: var(--text-color); opacity: 0.5;">max</small>
+                </div>
+                <input type="range"
+                       name="FuelAmount"
+                       class="form-range"
+                       min="0" max="25" step="0.5"
+                       id="FuelAmountRange"
+                       style="width: 100%; padding: 0;">
+            </div>
+            <input type="number"
+                   id="MaximumFuelAmount"
+                   class="form-control"
+                   value="@Model.FuelAmount"
+                   title="Maximale Tankmenge" />
+        </div>
+    </div>
+
+    <!-- SUBMIT: TANKSTELLEN SUCHEN -->
+    <button type="submit" class="btn btn-primary submit-btn"
+            asp-page-handler="Search" id="SearchBtn">
+        Tankstellen suchen
+        <div class="loader" id="loader-search"></div>
+    </button>
+</div>

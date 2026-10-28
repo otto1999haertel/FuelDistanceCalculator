@@ -1,0 +1,38 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- MODUS-TABS -->
+<ul class="mode-tabs" role="tablist">
+    @foreach (InputMode mode in Enum.GetValues(typeof(InputMode)))
+    {
+        var displayText = mode == InputMode.auto ? "Optimale Suche" : "Standortvergleich";
+        var radioId = $"mode_{mode}";
+        var isActive = Model.SelectInputMode == mode ? "active" : "";
+
+        <li class="nav-item">
+            <input type="radio"
+                   class="hidden-radio"
+                   asp-for="SelectInputMode"
+                   value="@mode"
+                   id="@radioId"/>
+            <label class="mode-tab @isActive" for="@radioId">
+                @displayText
+            </label>
+        </li>
+    }
+</ul>
+
+<!-- SPRITART -->
+<div class="mb-4">
+    <label class="section-label">Kraftstoffart</label>
+    <div class="fuel-type-buttons">
+        @foreach (var kvp in FuelTypeHelper.FuelTypeNames)
+        {
+            <input type="radio" class="fuel-radio"
+                   asp-for="SelectedFuelType"
+                   value="@kvp.Key"
+                   id="fuel_@kvp.Key"/>
+            <label class="fuel-label" for="fuel_@kvp.Key">@kvp.Value</label>
+        }
+    </div>
+</div>

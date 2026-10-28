@@ -1,0 +1,60 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- ERWEITERTE EINSTELLUNGEN (für beide Modi) -->
+<div class="mb-3">
+    <button class="advanced-toggle" type="button"
+            data-bs-toggle="collapse" data-bs-target="#advancedOptions"
+            aria-expanded="@(Model.AdvancedHasValue ? "true" : "false")"
+            aria-controls="advancedOptions"
+            id="advancedToggleButton">
+        <span>Erweiterte Einstellungen</span>
+        <span class="arrow-indicator">▼</span>
+    </button>
+
+    <div class="collapse @(Model.AdvancedHasValue ? "show" : "")" id="advancedOptions">
+        <div class="advanced-content">
+            <!-- Tankstellenmarke & Rabatt -->
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="stationBrand" class="section-label">Tankstellenmarke</label>
+                    <input type="text" id="stationBrand" name="StationBrand" class="form-control"
+                           placeholder="z.B. Shell, Aral" value="@Model.StationBrand" />
+                </div>
+                <div class="col-md-6">
+                    <label for="discountPercent" class="section-label">
+                        Rabatt (%/€)
+                        <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                              title="Verwende % für prozentuale Rabatte, ct für cent Anrechnung auf den Literpreis oder ohne Suffix für Festbeträge auf Gesamtkosten.">ⓘ</span>
+                    </label>
+                    <input type="text" id="discountPercent" name="DiscountPercentOrAbsolute" class="form-control"
+                           placeholder="z.B. 30%, 2ct oder 20" min="0" value="@Model.DiscountPercentOrAbsolute" />
+                </div>
+            </div>
+
+            <!-- Fahrzeug & Kosten pro KM -->
+            <div class="row gx-3">
+                <div class="col-md-6 mb-3 mb-md-0 position-relative">
+                    <label for="CarType" class="section-label">
+                        Fahrzeug
+                        <a href="https://www.adac.de/rund-ums-fahrzeug/auto-kaufen-verkaufen/autokosten/uebersicht/"
+                           target="_blank" rel="noopener noreferrer" class="small fw-normal">
+                            (ADAC Vorschlag)</a><sup><a href="#fn1" id="ref1">1</a></sup>
+                    </label>
+                    <input type="text" class="form-control" id="CarType" placeholder="Fahrzeug suchen..."
+                           list="CarTypeList" value="@Model.SelectedCarType" asp-for="SelectedCarType">
+                    <div id="suggestions" class="suggestions-box"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="PricePerKm" class="section-label">
+                        Kosten pro Kilometer (€)
+                        <span class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                              title="Durchschnittliche Kosten pro Kilometer. Für Vorschläge nutze die Fahrzeugsuche.">ⓘ</span>
+                    </label>
+                    <input type="number" class="form-control" id="PricePerKm" name="PricePerKm" required
+                           asp-for="PricePerKm" value="@Model.PricePerKm" step="any" min="0.01" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

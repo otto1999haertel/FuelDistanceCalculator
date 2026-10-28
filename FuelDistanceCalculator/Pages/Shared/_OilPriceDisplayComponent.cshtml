@@ -1,0 +1,75 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- Internationaler Öl-Preis -->
+@if (Model.OilPriceChange != null && Model.OilPriceChange.CurrentPrice != 0){
+<div class="mb-3">
+    <button class="advanced-toggle" type="button"
+            data-bs-toggle="collapse" data-bs-target="#internationalOilPrice"
+            aria-expanded="false"
+            aria-controls="internationalOilPrice">
+        <span>Internationaler Öl-Preis</span>
+        <span class="arrow-indicator">▼</span>
+    </button>
+
+    <div class="collapse" id="internationalOilPrice">
+        <div class="advanced-content">
+            <div class="oil-trend-section">
+                <div class="oil-trend-header">
+                    <span class="oil-trend-title">Rohöl (Brent)</span>
+                    <span class="oil-trend-price">@Model.OilPriceChange?.DisplayCurrentPriceWithCurrency() / Barrel</span>
+                </div>
+
+                @{
+                    string TrendClass(double value) => value < 0 ? "is-down" : "is-up";
+                }
+
+                <div class="oil-trend-grid">
+                    <div class="oil-trend-card">
+                        <div class="oil-trend-period">Täglich</div>
+                        <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Day)">
+                            @Model.OilPriceChange.DisplayDayChangeWithSign()
+                        </div>
+                        <div class="oil-trend-sub">ggü. gestern</div>
+                    </div>
+
+                    <div class="oil-trend-card">
+                        <div class="oil-trend-period">Wöchentlich</div>
+                        <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Week)">
+                            @Model.OilPriceChange.DisplayWeekChangeWithSign()
+                        </div>
+                        <div class="oil-trend-sub">ggü. Vorwoche</div>
+                    </div>
+
+                    <div class="oil-trend-card">
+                        <div class="oil-trend-period">Monatlich</div>
+                        <div class="oil-trend-value @TrendClass(Model.OilPriceChange.Month)">
+                            @Model.OilPriceChange.DisplayMonthChangeWithSign()
+                        </div>
+                        <div class="oil-trend-sub">ggü. Vormonat</div>
+                    </div>
+                </div>
+
+                <div class="oil-trend-note">
+                    <span>
+                        <i class="ti ti-clock" aria-hidden="true"></i>
+                        Letzte Aktualisierung: @Model.OilPriceChange.LastUpdated?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") Uhr
+                    </span>
+                    <span>
+                        <i class="ti ti-info-circle" aria-hidden="true"></i>
+                        Kraftstoffpreise können dem Rohölpreis folgen, sind aber von weiteren Faktoren abhängig. Trend ist nur eine Schätzung, zur Orientierung, kein Kaufsignal. Alle Angaben bzgl. Verlauf und Preis sind ohne Gewähr.
+                    </span>
+                    <span>
+                        <i class="ti ti-info-circle" aria-hidden="true"></i>
+                        Datenquelle: <a href="https://finance.yahoo.com/quote/BZ=F/" target="_blank" rel="noopener noreferrer">Yahoo Finance Öl-Preis (Symb. BZ=F)</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                       
+}
+else
+{
+    <p>Ölpreisdaten momentan nicht verfügbar.</p> 
+}

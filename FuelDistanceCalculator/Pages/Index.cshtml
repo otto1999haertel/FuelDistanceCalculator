@@ -8,10 +8,10 @@
     var culture = new CultureInfo("de-DE");
 
     // Erweiterte Einstellungen aufgeklappt lassen, falls Werte drin sind
+    // (Fahrzeugtyp zählt nicht: er ist ein transientes Hilfstool und wird nicht cached)
     var advancedHasValue =
         !string.IsNullOrWhiteSpace(Model.StationBrand)
-        || !string.IsNullOrWhiteSpace(Model.DiscountPercentOrAbsolute)
-        || !string.IsNullOrWhiteSpace(Model.SelectedCarType);
+        || !string.IsNullOrWhiteSpace(Model.DiscountPercentOrAbsolute);
 }
 
 <link rel="stylesheet" href="~/lib/leaflet/leaflet.css" />

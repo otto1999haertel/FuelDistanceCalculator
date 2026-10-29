@@ -103,7 +103,7 @@ public class GasStation
         TotalCombinedCosts += Math.Round(TotalTravelCost + TotalFuelCost, 3, MidpointRounding.AwayFromZero);
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCost:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
-                          $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount:F1}, Price per Km: {pricePerKm:F2}, Distance: {dist:F2})");
+                          $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount}, Price per Km: {pricePerKm}, Distance: {dist})");
         if(TotalCombinedCosts < 0)
         {
             TotalCombinedCosts = 0; 

@@ -118,8 +118,7 @@ public class IndexModel : PageModel
     /// </summary>
     public bool AdvancedHasValue =>
         !string.IsNullOrWhiteSpace(StationBrand)
-        || !string.IsNullOrWhiteSpace(DiscountPercentOrAbsolute)
-        || !string.IsNullOrWhiteSpace(SelectedCarType);
+        || !string.IsNullOrWhiteSpace(DiscountPercentOrAbsolute);
 
     private const string StationsSessionKey = "Stations";
     private const string InputDataSessionKey = "InputData";
@@ -218,6 +217,11 @@ public class IndexModel : PageModel
         {
             return;
         }
+
+        // Der Fahrzeugtyp dient nur als Hilfstool zur Ermittlung der Kosten pro km und
+        // wird nicht mitgespeichert oder wiedergegeben: Erweiterte Einstellungen bleiben
+        // geschlossen. Der ermittelte Preis pro km bleibt erhalten (siehe localStorage).
+        SelectedCarType = string.Empty;
 
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
         

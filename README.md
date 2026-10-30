@@ -62,6 +62,9 @@ For a successfull connection to the gas station price service you have to create
 ```bash
 git fetch --prune && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d
 ```  
+```bash
+git branch -vv | Select-String ': gone]' | ForEach-Object { $_.ToString().Trim().Split(' ')[0] } | ForEach-Object { git branch -d --force $_ }
+```  
 - create new branch from current branch:  
 ```bash
 git checkout -b [name]

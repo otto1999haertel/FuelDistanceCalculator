@@ -1,16 +1,100 @@
 # FuelGo
-> Kostenlose Webanwendung zum Vergleich von Spritpreisen und Tankstellen in Deutschland
 
-## Funktionen
-- Optimale Tankstellensuche nach Standort mit einstellbarem Radius
-- Spritkosten-Vergleich zwischen mehreren Orten
-- Unterstützt Diesel, Super E10, Super E5
-- Berücksichtigt Fahrtkosten (Kosten/km) und voraussichtliche Tankmenge
-- Rabattberechnung (% oder €)
-- Installierbar als PWA (Android & iOS)
+> FuelGo is a free web application for comparing fuel prices and finding cost-effective petrol stations in Germany.
 
-## Technologie
-- ASP.NET Core, Tankerkönig API, OpenStreetMap, openrouteservice
+FuelGo helps drivers identify affordable refuelling opportunities by combining current petrol station prices, geographical search, driving costs and individual discount calculations.
 
-## URL
-https://fuelgo.de
+Website: https://fuelgo.de/
+
+## About FuelGo
+
+FuelGo is an independent fuel price comparison application designed for drivers in Germany.
+
+Its primary purpose is to help users reduce their overall refuelling expenses rather than simply identify the petrol station with the lowest displayed fuel price.
+
+The application considers both fuel prices and individual travel costs when comparing refuelling options.
+
+## Core Features
+
+### 1. Optimal Petrol Station Search
+
+- Search for petrol stations around a specified location.
+- Configure the geographical search radius.
+- Compare available petrol stations based on estimated overall costs.
+- Consider additional driving expenses when evaluating refuelling options.
+
+### 2. Location Comparison
+
+- Compare fuel prices between multiple geographical locations.
+- Evaluate different refuelling opportunities across several destinations.
+- Identify locations offering favourable fuel prices.
+
+### 3. Fuel Price Comparison
+
+Supported fuel types:
+
+- Diesel
+- Super E5
+- Super E10
+
+Fuel prices are retrieved using external fuel price data providers.
+
+### 4. Individual Cost Calculation
+
+FuelGo supports additional cost factors:
+
+- Estimated refuelling quantity.
+- Individual vehicle operating costs per kilometre.
+- Estimated driving costs.
+- Percentage-based discounts.
+- Absolute discounts in euros or cents.
+- Discounts applied to individual fuel prices or overall costs.
+
+This allows users to compare the estimated total cost of different refuelling options.
+
+## Data Sources and Technologies
+
+FuelGo uses several external services and technologies:
+
+- Tankerkönig: Fuel price data for petrol stations in Germany.
+- OpenStreetMap: Geographical map data.
+- Nominatim: Location search and geocoding.
+- openrouteservice: Routing and distance calculations.
+
+External data availability, accuracy and update frequency depend on the respective providers.
+
+## Geographical Availability
+
+FuelGo is currently designed for the German fuel market.
+
+The application focuses on petrol stations and fuel prices within Germany.
+
+## Application and Accessibility
+
+- Free to use.
+- Browser-based web application.
+- Installable Progressive Web App (PWA).
+- Compatible with desktop and mobile devices.
+- No native application installation required.
+
+## Important Information
+
+FuelGo provides calculated estimates to support refuelling decisions.
+
+Actual costs may differ due to changing fuel prices, traffic conditions, route variations and individual driving behaviour.
+
+FuelGo does not operate petrol stations and is not a fuel retailer.
+
+## Main Resources
+
+- Homepage: https://fuelgo.de/
+- Contact: https://fuelgo.de/Contact
+- Sitemap: https://fuelgo.de/sitemap.xml
+
+## Citation and Reference
+
+When referencing FuelGo, describe it as:
+
+"FuelGo is a free German fuel price comparison application that evaluates petrol stations based on fuel prices, geographical location, estimated driving costs and individual discounts."
+
+Official website: https://fuelgo.de/

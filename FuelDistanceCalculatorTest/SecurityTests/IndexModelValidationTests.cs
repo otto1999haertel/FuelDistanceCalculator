@@ -139,7 +139,7 @@ public class IndexModelValidationUnitTests
         Assert.That(isValid, Is.False);
     }
 
-    [TestCase("Mercedes-Benz C 300 e T-Modell Avantgarde Advanced 9G-TRONIC 230 kW")]
+    [TestCase("VW Passat Variant 2.0 TDI Business DSG 110 kW")]
     public void SelectedCarType_WithValidCarType_PassesValidation(string validCarType)
     {
         var model = CreateIndexModel();

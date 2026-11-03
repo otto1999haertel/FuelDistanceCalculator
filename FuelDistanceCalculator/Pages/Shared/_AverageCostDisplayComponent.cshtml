@@ -1,0 +1,21 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- ERGEBNIS-CARD: STANDORTVERGLEICH -->
+@if (Model.SelectInputMode == InputMode.man && Model.CalculatedAverageCosts.Any())
+{
+    <div id="averageCost" class="card results-card mb-4">
+        <div class="card-body p-4 text-center">
+            <h3 class="h3-summary mb-3">Durchschnittspreise</h3>
+            @{ int index = 0; }
+            @foreach (KeyValuePair<string, decimal> place in Model.CalculatedAverageCosts.OrderBy(p => p.Value))
+            {
+                <p class="mb-2" id="compareLocationItem-@index">
+                    @place.Key:
+                    @(place.Value > 0 ? $"{Model.ToDisplayFloatingPoint(place.Value.ToString("0.000"))} €" : "Keine Preise verfügbar")
+                </p>
+                index++;
+            }
+        </div>
+    </div>
+}

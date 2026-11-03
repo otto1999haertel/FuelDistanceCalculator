@@ -89,6 +89,7 @@ builder.Services.AddAntiforgery(options =>
 builder.Services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
 
 builder.Services.AddScoped<IGeoLocationService, GeoLocationService>();
+builder.Services.AddScoped<TankStationSearchService>();
 builder.Services.AddRazorPages();
 builder.Services.AddMemoryCache();
 builder.Services.AddHealthChecks();

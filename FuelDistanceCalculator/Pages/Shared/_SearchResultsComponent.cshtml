@@ -1,0 +1,85 @@
+@using FuelDistanceCalculator.Constants
+@model IndexModel
+
+<!-- ERGEBNIS-CARD: OPTIMALE SUCHE -->
+<div id="autoResults" style="display:@(Model.SelectInputMode == InputMode.auto ? "block" : "none")">
+    @if (Model.CheapestResultStations.Any())
+    {
+        <div class="card results-card mb-4">
+            <div class="card-body p-4">
+                <div class="mb-3 d-flex flex-wrap align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="viewMode" class="form-label mb-0 fw-semibold">Ansicht</label>
+                        <div id="viewModeCustom" class="custom-select">
+                            <div class="select-trigger">
+                                <span id="selectedValue">Liste</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div id="optionsList" class="suggestions-box">
+                                <div class="suggestion-item" data-value="list">Liste</div>
+                                <div class="suggestion-item" data-value="map">Karte</div>
+                            </div>
+                        </div>
+                        @if (Model.FuelAmount > 0)
+                        {
+                            <span id="listTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                                  title="Die Wegkosten werden für Hin- und Rückfahrt angesetzt">ⓘ</span>
+                        }
+                        <span id="mapTooltip" class="input-group-text-icon" data-bs-toggle="tooltip" data-bs-placement="auto"
+                              title="Für Routenplanung via Google Maps klicke auf die Markierung der Tankstelle" style="display: none;">ⓘ</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 ms-md-auto">
+                        <label for="sortMode" class="form-label mb-0 fw-semibold" id="sortLabel">
+                            Sortierung <span class="sort-arrow">↓</span>
+                        </label>
+                        <div id="sortModeCustom" class="custom-select">
+                            <div class="select-trigger">
+                                <span id="selectedSortValue">
+                                    @if (Model.FuelAmount > 0)
+                                    {
+                                        <text>Gesamtkosten</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Preis pro Liter</text>
+                                    }
+                                </span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div id="sortOptionsList" class="suggestions-box">
+                                @if (Model.FuelAmount > 0)
+                                {
+                                    <div class="suggestion-item" data-value="totalCost">Gesamtkosten</div>
+                                    <div class="suggestion-item" data-value="fuelPrice">Preis pro Liter</div>
+                                    <div class="suggestion-item" data-value="distance">Entfernung</div>
+                                }
+                                else
+                                {
+                                    <div class="suggestion-item" data-value="fuelPrice">Preis pro Liter</div>
+                                    <div class="suggestion-item" data-value="distance">Entfernung</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stationListContainer">
+                    @await Html.PartialAsync("_StationListPartial", Model)
+                    @{ TempData.Keep("StationsJson"); TempData.Keep("FuelAmount"); }
+                </div>
+                <div id="mapView" style="display: none;">
+                    <div id="map_div" class="map" style="height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.SearchExecuted)
+    {
+        <div class="card results-card mb-4">
+            <div class="card-body p-4 text-center">
+                <label id="noOpenStations">Keine offene Tankstelle im gewählten Radius gefunden</label>
+            </div>
+        </div>
+    }
+</div>

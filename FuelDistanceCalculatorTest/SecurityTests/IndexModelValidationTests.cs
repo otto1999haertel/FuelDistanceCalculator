@@ -13,6 +13,9 @@ public class IndexModelValidationUnitTests
     {
         var loggerMock = new Mock<ILogger<IndexModel>>();
         var fuelPriceService = new FuelPriceService();
+        var tankStationSearchService = new TankStationSearchService(
+            new Mock<IMarketFuelPriceService>().Object, 
+            new Mock<IGeoLocationService>().Object);
         var marketServiceMock = new Mock<IMarketFuelPriceService>();
         var geoServiceMock = new Mock<IGeoLocationService>();
         var oilServiceMock = new Mock<IOilPriceService>();
@@ -21,6 +24,7 @@ public class IndexModelValidationUnitTests
         var model = new IndexModel(
             loggerMock.Object,
             fuelPriceService,
+            tankStationSearchService,
             marketServiceMock.Object,
             geoServiceMock.Object,
             oilServiceMock.Object,
@@ -135,7 +139,7 @@ public class IndexModelValidationUnitTests
         Assert.That(isValid, Is.False);
     }
 
-    [TestCase("Mercedes-Benz C 300 e T-Modell Avantgarde Advanced 9G-TRONIC 230 kW")]
+    [TestCase("VW Passat Variant 2.0 TDI Business DSG 110 kW")]
     public void SelectedCarType_WithValidCarType_PassesValidation(string validCarType)
     {
         var model = CreateIndexModel();

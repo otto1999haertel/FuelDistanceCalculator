@@ -24,6 +24,9 @@ public abstract class E2EBaseTest :  PageTest
     public async Task SetUp()
     {
         await Page.GotoAsync("/");
+        await Page.EvaluateAsync("localStorage.clear()");
+        await Page.ReloadAsync();
+
 
         var cookieButton = Page.GetByRole(AriaRole.Button, new()
         {

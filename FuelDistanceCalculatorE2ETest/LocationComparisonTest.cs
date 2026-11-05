@@ -68,6 +68,23 @@ public class LocationComparisonTest : E2EBaseTest
         CheckResultView();
     }
 
+    [Test]
+    public async Task SwitchingFuelTypeInCompareShouldWork()
+    {
+        locationNames = new List<string>();
+        locationRadius = new List<int>();
+        OpenComparisonTab();
+        SettingUpTwoCompareLocations();
+        await Page.Locator("label[for='fuel_SuperE5']").ClickAsync();
+        await ExecuteCompareAndCheckHeading();
+        List<string> averageCostsBeforeSwitch = await CheckResultView();
+        await Page.Locator("label[for='fuel_Diesel']").ClickAsync();
+        await ExecuteCompareAndCheckHeading();
+        List<string> averageCostsAfterSwitch = await CheckResultView();
+        Assert.That(averageCostsBeforeSwitch[0], Is.Not.EqualTo(averageCostsAfterSwitch[0]));
+
+    }
+
     private async Task OpenComparisonTab()
     {
         var manualTab = Page.Locator("label[for='mode_man']").First;
@@ -156,14 +173,21 @@ public class LocationComparisonTest : E2EBaseTest
         }
     }
 
-    private async Task CheckResultView()
+    private async Task<List<string>> CheckResultView()
     {
+        List<string> averageCosts = new List<string>();
         for(int i=0; i<locationNames.Count; i++)
         {
             var averageLocationElement = Page.Locator($"#compareLocationItem-{i}");
             string averageLocationText = await averageLocationElement.InnerTextAsync();
             string expectedPattern = @$"{locationNames[i]}: [0-9]+,[0-9]+ €";
+            string averageCost = averageLocationText.Split(':')[1].Trim();
+            if(!averageCosts.Contains(averageCost))
+            {
+                averageCosts.Add(averageCost);
+            }
             Assert.That(averageLocationText, Does.Match(expectedPattern), $"Erwarteter Text nicht gefunden. Tatsächlicher Text: '{averageLocationText}'");
         }
+        return averageCosts;
     }
 }

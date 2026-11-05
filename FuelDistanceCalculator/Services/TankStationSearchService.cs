@@ -137,7 +137,7 @@ public class TankStationSearchService
             // Execute all calculations in parallel
             var taskList = filteredPlaces
                 .Select((place, index) => Task.Run(() => 
-                    CalculateSingleAverageCost(place, radiusPlaces, index)))
+                    CalculateSingleAverageCost(place, radiusPlaces, index, fuelType)))
                 .ToList();
 
             await Task.WhenAll(taskList);
@@ -167,7 +167,7 @@ public class TankStationSearchService
     private async Task<LocationCostResult> CalculateSingleAverageCost(
         string place,
         List<double> radiusPlaces,
-        int index)
+        int index, FuelType fuelType)
     {
         var result = new LocationCostResult { Name = place };
         
@@ -178,7 +178,7 @@ public class TankStationSearchService
             if (coordinates != null)
             {
                 var radius = (index >= radiusPlaces.Count) ? 10 : radiusPlaces[index];
-                var fuelTypeForApi = GetFuelTypeForApi(FuelType.Diesel); // TODO: Use parameter
+                var fuelTypeForApi = GetFuelTypeForApi(fuelType);
                 
                 var gasStationsResult = await _marketFuelPriceService.GetGasStationsAsync(
                     coordinates.Latitude, 

@@ -323,13 +323,8 @@
                     document.getElementById('loader-compare').style.display = 'inline-block';
                 });
 
-            // View Dropdown
-            document.getElementById('viewModeCustom')?.querySelector('.select-trigger')
-                ?.addEventListener('click', toggleDropdown);
-
-            document.querySelectorAll('#optionsList .suggestion-item').forEach(el => {
-                el.addEventListener('click', () => selectOption(el));
-            });
+            // View-Toggle (Liste ⇄ Karte)
+            document.getElementById('viewModeToggle')?.addEventListener('click', toggleViewMode);
 
             // Sort Dropdown
             document.getElementById('sortModeCustom')?.querySelector('.select-trigger')
@@ -453,6 +448,11 @@
     });
 
     function switchView(value) {
+        const toggle = document.getElementById('viewModeToggle');
+        if (toggle) {
+            toggle.setAttribute('data-view', value);
+            toggle.setAttribute('aria-pressed', value === 'map' ? 'true' : 'false');
+        }
         const selected = value;
         document.getElementById("stationListContainer").style.display = selected === "list" ? "block" : "none";
         document.getElementById("mapView").style.display = selected === "map" ? "block" : "none";
@@ -673,17 +673,11 @@
             });
     }
 
-    function toggleDropdown() {
-        const optionsList = document.getElementById('optionsList');
-        optionsList.style.display = optionsList.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function selectOption(element) {
-        const selectedValue = document.getElementById('selectedValue');
-        selectedValue.textContent = element.textContent;
-        const value = element.getAttribute('data-value');
-        document.getElementById('optionsList').style.display = 'none';
-        switchView(value);
+    // View-Toggle: wechselt zwischen Listen- und Kartenansicht
+    function toggleViewMode() {
+        const toggle = document.getElementById('viewModeToggle');
+        const current = toggle ? toggle.getAttribute('data-view') : 'list';
+        switchView(current === 'map' ? 'list' : 'map');
     }
 
     function toggleDropdownSort() {
@@ -705,11 +699,6 @@
     }
 
     document.addEventListener('click', function (event) {
-        const viewSelect = document.getElementById('viewModeCustom');
-        if (viewSelect && !viewSelect.contains(event.target)) {
-            document.getElementById('optionsList').style.display = 'none';
-        }
-
         const sortSelect = document.getElementById('sortModeCustom');
         if (sortSelect && !sortSelect.contains(event.target)) {
             document.getElementById('sortOptionsList').style.display = 'none';

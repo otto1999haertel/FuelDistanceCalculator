@@ -1097,6 +1097,73 @@ html.dark-mode .btn-primary.submit-btn:hover {
     height: 18px;
 }
 
+/* ---------- View-Toggle (Liste ⇄ Karte) mit themenabhängigen Icons ---------- */
+/* Icons liegen in wwwroot/ (Licht- & Dunkel-Varianten).
+   Standard = Licht-Icons; im dunklen Modus werden die Dark-Varianten aktiviert. */
+:root {
+  --view-icon-list: url("../fuelgo-list-light.svg");
+  --view-icon-map:  url("../fuelgo-map-light.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode) {
+    --view-icon-list: url("../fuelgo-list-dark.svg");
+    --view-icon-map:  url("../fuelgo-map-dark.svg");
+  }
+}
+
+html.dark-mode {
+  --view-icon-list: url("../fuelgo-list-dark.svg");
+  --view-icon-map:  url("../fuelgo-map-dark.svg");
+}
+
+html.light-mode {
+  --view-icon-list: url("../fuelgo-list-light.svg");
+  --view-icon-map:  url("../fuelgo-map-light.svg");
+}
+
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Der Button zeigt das Icon der Ansicht, zu der beim Klick gewechselt wird. */
+.view-toggle-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--navbar-bg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 21px 21px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Aktuelle Ansicht = Liste → Icon für den Wechsel zur Karte */
+.view-toggle-btn[data-view="list"] {
+  background-image: var(--view-icon-map);
+}
+/* Aktuelle Ansicht = Karte → Icon für den Wechsel zur Liste */
+.view-toggle-btn[data-view="map"] {
+  background-image: var(--view-icon-list);
+}
+
+.view-toggle-btn:hover {
+  border-color: var(--primary-color);
+  background-color: var(--hover-bg);
+}
+
+.view-toggle-btn:focus-visible {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: var(--focus-shadow);
+}
+
 /* ---------- Footer-Note ---------- */
 .footer-note {
     font-size: 0.85rem;

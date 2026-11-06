@@ -15,7 +15,7 @@ public static class DiscountParser
         input = input.Trim();
         if (decimal.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out discountValueAbsolute))
         {
-            if(discountValueAbsolute < 0)
+            if (discountValueAbsolute < 0)
             {
                 return false; // Negative discounts are not valid
             }
@@ -36,7 +36,7 @@ public static class DiscountParser
         }
         input = input.Trim();
         bool isPerUnit = input.EndsWith("%");
-        if(!isPerUnit)
+        if (!isPerUnit)
         {
             return false; // Not a per-unit percentage
         }
@@ -66,7 +66,7 @@ public static class DiscountParser
         }
         input = input.Trim();
         bool isPerUnit = input.EndsWith("ct");
-        if(!isPerUnit)
+        if (!isPerUnit)
         {
             return false; // Not a per-unit discount
         }
@@ -78,7 +78,7 @@ public static class DiscountParser
                 return false; // Negative discounts are not valid
             }
             discountValueOnUnit /= 100; // Convert cents to euros
-             return true;
+            return true;
         }
         else
         {

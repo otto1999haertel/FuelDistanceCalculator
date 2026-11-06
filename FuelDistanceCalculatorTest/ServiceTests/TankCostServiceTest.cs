@@ -81,7 +81,7 @@ public class TankCostServiceTest : ServiceTestBase
     [TestCase(0, "20%")]
     [TestCase(40, "15%")]
     [TestCase(40, "20")]
-    [TestCase(0,"5ct")]
+    [TestCase(0, "5ct")]
     [TestCase(40, "5ct")]
     public void GetCheapestGasStationPerceantageDiscountTest(decimal fuelAmount, string discountPercentOrAbsolute)
     {
@@ -128,7 +128,7 @@ public class TankCostServiceTest : ServiceTestBase
                 }
                 else if (DiscountParser.TryParseDiscountOnUnitAbsolut(discountPercentOrAbsolute, out discountDecimal))
                 {
-                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + (expectedPrice - discountDecimal) * fuelAmount ;
+                    expectedPrice = pricePerKm * (decimal)station.Dist * 2m + (expectedPrice - discountDecimal) * fuelAmount;
                     Assert.That(station.TotalCombinedCosts, Is.EqualTo(expectedPrice).Within(0.001m));
                 }
                 else
@@ -185,7 +185,7 @@ public class TankCostServiceTest : ServiceTestBase
     }
 
     [Test]
-    public void SortCheapestGasStationDiscountAppliedKeepsBooleanDiscountValue( [Values] SortModeEnum sortMode)
+    public void SortCheapestGasStationDiscountAppliedKeepsBooleanDiscountValue([Values] SortModeEnum sortMode)
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
         List<GasStation> testData = CheapestGasStationPerceantageDiscountTestCaseSource();
@@ -230,7 +230,7 @@ public class TankCostServiceTest : ServiceTestBase
         decimal expectedPrice = 0m;
 
         DiscountApplier discountApplier = DiscountApplierFactory.CreateDiscountApplier(StationBrand, discountPercentOrAbsolute, fuelAmount);
-        
+
         CheapestResultStations = TankCostService.GetCheapestStation(testData, pricePerKm, fuelAmount, fuelTypeForAPI, StationBrand, discountApplier);
 
         foreach (var station in CheapestResultStations)

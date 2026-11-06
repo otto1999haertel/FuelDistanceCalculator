@@ -60,7 +60,7 @@ public class DiscountParserTest : ServiceTestBase
         Assert.That(DiscountParser.TryParseDiscountOnUnitAbsolut(input, out discountValue).Equals(parseable));
         if (parseable)
         {
-            Assert.That(discountValue, Is.EqualTo(expected));       
+            Assert.That(discountValue, Is.EqualTo(expected));
         }
     }
 }

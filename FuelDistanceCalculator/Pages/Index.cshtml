@@ -1,5 +1,4 @@
 ﻿@page
-@using FuelDistanceCalculator.Constants
 @using System.Globalization
 @using FuelDistanceCalculator.Extensions
 @model IndexModel
@@ -82,9 +81,26 @@
         document.getElementById('fuelAmountValue').textContent = String(value).replace('.', ',') + ' l';
     }
 
-    function updateMax(value) {
-        document.getElementById('FuelAmountRange').max = value;
-        localStorage.setItem("maxVolume", value);
+    const FUEL_AMOUNT_MIN = 0;
+    const FUEL_AMOUNT_MAX = 500;
+
+    function updateMax(rawValue) {
+        const input = document.getElementById('MaximumFuelAmount');
+        const slider = document.getElementById('FuelAmountRange');
+        if (!input || !slider) return;
+
+        const normalized = String(rawValue).trim().replace(',', '.');
+        const parsed = Number(normalized);
+
+        if (normalized === "" || !Number.isFinite(parsed)) {
+            input.value = slider.max || "25";
+            return;
+        }
+
+        const clamped = Math.min(Math.max(parsed, FUEL_AMOUNT_MIN), FUEL_AMOUNT_MAX);
+        input.value = String(clamped);
+        slider.max = clamped;
+        localStorage.setItem("maxVolume", String(clamped));
     }
 
     function toggleInputMethod(radio) {
@@ -270,9 +286,13 @@
             document.getElementById('FuelAmountRange')
                 ?.addEventListener('input', function () { updateFuel(this.value); });
 
-            // Maximale Tankmenge
-            document.getElementById('MaximumFuelAmount')
-                ?.addEventListener('blur', function () { updateMax(this.value); });
+
+            const maxFuelInput = document.getElementById('MaximumFuelAmount');
+            if (maxFuelInput) {
+                const sanitizeMax = () => updateMax(maxFuelInput.value);
+                maxFuelInput.addEventListener('blur', sanitizeMax);
+                maxFuelInput.addEventListener('change', sanitizeMax);
+            }
 
             // Kosten pro km
             document.getElementById('PricePerKm')

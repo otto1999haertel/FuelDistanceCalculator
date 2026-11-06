@@ -1,4 +1,3 @@
-// FuelDistanceCalculator/Extensions/HtmlHelperExtensions.cs
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FuelDistanceCalculator.Extensions;

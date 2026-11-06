@@ -20,7 +20,7 @@ public static class TankCostService
     public static List<GasStation> GetCheapestStation(List<GasStation> gasStations, decimal pricePerKm, decimal fuelAmount, string fuelType, string stationBrand = "", DiscountApplier discountApplier = null)
     {
         List<GasStation> CheapestResultStations = new List<GasStation>();
-        if(gasStations == null || gasStations.Count == 0)
+        if (gasStations == null || gasStations.Count == 0)
         {
             return CheapestResultStations;
         }

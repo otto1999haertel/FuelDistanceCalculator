@@ -1,6 +1,8 @@
 @using System.Globalization
 @using FuelDistanceCalculator.Model
+@using FuelDistanceCalculator.Extensions
 @using Microsoft.IdentityModel.Tokens
+@using Newtonsoft.Json
 @model IndexModel
 
 @if (Model.CheapestResultStations == null || !Model.CheapestResultStations.Any())
@@ -113,4 +115,15 @@
                                 index++;
                             }
                         </ul>
+
+    <script type="application/json" id="sortedStationsData" nonce="@Html.CspNonce()">
+@Html.Raw(JsonConvert.SerializeObject(Model.CheapestResultStations.Take(10).Select(s => new
+{
+    lat   = s.Coords?.Lat,
+    lng   = s.Coords?.Lng,
+    price = Model.FuelAmount > 0
+        ? Model.ToDisplayFloatingPoint(s.TotalCombinedCosts.ToString())
+        : Model.ToDisplayFloatingPoint(s.FuelTypePrice.ToString())
+})))
+    </script>
                     </div>

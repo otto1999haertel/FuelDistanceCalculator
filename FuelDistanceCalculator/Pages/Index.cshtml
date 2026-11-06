@@ -94,6 +94,7 @@
 
         if (normalized === "" || !Number.isFinite(parsed)) {
             input.value = slider.max || "25";
+            toastr.error("Falsche Eingabe für maximale Tankmenge. Bitte nur Ganzzahlen.");
             return;
         }
 

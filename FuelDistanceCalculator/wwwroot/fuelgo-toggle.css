@@ -1,0 +1,33 @@
+/* FuelGo map/list toggle — theme-adaptive SVG icons */
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--navbar-bg);
+}
+
+.view-toggle button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  color: var(--text-color);
+  background: transparent;
+  cursor: pointer;
+}
+
+.view-toggle button svg {
+  width: 21px;
+  height: 21px;
+}
+
+.view-toggle button[aria-pressed="true"] {
+  color: var(--bg-color);
+  background: var(--primary-color);
+}

@@ -75,6 +75,9 @@
     let mapInitialized = false;
     let map;
     let Tiles;
+    let markerLayer;
+    let defaultIcon;
+    let greenIcon;
     let locationIndex = @Model.NamePlaces.Count;
 
     function updateFuel(value) {
@@ -487,7 +490,7 @@
             mapDiv.classList.remove("dark-map");
         }
 
-        const defaultIcon = new L.Icon({
+        defaultIcon = new L.Icon({
             iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
             iconSize: [25, 41],
@@ -495,7 +498,7 @@
             tooltipAnchor: [0, -32],
             shadowSize: [41, 41]
         });
-        const greenIcon = new L.Icon({
+        greenIcon = new L.Icon({
             iconUrl: 'marker-icon-green.png',
             shadowUrl: 'lib/leaflet/images/marker-shadow.png',
             iconSize: [25, 41],
@@ -504,26 +507,25 @@
             shadowSize: [41, 41]
         });
 
-        @foreach (var station in Model.CheapestResultStations.Take(10))
-        {
-            var lat = station.Coords.Lat.ToString().Replace(",", ".");
-            var lng = station.Coords.Lng.ToString().Replace(",", ".");
-            var price = Model.FuelAmount > 0
-                ? Model.ToDisplayFloatingPoint(station.TotalCombinedCosts.ToString())
-                : Model.ToDisplayFloatingPoint(station.FuelTypePrice.ToString());
+        markerLayer = L.layerGroup().addTo(map);
+        renderMarkers(getMarkerData());
+    }
 
-            var isCheapest = station == Model.CheapestResultStations.First();
+    function getMarkerData() {
+        return JSON.parse(document.getElementById('sortedStationsData')?.textContent || '[]');
+    }
 
-            <text>
-                L.marker([@lat, @lng], { icon: @(isCheapest ? "greenIcon" : "defaultIcon") })
-                    .addTo(map)
-                    .bindTooltip(`@price €`, { permanent: true, direction: "top" })
-                    .openTooltip()
-                    .on('click', function () {
-                        window.open("https://www.google.com/maps?q=@lat,@lng", "_blank", "noopener,noreferrer");
-                    });
-            </text>
-        }
+    function renderMarkers(stations) {
+        markerLayer.clearLayers();
+        stations.forEach((s, i) => {
+            L.marker([s.lat, s.lng], { icon: i === 0 ? greenIcon : defaultIcon })
+                .addTo(markerLayer)
+                .bindTooltip(s.price + ' €', { permanent: true, direction: 'top' })
+                .openTooltip()
+                .on('click', function () {
+                    window.open('https://www.google.com/maps?q=' + s.lat + ',' + s.lng, '_blank', 'noopener,noreferrer');
+                });
+        });
     }
 
     function getLocation() {
@@ -661,6 +663,7 @@
             })
             .then(html => {
                 container.innerHTML = html;
+                if (mapInitialized) renderMarkers(getMarkerData());
             })
             .catch(err => {
                 console.error('Sortierfehler:', err);

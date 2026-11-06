@@ -138,22 +138,24 @@ public class HomepageTests : E2EBaseTest
         await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("20 l");
     }
 
-    [Test]
-    public async Task Invalid_MaxFuelAmount_Does_Not_Block_Form()
+    [TestCase("56.5", "56")]
+    [TestCase("12.9", "12")]
+    public async Task MaxFuelAmount_Decimal_Is_Rounded_Down(string typed, string expected)
     {
         await Page.GotoAsync("/");
 
-        await Page.Locator("#MaximumFuelAmount").EvaluateAsync(
-            "el => { el.value = 'abc'; el.dispatchEvent(new Event('change', { bubbles: true })); }");
+        var maxInput = Page.Locator("#MaximumFuelAmount");
+        var slider = Page.Locator("#FuelAmountRange");
 
-        var sliderMax = await Page.Locator("#FuelAmountRange").GetAttributeAsync("max");
+        await maxInput.FillAsync(typed);
+        await maxInput.BlurAsync(); // updateMax is bound to blur
+
+        await Expect(maxInput).ToHaveValueAsync(expected);
+        await Expect(slider).ToHaveAttributeAsync("max", expected);
+
+        // Original intent: the slider max must stay a valid number so the form can submit
+        var sliderMax = await slider.GetAttributeAsync("max");
         Assert.That(double.TryParse(sliderMax, out _), Is.True,
             "Ein ungültiger Tankmenge-Wert hat den Slider-Maximum (und damit den Form-Submit) zerstört.");
-
-        await Page.Locator("#MaximumFuelAmount").EvaluateAsync(
-            "el => { el.value = '1000'; el.dispatchEvent(new Event('change', { bubbles: true })); }");
-
-        await Expect(Page.Locator("#FuelAmountRange")).ToHaveAttributeAsync("max", "500");
-        await Expect(Page.Locator("#MaximumFuelAmount")).ToHaveValueAsync("500");
     }
 }

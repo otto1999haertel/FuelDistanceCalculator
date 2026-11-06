@@ -92,13 +92,10 @@
         const normalized = String(rawValue).trim().replace(',', '.');
         const parsed = Number(normalized);
 
-        if (normalized === "" || !Number.isFinite(parsed)) {
-            input.value = slider.max || "25";
-            toastr.error("Falsche Eingabe für maximale Tankmenge. Bitte nur Ganzzahlen.");
-            return;
-        }
+        // Round down to a whole number; unusable input becomes the minimum
+        const whole = Number.isFinite(parsed) ? Math.floor(parsed) : FUEL_AMOUNT_MIN;
 
-        const clamped = Math.min(Math.max(parsed, FUEL_AMOUNT_MIN), FUEL_AMOUNT_MAX);
+        const clamped = Math.min(Math.max(whole, FUEL_AMOUNT_MIN), FUEL_AMOUNT_MAX);
         input.value = String(clamped);
         slider.max = clamped;
         localStorage.setItem("maxVolume", String(clamped));

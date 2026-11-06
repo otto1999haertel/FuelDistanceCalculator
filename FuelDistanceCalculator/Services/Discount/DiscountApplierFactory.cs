@@ -10,7 +10,7 @@ public static class DiscountApplierFactory
         {
             return null; // No discount to apply
         }
-        if(fuelAmount > 0 && DiscountParser.TryParseDiscountOnTotalAbsolut(discountAmount, out decimal parsedDiscountAmount))
+        if (fuelAmount > 0 && DiscountParser.TryParseDiscountOnTotalAbsolut(discountAmount, out decimal parsedDiscountAmount))
         {
             return new TotalAbsolutDiscount(brand, parsedDiscountAmount);
         }

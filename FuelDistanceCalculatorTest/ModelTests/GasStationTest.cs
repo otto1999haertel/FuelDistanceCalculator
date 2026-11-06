@@ -62,8 +62,8 @@ public class GasStationTest : ServiceTestBase
         decimal pricePerKm = 0.25m; // 0.10 € pro km
 
         // Act
-       gasStation.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, pricePerKm);
-       var expectedTravelCost = Math.Round(pricePerKm * (decimal)gasStation.Dist * 2,3,MidpointRounding.AwayFromZero); // Faktor 2: hin und zurück
+        gasStation.CalculateTotalCostDoubleWayWithDiscountGreaterOne(fuelAmount, pricePerKm);
+        var expectedTravelCost = Math.Round(pricePerKm * (decimal)gasStation.Dist * 2, 3, MidpointRounding.AwayFromZero); // Faktor 2: hin und zurück
         // Assert
         Assert.AreEqual(gasStation.TotalTravelCost, expectedTravelCost);
         if (fuelAmount > 0)

@@ -2,7 +2,6 @@ using FuelDistanceCalculator.Model;
 
 namespace FuelDistanceCalculator.Services.Discount;
 
-
 public class UnitAbsolutDiscount : DiscountApplier
 {
     public UnitAbsolutDiscount(string brand, decimal discountAmount) : base(brand, discountAmount)

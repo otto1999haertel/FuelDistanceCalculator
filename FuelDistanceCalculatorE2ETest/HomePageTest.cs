@@ -137,4 +137,25 @@ public class HomepageTests : E2EBaseTest
         // 4. Prüfen, dass das Label exakt die Hälfte anzeigt
         await Expect(Page.Locator("#fuelAmountValue")).ToHaveTextAsync("20 l");
     }
+
+    [TestCase("56.5", "56")]
+    [TestCase("12.9", "12")]
+    public async Task MaxFuelAmount_Decimal_Is_Rounded_Down(string typed, string expected)
+    {
+        await Page.GotoAsync("/");
+
+        var maxInput = Page.Locator("#MaximumFuelAmount");
+        var slider = Page.Locator("#FuelAmountRange");
+
+        await maxInput.FillAsync(typed);
+        await maxInput.BlurAsync(); // updateMax is bound to blur
+
+        await Expect(maxInput).ToHaveValueAsync(expected);
+        await Expect(slider).ToHaveAttributeAsync("max", expected);
+
+        // Original intent: the slider max must stay a valid number so the form can submit
+        var sliderMax = await slider.GetAttributeAsync("max");
+        Assert.That(double.TryParse(sliderMax, out _), Is.True,
+            "Ein ungültiger Tankmenge-Wert hat den Slider-Maximum (und damit den Form-Submit) zerstört.");
+    }
 }

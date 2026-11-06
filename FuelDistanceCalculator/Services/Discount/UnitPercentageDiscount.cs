@@ -15,7 +15,7 @@ public class UnitPercentageDiscount : DiscountApplier
             station.DiscountApplied = false;
             return;
         }
-        
+
 
         if (station.FuelTypePrice.HasValue)
         {

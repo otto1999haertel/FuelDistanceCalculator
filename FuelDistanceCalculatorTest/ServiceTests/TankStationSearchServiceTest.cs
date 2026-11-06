@@ -2,6 +2,7 @@ using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Services;
 
 namespace FuelDistanceCalculatorTest.ServiceTests;
+
 public class TankStationSearchServiceTest : ServiceTestBase
 {
     [Test]
@@ -29,10 +30,10 @@ public class TankStationSearchServiceTest : ServiceTestBase
 
         result.Stations.ForEach(station =>
         {
-                Assert.That(fuelAmount > 0 ? station.TotalCombinedCosts > 0 : station.TotalCombinedCosts == 0);
-                Assert.False(string.IsNullOrEmpty(station.Brand));
-                Assert.IsNotNull(station.Dist);
-                Assert.IsNotNull(station.FuelTypePrice);
+            Assert.That(fuelAmount > 0 ? station.TotalCombinedCosts > 0 : station.TotalCombinedCosts == 0);
+            Assert.False(string.IsNullOrEmpty(station.Brand));
+            Assert.IsNotNull(station.Dist);
+            Assert.IsNotNull(station.FuelTypePrice);
         });
     }
 
@@ -96,7 +97,7 @@ public class TankStationSearchServiceTest : ServiceTestBase
 
         // Assert
         string id = "64c43b30-4e90-4eae-aab5-44358c1ce7e5";
-        Assert.That(resultDiesel.Stations.FirstOrDefault(x => x.Id.Equals(id)).FuelTypePrice, 
+        Assert.That(resultDiesel.Stations.FirstOrDefault(x => x.Id.Equals(id)).FuelTypePrice,
         Is.Not.EqualTo(resultSuperE5.Stations.FirstOrDefault(x => x.Id.Equals(id)).FuelTypePrice));
     }
 
@@ -112,8 +113,8 @@ public class TankStationSearchServiceTest : ServiceTestBase
         List<double> radiusPlaces = new List<double> { 10, 20 };
 
         // Act
-        var resultDiesel = await tankStationSearchService.CalculateAverageCostsAsync(places,radiusPlaces,FuelType.Diesel);
-        var resultSuperE5 = await tankStationSearchService.CalculateAverageCostsAsync(places,radiusPlaces,FuelType.SuperE5);
+        var resultDiesel = await tankStationSearchService.CalculateAverageCostsAsync(places, radiusPlaces, FuelType.Diesel);
+        var resultSuperE5 = await tankStationSearchService.CalculateAverageCostsAsync(places, radiusPlaces, FuelType.SuperE5);
 
         //Assert
         Assert.That(resultDiesel.Locations.FirstOrDefault().AverageCost,

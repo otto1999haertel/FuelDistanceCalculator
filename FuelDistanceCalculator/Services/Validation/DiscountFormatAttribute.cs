@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using FuelDistanceCalculator.Services; // Ensure this matches your DiscountParser namespace
+using FuelDistanceCalculator.Services;
 
 namespace FuelDistanceCalculator.Validation;
 
@@ -22,7 +22,7 @@ public class DiscountFormatAttribute : ValidationAttribute
 
         // Delegate validation directly to DiscountParser
         Console.WriteLine($"Validating discount input: '{input}'");
-        if (DiscountParser.TryParseDiscountOnTotalAbsolut(input, out _) || 
+        if (DiscountParser.TryParseDiscountOnTotalAbsolut(input, out _) ||
             DiscountParser.TryParseDiscountOnUnitPercentage(input, out _)
             || DiscountParser.TryParseDiscountOnUnitAbsolut(input, out _)
             )

@@ -14,7 +14,7 @@ public class IndexModelValidationUnitTests
         var loggerMock = new Mock<ILogger<IndexModel>>();
         var fuelPriceService = new FuelPriceService();
         var tankStationSearchService = new TankStationSearchService(
-            new Mock<IMarketFuelPriceService>().Object, 
+            new Mock<IMarketFuelPriceService>().Object,
             new Mock<IGeoLocationService>().Object);
         var marketServiceMock = new Mock<IMarketFuelPriceService>();
         var geoServiceMock = new Mock<IGeoLocationService>();

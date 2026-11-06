@@ -1,9 +1,7 @@
-using System.Collections.Concurrent;
 using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services.Discount;
-using Newtonsoft.Json;
 
 namespace FuelDistanceCalculator.Services;
 
@@ -37,12 +35,12 @@ public class TankStationSearchService
         string? discountPercentOrAbsolute)
     {
         var result = new SearchResult();
-        
+
         try
         {
             // Get coordinates for the place
             var coordinates = await _geoLocationService.GetCoordinatesAsync(place);
-            
+
             if (coordinates == null)
             {
                 result.Success = false;
@@ -56,12 +54,12 @@ public class TankStationSearchService
 
             // Convert fuel type to API string
             var fuelTypeForApi = GetFuelTypeForApi(fuelType);
-            
+
             // Get gas stations from API
             var gasStationsResult = await _marketFuelPriceService.GetGasStationsAsync(
-                coordinates.Latitude, 
-                coordinates.Longitude, 
-                radius, 
+                coordinates.Latitude,
+                coordinates.Longitude,
+                radius,
                 fuelTypeForApi);
 
             if (!gasStationsResult.IsSuccess)
@@ -73,22 +71,22 @@ public class TankStationSearchService
 
             // Calculate distance from API
             var stationsWithDistance = await _geoLocationService.CalculateDistanceFromAPI(
-                coordinates.Latitude, 
-                coordinates.Longitude, 
+                coordinates.Latitude,
+                coordinates.Longitude,
                 gasStationsResult.Stations);
 
             // Apply discount and calculate costs
             var applier = DiscountApplierFactory.CreateDiscountApplier(
-                stationBrand ?? string.Empty, 
-                discountPercentOrAbsolute ?? string.Empty, 
+                stationBrand ?? string.Empty,
+                discountPercentOrAbsolute ?? string.Empty,
                 fuelAmount);
 
             var cheapestStations = TankCostService.GetCheapestStation(
-                stationsWithDistance, 
-                pricePerKm, 
-                fuelAmount, 
-                fuelTypeForApi, 
-                stationBrand ?? string.Empty, 
+                stationsWithDistance,
+                pricePerKm,
+                fuelAmount,
+                fuelTypeForApi,
+                stationBrand ?? string.Empty,
                 applier);
 
             // Calculate savings using the original method name (contains intentional typo)
@@ -120,7 +118,7 @@ public class TankStationSearchService
         FuelType fuelType)
     {
         var result = new AverageCostResult();
-        
+
         try
         {
             // Filter empty/whitespace locations
@@ -136,7 +134,7 @@ public class TankStationSearchService
 
             // Execute all calculations in parallel
             var taskList = filteredPlaces
-                .Select((place, index) => Task.Run(() => 
+                .Select((place, index) => Task.Run(() =>
                     CalculateSingleAverageCost(place, radiusPlaces, index, fuelType)))
                 .ToList();
 
@@ -148,7 +146,7 @@ public class TankStationSearchService
                 var locationResult = locationTask.Result;
                 result.Locations.Add(locationResult);
             }
-            
+
             // Check if any locations failed - overall success=true if at least one succeeded
             result.Success = result.Locations.Any(l => l.Success);
         }
@@ -170,20 +168,20 @@ public class TankStationSearchService
         int index, FuelType fuelType)
     {
         var result = new LocationCostResult { Name = place };
-        
+
         try
         {
             var coordinates = await _geoLocationService.GetCoordinatesAsync(place);
-            
+
             if (coordinates != null)
             {
                 var radius = (index >= radiusPlaces.Count) ? 10 : radiusPlaces[index];
                 var fuelTypeForApi = GetFuelTypeForApi(fuelType);
-                
+
                 var gasStationsResult = await _marketFuelPriceService.GetGasStationsAsync(
-                    coordinates.Latitude, 
-                    coordinates.Longitude, 
-                    radius, 
+                    coordinates.Latitude,
+                    coordinates.Longitude,
+                    radius,
                     fuelTypeForApi);
 
                 if (gasStationsResult.IsSuccess)

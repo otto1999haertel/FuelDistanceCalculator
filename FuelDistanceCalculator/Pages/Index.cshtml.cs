@@ -4,7 +4,6 @@ using FuelDistanceCalculator.Constants;
 using FuelDistanceCalculator.Interfaces;
 using FuelDistanceCalculator.Model;
 using FuelDistanceCalculator.Services;
-using FuelDistanceCalculator.Services.Discount;
 using FuelDistanceCalculator.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -76,7 +75,7 @@ public class IndexModel : PageModel
     [BindProperty, Range(-90, 90, ErrorMessage = "Ungültiger Breitengrad.")]
     public double LongitudePlace { get; set; }
 
-    [BindProperty, Range(-180, 180, ErrorMessage = "Ungültiger Längengrad.")] 
+    [BindProperty, Range(-180, 180, ErrorMessage = "Ungültiger Längengrad.")]
     public double LatitudePlace { get; set; }
 
     /// <summary>
@@ -155,7 +154,7 @@ public class IndexModel : PageModel
     public async Task OnGetAsync()
     {
         Console.WriteLine("get was executed and overwrite of values");
-        
+
         // Initialize view data
         ViewData["ContactName"] = ContactInfo.Name;
 
@@ -224,7 +223,7 @@ public class IndexModel : PageModel
         SelectedCarType = string.Empty;
 
         Console.WriteLine($"Search for optimum was executed. Input mode: {SelectInputMode}, Radius: {Radius}, Place: {Place}, Fuel type: {SelectedFuelType}, Fuel Amount: {FuelAmount}, Price per km: {PricePerKm}");
-        
+
         // Delegate to TankStationSearchService for search logic
         var searchResult = await _tankStationSearchService.ExecuteSearchAsync(
             Place!,
@@ -363,8 +362,8 @@ public class IndexModel : PageModel
 
         // Delegate to TankStationSearchService for parallel calculation
         var result = await _tankStationSearchService.CalculateAverageCostsAsync(
-            NamePlaces, 
-            RadiusPlaces, 
+            NamePlaces,
+            RadiusPlaces,
             SelectedFuelType);
 
         // Store results in CalculatedAverageCosts dictionary
@@ -556,5 +555,5 @@ public class IndexModel : PageModel
         }
         return true;
     }
-    
+
 }

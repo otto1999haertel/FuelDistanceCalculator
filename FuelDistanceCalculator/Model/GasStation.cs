@@ -79,13 +79,13 @@ public class GasStation
 
     [JsonProperty("discountApplied")]
 
-    public bool DiscountApplied { get;  set; } = false;
+    public bool DiscountApplied { get; set; } = false;
 
     [JsonProperty("totalFuelCost")]
-    public decimal TotalFuelCost {get; private set;}
+    public decimal TotalFuelCost { get; private set; }
 
     [JsonProperty("totalTravelCost")]
-    public decimal TotalTravelCost {get; private set;}
+    public decimal TotalTravelCost { get; private set; }
 
 
     public decimal CalculateTotalCostDoubleWayWithDiscountGreaterOne(decimal fuelAmount, decimal pricePerKm)
@@ -97,16 +97,16 @@ public class GasStation
 
         decimal dist = (decimal)Dist.Value;
         decimal fuelCost = (_fuelPrice ?? 0) * fuelAmount;
-        TotalFuelCost = fuelCost>0 ? Math.Round(fuelCost,3,MidpointRounding.AwayFromZero) : 0;
+        TotalFuelCost = fuelCost > 0 ? Math.Round(fuelCost, 3, MidpointRounding.AwayFromZero) : 0;
         decimal travelCost = pricePerKm * dist * 2m;
-        TotalTravelCost = travelCost>0 ? Math.Round(travelCost,3,MidpointRounding.AwayFromZero) : 0;
+        TotalTravelCost = travelCost > 0 ? Math.Round(travelCost, 3, MidpointRounding.AwayFromZero) : 0;
         TotalCombinedCosts += Math.Round(TotalTravelCost + TotalFuelCost, 3, MidpointRounding.AwayFromZero);
         Console.WriteLine($"Total Cost for station {Name} (ID: {Id}): {_totalCost:F2} € " +
                           $"(Fuel Cost: {fuelCost:F2}, Travel Cost: {travelCost:F2}, " +
                           $"Fuel Price: {_fuelPrice:F3}, Fuel Amount: {fuelAmount}, Price per Km: {pricePerKm}, Distance: {dist})");
-        if(TotalCombinedCosts < 0)
+        if (TotalCombinedCosts < 0)
         {
-            TotalCombinedCosts = 0; 
+            TotalCombinedCosts = 0;
         }
         return TotalCombinedCosts;
     }

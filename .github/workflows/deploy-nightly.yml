@@ -2,8 +2,21 @@ name: Nightly Deployment
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'   # nightly: deploys only if there was a commit in the last 24h
+    - cron: '0 2 * * 3'   # weekly patch run (Wednesday, day after Patch Tuesday): always rebuilds fresh
   workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force deploy with fresh pull and --no-cache build'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
   check_adac:
@@ -40,15 +53,34 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
+      fresh: ${{ steps.check.outputs.fresh }}
 
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 2
 
-      - name: Check for new commits
+      - name: Decide whether to deploy
         id: check
+        env:
+          EVENT: ${{ github.event_name }}
+          CRON: ${{ github.event.schedule }}
+          FORCE: ${{ inputs.force_rebuild }}
         run: |
+          FRESH=false
+          if [ "$EVENT" = "schedule" ] && [ "$CRON" = "0 5 * * 3" ]; then
+            FRESH=true
+          elif [ "$EVENT" = "workflow_dispatch" ] && [ "$FORCE" = "true" ]; then
+            FRESH=true
+          fi
+          echo "fresh=$FRESH" >> $GITHUB_OUTPUT
+
+          if [ "$FRESH" = "true" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "✓ Patch run / forced rebuild: deploying with fresh pull and --no-cache"
+            exit 0
+          fi
+
           LAST_COMMIT=$(git log -1 --format=%ct)
           LAST_COMMIT_INFO=$(git log -1 --pretty=format:"%h - %s (%an, %ar)")
           echo "Last commit: $LAST_COMMIT_INFO"
@@ -63,10 +95,31 @@ jobs:
             echo "✗ Keine neuen Commits in den letzten 24h"
           fi
 
+  # Alerts you (failed run = email) when a NuGet package has a known vulnerability.
+  # Deliberately NOT a dependency of deploy, so a new advisory never blocks unrelated deploys.
+  vuln_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Scan NuGet packages
+        run: |
+          dotnet restore
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vuln.txt
+          if grep -q "has the following vulnerable packages" vuln.txt; then
+            echo "::error::Vulnerable NuGet packages found - see log"
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
       - run: dotnet build --configuration Release
 
   test:
@@ -78,6 +131,9 @@ jobs:
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
       - run: dotnet test --configuration Release
 
   deploy:
@@ -161,34 +217,47 @@ jobs:
           SSH_PORT: ${{ secrets.SSH_PORT }}
 
       - name: Deploy on remote server
+        env:
+          FRESH: ${{ needs.check_changes.outputs.fresh }}
         run: |
+          # Always re-pull base images; skip the layer cache on patch runs so
+          # apt packages and 'dotnet restore' are re-executed.
+          BUILD_FLAGS="--pull"
+          if [ "$FRESH" = "true" ]; then BUILD_FLAGS="--pull --no-cache"; fi
+
+          # $BUILD_FLAGS is expanded here on the runner (unescaped on purpose)
           ssh -o StrictHostKeyChecking=yes -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          set -e
           if sudo systemctl is-active --quiet nginx; then
             echo "Stopping native Nginx service"
             sudo systemctl stop nginx
           fi
 
           cd /home/${{ secrets.SSH_USER }}/fuelgo
+
+          # Build first while the old web app container keeps serving ...
+          sudo docker compose --env-file .env.server build $BUILD_FLAGS fuelgo-webapp
+
+          # ... then stop ONLY the web app and start the new one.
+          # nginx and redis are never stopped, recreated or pulled here.
           sudo docker compose --env-file .env.server down fuelgo-webapp
-          sleep 3
-          sudo docker compose --env-file .env.server -f docker-compose.yml build fuelgo-webapp
-          sleep 3 
-          sudo docker compose --env-file .env.server up --build -d
-          
+          sudo docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+
+          # nginx resolves the 'fuelgo-webapp' upstream when it loads its config, so a
+          # recreated container with a new IP could cause 502s. A reload is graceful
+          # (no dropped connections); if it fails, the old config simply stays active.
+          sudo docker exec fuelgo-nginx nginx -s reload || echo "nginx reload skipped"
+
+          sudo docker image prune -f
           echo "✓ Deployment completed successfully at \$(date)"
           EOF
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
 
-      - name: Notify deployment status
-        if: always()
+      - name: Smoke test
         run: |
-          if [ "${{ needs.test.result }}" == "success" ]; then
-            echo "✓ Nightly deployment successful"
-          else
-            echo "✗ Deployment failed"
-            exit 1
-          fi
+          curl -fsS -o /dev/null --retry 10 --retry-delay 6 --retry-all-errors https://fuelgo.de/
+          echo "✓ fuelgo.de responds"
+
+      - name: Deployment summary
+        if: always()
+        run: echo "Deployment finished with status ${{ job.status }}"

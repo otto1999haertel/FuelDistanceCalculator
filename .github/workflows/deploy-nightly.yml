@@ -68,7 +68,7 @@ jobs:
           FORCE: ${{ inputs.force_rebuild }}
         run: |
           FRESH=false
-          if [ "$EVENT" = "schedule" ] && [ "$CRON" = "0 5 * * 3" ]; then
+          if [ "$EVENT" = "schedule" ] && [ "$CRON" = "0 2 * * 3" ]; then
             FRESH=true
           elif [ "$EVENT" = "workflow_dispatch" ] && [ "$FORCE" = "true" ]; then
             FRESH=true
@@ -236,12 +236,19 @@ jobs:
 
           cd /home/${{ secrets.SSH_USER }}/fuelgo
 
-          # Build first while the old web app container keeps serving ...
-          sudo docker compose --env-file .env.server build $BUILD_FLAGS fuelgo-webapp
-
-          # ... then stop ONLY the web app and start the new one.
-          # nginx and redis are never stopped, recreated or pulled here.
+          # Stop ONLY the web app first, so the build has the whole server to itself.
+          # nginx shows the offline page meanwhile; nginx and redis are never stopped.
           sudo docker compose --env-file .env.server down fuelgo-webapp
+
+          # Build the new image. If the build fails, the previous image is still
+          # tagged, so bring the old version back up before failing the run.
+          if ! sudo docker compose --env-file .env.server build $BUILD_FLAGS fuelgo-webapp; then
+            echo "✗ Build failed - restarting the previous version"
+            sudo docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
+            exit 1
+          fi
+
+          # Start the new web app
           sudo docker compose --env-file .env.server up -d --no-deps fuelgo-webapp
 
           # nginx resolves the 'fuelgo-webapp' upstream when it loads its config, so a
